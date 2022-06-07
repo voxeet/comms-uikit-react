@@ -2,7 +2,7 @@
 
 ## UI Kit
 
-DolbyIO Communications UIKit React is a package for React developers to build a communication application. The main aim of this package is to reduce the complexity of building a web application DolbyIO.
+DolbyIO Communications UIKit React is a package for React developers to build a communication application. The main aim of this package is to reduce the complexity of building a web application using DolbyIO.
 
 Package consists of three basic elements:
 
