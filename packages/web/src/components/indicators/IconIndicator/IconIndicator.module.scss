@@ -1,0 +1,18 @@
+.indicator {
+  border-radius: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &.size {
+    &-s {
+      width: 24px;
+      height: 24px;
+    }
+
+    &-m {
+      width: 32px;
+      height: 32px;
+    }
+  }
+}

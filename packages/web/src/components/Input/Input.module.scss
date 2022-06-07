@@ -1,0 +1,40 @@
+.wrapper {
+  position: relative;
+}
+
+.label {
+  padding: 2px 6px;
+  display: inline-block;
+  position: absolute;
+  top: -11px;
+  left: 16px;
+}
+
+.input {
+  display: block;
+  border-radius: 10px;
+  border: 1px solid;
+  height: 56px;
+  padding: 16px;
+  padding-right: 36px;
+  box-sizing: border-box;
+  width: 100%;
+  &:focus,
+  &:focus-visible {
+    border-color: inherit;
+    outline: inherit;
+  }
+}
+
+.error {
+  display: block;
+  text-align: left;
+  margin-top: 8px;
+}
+
+.clear {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+}

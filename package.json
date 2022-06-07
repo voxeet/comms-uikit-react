@@ -1,0 +1,57 @@
+{
+  "name": "comms-sdk-react-native-showcase",
+  "author": "Dolby.io (https://dolby.io/)",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": "true",
+  "keywords": [
+    "react-native",
+    "web",
+    "ios",
+    "android",
+    "ui kit",
+    "ux kit",
+    "ui library"
+  ],
+  "scripts": {
+    "license-checker": "license-checker --json --out third-party-licenses.json --relativeLicensePath",
+    "lint:react": "lint --projects packages/web",
+    "lint:reactnative": "lint --config=packages/mobile/jest.config.js",
+    "lint:common": "lint --projects packages/common",
+    "tests:react": "jest --projects packages/web",
+    "tests:reactnative": "jest --config=packages/mobile/jest.config.js",
+    "tests:common": "jest --projects packages/common",
+    "reset": "find . -type dir -name node_modules | xargs rm -rf && rm -rf yarn.lock"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.17.7",
+    "@babel/preset-env": "^7.16.11",
+    "@types/jest": "^27.4.1",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
+    "babel-jest": "^27.5.1",
+    "babel-plugin-module-resolver": "^4.1.0",
+    "eslint": "8.7.0",
+    "eslint-config-airbnb": "^19.0.1",
+    "eslint-config-prettier": "7.2.0",
+    "eslint-import-resolver-babel-module": "^5.3.1",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-prettier": "3.4.1",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "license-checker": "^25.0.1",
+    "prettier": "2.5.1",
+    "ts-jest": "^27.1.3",
+    "typescript": "4.5.5"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "examples/*"
+    ],
+    "nohoist": [
+      "**"
+    ]
+  }
+}

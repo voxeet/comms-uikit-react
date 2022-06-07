@@ -1,0 +1,81 @@
+{
+  "name": "@uikit/web",
+  "version": "1.0.0",
+  "description": "Dolby.IO UIKit React",
+  "license": "MIT",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "rollup -c",
+    "lint": "eslint \"src/**/*.{js,ts,tsx}\"",
+    "test": "jest",
+    "test:coverage": "jest --coverage=true",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
+  "contributors": [
+    "Adam Lorek <adam.lorek@dolby.com> (https://dolby.io)",
+    "Arkadiusz Kryk <arkadiusz.kryk@dolby.com> (https://dolby.io)",
+    "Michał Gruszczak <michal.gruszczak@dolby.com> (https://dolby.io)",
+    "Piotr Polus <piotr.polus@dolby.com> (https://dolby.io)"
+  ],
+  "keywords": [
+    "web",
+    "ui kit",
+    "ux kit",
+    "ui library"
+  ],
+  "dependencies": {
+    "@emotion/react": "^11.9.0",
+    "@types/color": "3.0.3",
+    "@uikit/common": "^1.0.0",
+    "@voxeet/voxeet-web-sdk": "^3.4.0",
+    "classnames": "^2.3.1",
+    "color": "4.2.3",
+    "lodash.merge": "^4.6.2",
+    "lottie-colorify": "0.8.0",
+    "postcss": "^8.4.7",
+    "react": "17.0.2",
+    "react-lottie": "1.2.3"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.1.3",
+    "@rollup/plugin-typescript": "^8.3.0",
+    "@storybook/addon-actions": "^6.5.6",
+    "@storybook/addon-essentials": "^6.5.6",
+    "@storybook/addon-interactions": "^6.5.6",
+    "@storybook/addon-links": "^6.5.6",
+    "@storybook/builder-webpack4": "^6.5.6",
+    "@storybook/manager-webpack4": "^6.5.6",
+    "@storybook/react": "^6.5.6",
+    "@storybook/testing-library": "^0.0.11",
+    "@testing-library/dom": "^8.12.0",
+    "@testing-library/jest-dom": "^5.16.3",
+    "@testing-library/react": "^12.1.4",
+    "@types/color": "^3.0.3",
+    "@types/lodash.merge": "^4.6.7",
+    "@types/react": "17.0.39",
+    "@types/react-lottie": "^1.2.6",
+    "babel-loader": "^8.2.5",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^27.5.1",
+    "jest-canvas-mock": "^2.3.1",
+    "react-dom": "^17.0.2",
+    "rollup": "^2.66.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-react-svg": "^3.0.3",
+    "rollup-plugin-terser": "^7.0.2",
+    "typescript": "4.5.5",
+    "typescript-plugin-css-modules": "^3.4.0"
+  },
+  "eslintConfig": {
+    "env": {
+      "jest": true
+    },
+    "rules": {
+      "react/react-in-jsx-scope": "off"
+    }
+  }
+}

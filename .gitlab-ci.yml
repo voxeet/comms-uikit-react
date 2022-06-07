@@ -1,0 +1,159 @@
+stages:
+  - install
+  - check
+  - lint
+  - test
+  - examples
+  - e2e
+
+.job_template:
+  image: node:14.17-alpine
+  before_script:
+    - yarn install
+  cache:
+    paths:
+      - packages/**/node_modules/
+      - examples/**/node_modules/
+      - yarn.lock
+
+install:
+  extends: .job_template
+  stage: install
+  script:
+    - yarn
+  cache:
+    paths:
+      - node_modules/
+  tags:
+    - dolby-iapi
+
+check:
+  extends: .job_template
+  stage: check
+  script:
+    - yarn license-checker
+  cache:
+    paths:
+      - node_modules/
+  tags:
+    - dolby-iapi
+
+lint-common:
+  extends: .job_template
+  stage: lint
+  script:
+    - yarn workspace @uikit/common run lint
+  tags:
+    - dolby-iapi
+
+lint-mobile:
+  extends: .job_template
+  stage: lint
+  script:
+    - yarn workspace @uikit/mobile run lint
+  tags:
+    - dolby-iapi
+
+lint-web:
+  extends: .job_template
+  stage: lint
+  script:
+    - yarn workspace @uikit/web run lint
+  tags:
+    - dolby-iapi
+
+test-common:
+  extends: .job_template
+  stage: test
+  script:
+    - yarn workspace @uikit/common run test
+  tags:
+    - dolby-iapi
+
+test-mobile:
+  extends: .job_template
+  stage: test
+  script:
+    - yarn workspace @uikit/mobile run test
+  tags:
+    - dolby-iapi
+
+test-web:
+  extends: .job_template
+  stage: test
+  script:
+    - yarn workspace @uikit/web run test
+  tags:
+    - dolby-iapi
+
+example-build-android:
+  extends: .job_template
+  stage: examples
+  script:
+    - echo 'TBD'
+  only:
+    - master
+    - develop
+  tags:
+    - dolby-iapi
+
+example-build-ios:
+  extends: .job_template
+  stage: examples
+  script:
+    - echo 'TBD'
+  only:
+    - master
+    - develop
+  tags:
+    - dolby-iapi
+
+pages:
+  extends: .job_template
+  stage: examples
+  script:
+    - yarn workspace @uikit/exampleweb run build
+    - mkdir .public
+    - cp -r examples/web/dist/* .public
+    - mv .public public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
+    - develop
+  tags:
+    - dolby-iapi
+
+e2e-android:
+  extends: .job_template
+  stage: e2e
+  script:
+    - echo 'TBD'
+  only:
+    - master
+    - develop
+  tags:
+    - dolby-iapi
+
+e2e-ios:
+  extends: .job_template
+  stage: e2e
+  script:
+    - echo 'TBD'
+  only:
+    - master
+    - develop
+  tags:
+    - dolby-iapi
+
+e2e-web:
+  extends: .job_template
+  stage: e2e
+  script:
+    - echo 'TBD'
+  only:
+    - master
+    - develop
+  tags:
+    - dolby-iapi
