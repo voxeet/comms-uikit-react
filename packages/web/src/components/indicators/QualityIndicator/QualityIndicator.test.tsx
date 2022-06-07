@@ -24,8 +24,8 @@ describe('QualityIndicator component', () => {
         testID={testID}
         qualityLevel={qualityLevel}
         backgroundColor={backgroundColor}
-        primaryColor={primaryColor}
-        secondaryColor={secondaryColor}
+        activeColor={primaryColor}
+        defaultColor={secondaryColor}
       />,
     );
     const element1 = getByTestId('lineFirst');

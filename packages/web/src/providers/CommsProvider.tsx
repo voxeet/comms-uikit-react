@@ -9,11 +9,11 @@ import sdkService from '../services/sdk';
 import sessionService from '../services/session';
 
 type ParticipantStatus = {
-  isAudio: boolean;
   isVideo: boolean;
   isSpeaking: boolean;
   isLocal: boolean;
-  isRemoteMuted?: boolean;
+  isRemoteAudio: boolean;
+  isLocalAudio: boolean;
 };
 
 type CommsContext = {
@@ -69,16 +69,18 @@ const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) =>
 
   useEffect(() => {
     const map: CommsContext['participantsStatus'] = {};
-    participants.forEach((p) => {
-      map[p.id] = {
-        isSpeaking: !!participantsStatus[p.id]?.isSpeaking,
-        isLocal: p.id === user?.id,
-        isAudio: p.id === user?.id ? p.audioTransmitting : p.audioReceivingFrom,
-        isVideo: p.streams[p.streams.length - 1]?.getVideoTracks().length > 0,
-        isRemoteMuted: p.id !== user?.id && !p.audioTransmitting,
-      };
+    setParticipantsStatus((prev) => {
+      participants.forEach((p) => {
+        map[p.id] = {
+          isSpeaking: !!participantsStatus[p.id]?.isSpeaking,
+          isLocal: p.id === user?.id,
+          isRemoteAudio: p.id === user?.id ? p.audioTransmitting : p.audioReceivingFrom,
+          isLocalAudio: prev[p.id] ? prev[p.id].isLocalAudio : true,
+          isVideo: p.streams[p.streams.length - 1]?.getVideoTracks().length > 0,
+        };
+      });
+      return map;
     });
-    setParticipantsStatus(map);
   }, [participants, user]);
 
   const openSession = async (participantInfo: ParticipantInfo) => {
@@ -110,7 +112,7 @@ const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) =>
           ...participantsStatus,
           [participant.id]: {
             ...participantsStatus[participant.id],
-            isAudio: true,
+            isLocalAudio: true,
           },
         };
       });
@@ -126,7 +128,7 @@ const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) =>
           ...participantsStatus,
           [participant.id]: {
             ...participantsStatus[participant.id],
-            isAudio: false,
+            isLocalAudio: false,
           },
         };
       });
@@ -139,8 +141,10 @@ const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) =>
       if (localUser) {
         if (localUser.audioTransmitting) {
           await stopParticipantAudio(localUser);
+          setIsAudio(false);
         } else {
           await startParticipantAudio(localUser);
+          setIsAudio(true);
         }
       }
     } else {
@@ -154,8 +158,10 @@ const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) =>
       if (localUser) {
         if (localUser.streams[localUser.streams.length - 1]?.getVideoTracks().length > 0) {
           await conferenceService.stopVideo(user);
+          setIsVideo(false);
         } else {
           await conferenceService.startVideo(user);
+          setIsVideo(true);
         }
       }
     } else {
@@ -176,13 +182,14 @@ const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) =>
 
   const leaveConference = useCallback(async () => {
     await conferenceService.leave();
+    await closeSession();
     setUser(null);
     setConference(null);
     setParticipantsStatus({});
     setConferenceStatus(null);
     setParticipants(new Map());
-    setIsAudio(true);
-    setIsVideo(true);
+    // setIsAudio(true);
+    // setIsVideo(true);
   }, []);
 
   const addIsSpeakingListener = (participant: Participant) => {
@@ -271,7 +278,7 @@ const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) =>
       conferenceStatus,
       participants: Array.from(participants.values()),
       participantsStatus,
-      isAudio: user?.id && participantsStatus[user.id] ? !!participantsStatus[user.id]?.isAudio : isAudio,
+      isAudio: user?.id && participantsStatus[user.id] ? !!participantsStatus[user.id]?.isRemoteAudio : isAudio,
       toggleAudio,
       startParticipantAudio,
       stopParticipantAudio,

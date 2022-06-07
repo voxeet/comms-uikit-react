@@ -1,16 +1,28 @@
 # Dolby.io Communications UI Kit React
 
-## UI Kit
+## Overview
 
 DolbyIO Communications UIKit React is a package for React developers to build a communication application. The main aim of this package is to reduce the complexity of building a web application using DolbyIO.
 
 Package consists of three basic elements:
 
-- Provider - Main component allowing to initialize integration with Dolby.io Comms API & state management
-- Hooks - Set of functions offering videoconferencing logic
-- UI components - Set of UI components covering most popular patterns of videoconferencing apps
+- Provider: The main component that is responsible for the integration with Dolby.io Communications APIs platform, initialization, and state management
+- Hooks: Set of functions responsible for the video conferencing logic
+- UI components: Set of UI components covering the most popular patterns for video conferencing applications
 
-## Prerequisites
+If you want to see an example of an application created using the React UI Component, you can also check our [video conferencing application](https://github.com/dolbyio-samples/comms-app-react-videoconference).
+
+## Dolby.io account and dashboard
+
+To use the Dolby.io Communications UI Component for React, you need to have a Dolby.io account. If you do not have an account, [sign up](https://dolby.io/signup) for a free account. After confirming your email address, you will be logged in to your dashboard. The dashboard allows you to manage your applications, account settings, and billing.
+
+The CommsProvider provides the token and refreshToken props to authenticate against the Dolby.io service. For more information, see the [Authentication](https://docs.dolby.io/communications-apis/docs/guides-authentication#initialize-the-sdk-with-secure-authentication) guide.
+
+## Getting Started
+
+This procedure will help you create a simple web application that supports making a video call using the Dolby.io Communications APIs. It is a good starting point that you can follow along in your code editor. This starter project will provide the foundation upon which you can add additional features as you build out your own solutions for meetings, events, collaboration, or education.
+
+### Prerequisites
 
 Make sure that you have:
 
@@ -18,31 +30,13 @@ Make sure that you have:
 - React 16.5+
 - A working video camera and microphone
 - The [Client Access Token](https://docs.dolby.io/communications-apis/docs/overview-developer-tools#client-access-token) copied from the Dolby.io dashboard
-- The [supported browser](https://docs.dolby.io/communications-apis/docs/overview-supported-environments#web-sdk)
+- The supported browser, either Chrome 100+, Safari 15+, Firefox 100+, or Edge 100+
 
 Please review [Supported Environments](https://docs.dolby.io/communications-apis/docs/overview-supported-environments) for more information on Dolby.io communication API's.
 
-## Getting Started
+### Build the application
 
-This guide explains how to create a basic conference application for browsers with the React UI component. It starts with importing dependencies and guides you through the steps to launch a conference call in an application.
-
-### How to get a Dolby.io account
-
-Dolby.io Comms API requires you to create a Dolby.io account.
-To set it up, you need to go to <https://dashboard.dolby.io/signup/> and complete the form. After confirming your email address, you will be logged in.
-
-### Dolby.io dashboard
-
-After logging in, you get access to the full dashboard where you can manage your account.
-
-From this page <https://dashboard.dolby.io/dashboard/applications/summary> you can manage your profile and billing.
-
-The CommsProvider provide the token & refreshToken props to authenticate against the service. For more information, see the section titled Initialise the SDK with secure authentication.
-https://docs.dolby.io/communications-apis/docs/guides-authentication#initialize-the-sdk-with-secure-authentication
-
-## Install the SDK, manage the token, and create a conference
-
-### Create a new project
+#### Create a new project
 
 Create a new React project and install the Dolby.io Communications APIs UI Component for React using `npm` or `yarn`:
 
@@ -54,9 +48,10 @@ npm install @dolbyio/comms-uikit-react --save
 yarn add @dolbyio/comms-uikit-react
 ```
 
-### Initialize your application
+#### Initialise your application
 
-To access the Dolby.io Communications APIs service, you need to authenticate your application. To do so, import [CommsProvider](./providers/CommsProvider.md) and use it to wrap your application:
+
+To access the Dolby.io Communications APIs service, you need to authenticate your application. To do so, import [CommsProvider](./documentation/providers/CommsProvider.md) and use it to wrap your application:
 
 ```javascript
 import { CommsProvider } from '@dolbyio/comms-uikit-react';
@@ -72,7 +67,7 @@ const App = () => {
 export default App;
 ```
 
-To establish a connection with the server, call the VoxeetSDK.initializeToken method that accepts a developer access token. To authenticate your application, pass the token copied from the dashboard and the refreshToken function to CommsProvider:
+To initialize the SDK, call the VoxeetSDK.initializeToken method that accepts a developer access token as a parameter. To authenticate your application, pass the token copied from the dashboard and the refreshToken function to CommsProvider:
 
 ```javascript
 import { CommsProvider } from '@dolbyio/comms-uikit-react';
@@ -95,7 +90,7 @@ const App = () => {
           });
         })
         .then(() => {
-          // Initialize your application
+          // Initialise your application
         })
         .catch(error => {
           // An error has occurred
@@ -112,7 +107,7 @@ const App = () => {
 export default App;
 ```
 
-Import and wrap the application using [ThemeProvider](./providers/ThemeProvider.md) and overwrite the theme by passing the theme prop:
+Import and wrap the application using [ThemeProvider](./documentation/providers/ThemeProvider.md) and overwrite the theme by passing the theme prop:
 
 ```javascript
 import { CommsProvider, ThemeProvider } from '@dolbyio/comms-uikit-react';
@@ -130,11 +125,11 @@ const App = () => {
 export default App;
 ```
 
-### Open a session and create a conference
+#### Open a session and create a conference
 
 A session is a connection between the client application and the Dolby.io Communications APIs. Initializing a session happens asynchronously because of the network handshake that must occur. When opening a session, you should provide a name. Commonly, this is the name of the participant who established the session.
 
-Import the [useSession](./hooks/useSession.md) and [useConference](./hooks/useConference.md) hooks and open a session:
+Import the [useSession](./documentation/hooks/useSession.md) and [useConference](./documentation/hooks/useConference.md) hooks and open a session:
 
 ```javascript
 import { useSession, useConference } from '@dolbyio/comms-uikit-react';
@@ -146,7 +141,7 @@ await openSession({
 
 You can call the openSession method to open a session any time after you've initialized the SDK.
 
-To distinguish between multiple conferences, you need to use a conference alias or name. When multiple participants join a conference of the same name using a token for the same Dolby.io application, they will be able to meet in a call. To create a conference, use the [createConference](./hooks/useConference.md) method:
+To distinguish between multiple conferences, you need to use a conference alias or name. When multiple participants join a conference of the same name using a token for the same Dolby.io application, they will be able to meet in a call. To create a conference, use the [createConference](./documentation/hooks/useConference.md) method:
 
 ```javascript
 import { useSession, useConference } from '@dolbyio/comms-uikit-react';
@@ -162,11 +157,11 @@ const conferenceOptions = {
 await createConference(conferenceOptions);
 ```
 
-### Display the conference UI
+#### Display the conference UI
 
 The conference UI, also called layout, is responsible for the final look of the conference. It displays participants' avatars and video tiles and assigns a specific size and location to these elements.
 
-To create the UI, import the [useParticipants](./hooks/useParticipants.md) hook and the [Avatar](./components/Avatar.md) and [Text](./components/Text.md) components:
+To create the UI, import the [useParticipants](./documentation/hooks/useParticipants.md) hook and the [Avatar](./documentation/components/Avatar.md) and [Text](./documentation/components/Text.md) components:
 
 ```javascript
 import { useParticipants, Avatar, Text } from '@dolbyio/comms-uikit-react';
@@ -194,11 +189,11 @@ return (
 
 ```
 
-### Display a video
+#### Display a video
 
 To display participants' video tiles in the layout, we offer the VideoGrid component that allows setting the maximum number of columns, tiles, and spaces between tiles.
 
-Import the [VideoGrid](./components/VideoGrid.md) component, pass the participants array to VideoGrid, and adjust it.
+Import the [VideoGrid](./documentation/components/VideoGrid.md) component, pass the participants array to VideoGrid, and adjust it.
 
 ```javascript
 import { useParticipants, VideoGrid } from '@dolbyio/comms-uikit-react';
@@ -209,52 +204,106 @@ return (<VideoGrid participants={participants} gap={20} /> );
 
 ```
 
-## Summary
-
-All these steps combined might contain the following code snippet:
-
-<!-- We need to add a code sample with code from this procedure that a user can just copy paste -->
-
-If you want to see an example of an application created using the React UI Component, see the [examples](../examples) folder.
-
 ## Theming system
 
-TBD
+The theme specifies the color of the components, darkness of the surfaces, level of shadow, appropriate opacity of ink elements, etc.
 
-## Example apps
+Themes let you apply a consistent tone to your app. It allows you to customize all design aspects of your project in order to meet the specific needs of your business or brand.
 
-Below is a list of sample projects using Dolby.io Communications UIKit React
+### Theme provider
 
-### Videoconferencing app
+UIKit requires you to use the ThemeProvider component in order to inject a theme into your application.
 
-The application available in this repository demonstrates the capabilities of Dolby.io for adding video conferencing functions to browser applications built using React.
-https://github.com/dolbyio-samples/comms-app-react-videoconference
+ThemeProvider relies on the context feature of React to pass the theme down to the components, so you need to make sure that ThemeProvider is a parent of the components you are trying to customize.
 
-## Known issues & limitations
+```
+<ThemeProvider>
+  <Navigator />
+</ThemeProvider>
+```
+
+### Theme variables
+
+Default theme variables are listed in [packages/common/src/theme/defaultTheme.ts](./packages/common/src/theme/defaultTheme.ts)
+
+### Customization
+
+Theme variables can be overwritten with ThemeProvider prop `theme`
+
+```
+<ThemeProvider theme={{ colors: { white: 'yellow', primary: { 400: 'red' }}}}>
+  <Navigator />
+</ThemeProvider>
+```
+
+For some reasons you might have a couple of themes present in your app. To achieve this use ThemeProvider prop `customThemes`
+
+```
+<ThemeProvider
+  customThemes={{
+    'dark': { colors: { white: 'yellow', primary: { 400: 'red' }, secondary: { 400: 'blue' } } },
+  }}
+>
+  <Navigator />
+</ThemeProvider>
+```
+
+To select one of it use function `setActiveTheme` from `useTheme` hook
+
+```
+import {useTheme} from '@dolbyio/comms-uxkit-react';
+
+...
+
+const {setActiveTheme} from useTheme();
+
+...
+
+setActiveTheme('dark');
+
+```
+
+### Usage in UIKit components?
+
+UIKit exported components can take theme variable string keys.
+It means that passing the prop in a way:
+
+```
+<Text color="grey.300" />
+```
+
+means that component Text will use value for key 300 of colors object in theme variable.
+
+### Usage in custom components?
+
+Custom components can also rely on theme system. useTheme hook comes with bunch of useful functions.
+
+```
+const { getColor } = useTheme();
+
+return (<div style={{backgroundColor: getColor('grey.300')}} /> 
+```
+
+Full documentation fo useTheme hook is located in [documentation/hooks/useTheme.md](documentation/hooks/useTheme.md)
+
+## Known issues and limitations
 
 - Copy conference link works only for root directories
-- Local mute can result in some other participants mute state desynchronizations
-
-## Requirements & supported platforms
-
-### Dolby.io Comms UIKit React supports 4 main browsers:
-
-- Chrome 100+
-- Safari 15+
-- Firefox 100+
-- Edge 100+
+- Local mute can result in some other participants mute state desynchronization
+- Entering conference may take more than 3 seconds
+- Long conferences might have issue of audio & video desynchronization
 
 ## Documentation
 
-A complete list of the available providers, hooks, and components is available in the [documentation](../documentation) folder.
+A complete list of the available providers, hooks, and components is available in the [documentation](./documentation) folder.
 
 ## UI Component license agreement
 
 The Dolby.io Communications UI Component for React and its repository are licensed under the MIT License.
 
-Before using the latest version of the @dolbyio/comms-uikit-react, please review and accept the [Dolby Software License Agreement](../LICENSE).
+Before using the latest version of the @dolbyio/comms-uikit-react, please review and accept the [Dolby Software License Agreement](./LICENSE).
 
-## Third Party licenses
+## Third-Party licenses
 
 Direct licenses can be found [here](./third-party-licenses)
 

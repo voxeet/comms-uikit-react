@@ -49,15 +49,6 @@ const ThemeProvider = ({ children, theme, customThemes }: ThemeProviderProps) =>
     setThemeState({ ...deepMerge(defaultTheme, themes[activeTheme], theme) });
   }, [theme, activeTheme]);
 
-  // useEffect(() => {
-  //   Object.entries(themeState).forEach(([key, value]) => {
-  //     document.documentElement.style.setProperty(`--${key}`, `${value}`);
-  //   });
-  //   Object.entries(Colors).forEach(([key, value]) => {
-  //     document.documentElement.style.setProperty(`--${key}`, `${value}`);
-  //   });
-  // }, [themeState, themeModeState]);
-
   const contextValue: ThemeContext = useMemo(
     () => ({
       theme: themeState,

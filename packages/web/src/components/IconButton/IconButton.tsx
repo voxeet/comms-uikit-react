@@ -14,8 +14,7 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
   variant?: 'square' | 'rectangular' | 'circle';
   backgroundColor?: ColorKey | [ColorKey, ColorKey];
   iconColor?: ColorKey;
-
-  badge?: boolean | React.ReactNode;
+  badge?: boolean;
   badgeColor?: ColorKey;
   badgeContentColor?: ColorKey;
   strokeColor?: ColorKey;
@@ -53,7 +52,6 @@ const IconButton = ({
   const handleIconColorTone = useMemo(() => {
     let colorTone: ColorTone = 'default';
 
-    // if (disabled) colorTone = 'dark';
     if (isHovered) colorTone = 'light';
     else return colorTone;
 
@@ -63,19 +61,13 @@ const IconButton = ({
   const handleBackgroundColor = useMemo(() => {
     let color = getColorOrGradient(backgroundColor, 'grey.800');
 
-    // NO GRADIENT
     if (!isGradient && backgroundColor !== 'transparent') {
       if (backgroundColor) color = getColor(backgroundColor as string);
-      // if (disabled) color = Color(color).darken(0.5).hex();
       if (isHovered) color = Color(color).lighten(0.2).hex();
       else color = getColor(backgroundColor as string, 'grey.800');
     }
     // GRADIENT
     if (isGradient && backgroundColor) {
-      // if (disabled)
-      //   color = `linear-gradient(99.69deg, ${Color(color[0]).darken(0.5).hex()} -10.66%, ${Color(color[1])
-      //     .darken(0.5)
-      //     .hex()} 114.64%)`;
       if (isHovered)
         color = `linear-gradient(99.69deg, ${Color(color[0]).lighten(0.2).hex()} -10.66%, ${Color(color[1])
           .lighten(0.2)
