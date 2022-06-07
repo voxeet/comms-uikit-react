@@ -2,7 +2,7 @@
 
 ## UI Kit
 
-DolbyIO Communications UXKit React is package for React. The main aim is to reduce the complexity of DolbyIO Comms API implementation in both web.
+DolbyIO Communications UIKit React is a package for React developers to build a communication application. The main aim of this package is to reduce the complexity of building a web application DolbyIO.
 
 Package consists of three basic elements:
 
@@ -20,11 +20,11 @@ Make sure that you have:
 - The [Client Access Token](https://docs.dolby.io/communications-apis/docs/overview-developer-tools#client-access-token) copied from the Dolby.io dashboard
 - The [supported browser](https://docs.dolby.io/communications-apis/docs/overview-supported-environments#web-sdk)
 
-Please review [Supported Environments](https://docs.dolby.io/communications-apis/docs/overview-supported-environments) for more information on Dolby.io requirements.
+Please review [Supported Environments](https://docs.dolby.io/communications-apis/docs/overview-supported-environments) for more information on Dolby.io communication API's.
 
 ## Getting Started
 
-This guide explains how to create a basic conference application for mobile devices with the React UI component. It starts with importing dependencies and guides you through the steps to launch a conference call.
+This guide explains how to create a basic conference application for browsers with the React UI component. It starts with importing dependencies and guides you through the steps to launch a conference call in an application.
 
 ### How to get a Dolby.io account
 
@@ -37,7 +37,7 @@ After logging in, you get access to the full dashboard where you can manage your
 
 From this page <https://dashboard.dolby.io/dashboard/applications/summary> you can manage your profile and billing.
 
-The CommsProvider provide the token & refreshToken props to authenticate against the service. For more information, see the section titled Initialize the SDK with secure authentication.
+The CommsProvider provide the token & refreshToken props to authenticate against the service. For more information, see the section titled Initialise the SDK with secure authentication.
 https://docs.dolby.io/communications-apis/docs/guides-authentication#initialize-the-sdk-with-secure-authentication
 
 ## Install the SDK, manage the token, and create a conference
@@ -72,7 +72,7 @@ const App = () => {
 export default App;
 ```
 
-To establish a connection with the server, call the VoxeetSDK.initializeToken method that accepts a JSON Web Token (JWT) as a parameter. To authenticate your application, pass the token copied from the dashboard and the refreshToken function to CommsProvider:
+To establish a connection with the server, call the VoxeetSDK.initializeToken method that accepts a developer access token. To authenticate your application, pass the token copied from the dashboard and the refreshToken function to CommsProvider:
 
 ```javascript
 import { CommsProvider } from '@dolbyio/comms-uikit-react';
