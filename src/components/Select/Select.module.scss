@@ -1,0 +1,85 @@
+$height: 56px;
+
+.uiSelect {
+  .label {
+    text-align: left;
+    margin: 5px 0 10px 16px;
+  }
+  .wrapper {
+    position: relative;
+    width: 100%;
+    &.isOpen {
+      .control {
+        z-index: 4;
+      }
+      .dropdownArrow {
+        transform: rotate(-45deg);
+      }
+    }
+  }
+
+  .control,
+  .option {
+    padding: 0 17px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    height: $height;
+    transition: background-color 0.3s;
+    background: none;
+    span {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .control {
+    position: relative;
+    border: 1px solid;
+    box-shadow: 0px 4px 10px 3px rgba(97, 97, 97, 0.08);
+    border-radius: 10px;
+    padding-right: 50px;
+    z-index: 2;
+  }
+
+  .dropdown {
+    position: absolute;
+    left: 0;
+    right: 0;
+    padding: 20px 0 10px 0;
+    box-shadow: 0px 4px 8px rgba(97, 97, 97, 0.18);
+    z-index: 3;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    overflow: hidden;
+    margin-top: -10px;
+  }
+
+  .dropdownContent {
+    max-height: $height * 3;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .dropdownArrow {
+    position: absolute;
+    border-style: solid;
+    border-width: 2px 2px 0 0;
+    content: '';
+    display: inline-block;
+    height: 8px;
+    transform: rotate(135deg);
+    transform-origin: center;
+    width: 8px;
+    transition: transform 0.5s;
+    right: 16px;
+    top: 22px;
+  }
+}

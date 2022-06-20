@@ -1,0 +1,45 @@
+.wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.videoItem {
+  box-sizing: border-box;
+}
+
+.maxTile {
+  box-sizing: border-box;
+}
+
+.maxTileWrapper {
+  height: 0;
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+}
+
+.maxTileContent {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  > span > span {
+    display: inline-block;
+    margin-right: 5px;
+  }
+}

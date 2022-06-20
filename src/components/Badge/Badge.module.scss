@@ -1,0 +1,13 @@
+.badge {
+  box-sizing: border-box;
+  height: 16px;
+  padding: 0 8px;
+  border-radius: 12px;
+
+  &.noContent {
+    width: 8px;
+    height: 8px;
+    border-radius: 100%;
+    padding: 0;
+  }
+}

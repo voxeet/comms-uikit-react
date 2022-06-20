@@ -1,0 +1,136 @@
+.text {
+  letter-spacing: -0.02em;
+
+  &.type {
+    &-H0 {
+      font-size: 36px;
+      line-height: 44px;
+      font-weight: 700;
+    }
+
+    &-H1 {
+      font-size: 30px;
+      line-height: 40px;
+      font-weight: 700;
+    }
+
+    &-H2 {
+      font-size: 24px;
+      line-height: 32px;
+      font-weight: 700;
+    }
+
+    &-H3 {
+      font-size: 18px;
+      line-height: 24px;
+      font-weight: 700;
+    }
+
+    &-H4 {
+      font-size: 15px;
+      line-height: 24px;
+      font-weight: 700;
+    }
+
+    &-bodyDefault {
+      font-size: 15px;
+      line-height: 24px;
+      font-weight: 600;
+    }
+
+    &-bodySmallSemiBold {
+      font-size: 13px;
+      line-height: 16px;
+      font-weight: 700;
+    }
+
+    &-bodySmall {
+      font-size: 13px;
+      line-height: 16px;
+      font-weight: 600;
+    }
+
+    &-buttonDefault {
+      font-size: 14px;
+      line-height: 24px;
+      font-weight: 700;
+    }
+
+    &-buttonSmall {
+      font-size: 13px;
+      line-height: 24px;
+      font-weight: 700;
+    }
+
+    &-captionBold {
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 800;
+    }
+
+    &-captionSemiBold {
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 700;
+    }
+
+    &-captionRegular {
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 600;
+    }
+
+    &-captionSmallSemiBold {
+      font-size: 10px;
+      line-height: 16px;
+      font-weight: 700;
+    }
+
+    &-captionSmallRegular {
+      font-size: 10px;
+      line-height: 12px;
+      font-weight: 600;
+    }
+    &-avatar {
+      font-weight: 800;
+      &-xs {
+        font-size: 10px;
+        line-height: 18px;
+      }
+      &-s {
+        font-size: 16.6667px;
+        line-height: 23px;
+      }
+      &-m {
+        font-size: 20px;
+        line-height: 28px;
+      }
+      &-l {
+        font-size: 32px;
+        line-height: 40px;
+      }
+    }
+    &-pill {
+      font-size: 12px;
+      line-height: 16px;
+    }
+    &-pill-s {
+      font-size: 10px;
+      line-height: 16px;
+    }
+  }
+
+  &.align {
+    &-center {
+      text-align: center;
+    }
+
+    &-right {
+      text-align: right;
+    }
+  }
+
+  &.uppercase {
+    text-transform: uppercase;
+  }
+}
