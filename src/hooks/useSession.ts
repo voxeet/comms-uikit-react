@@ -2,19 +2,25 @@ import { useContext } from 'react';
 
 import { CommsContext } from '../providers/CommsProvider';
 import SDKService from '../services/sdk';
+import type { UseSession } from './types/Session';
 
-/**
- * A hook
- * @category Hook
- */
-const useSession = () => {
-  const { openSession, closeSession, user } = useContext(CommsContext);
+const useSession: UseSession = () => {
+  const {
+    participant,
+    openSession,
+    closeSession,
+  } = useContext(CommsContext);
 
   const getSDKVersion = () => {
     return SDKService.getSDKVersion();
   };
 
-  return { user, openSession, closeSession, getSDKVersion };
+  return {
+    participant,
+    openSession,
+    closeSession,
+    getSDKVersion,
+  };
 };
 
 export default useSession;

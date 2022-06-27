@@ -35,14 +35,15 @@ const VideoLocalView = ({
   ...props
 }: VideoViewProps) => {
   const [videoSrcObject, setVideoSrcObject] = useState<MediaStream | null>(null);
+  const [videoStreams, setVideoStreams] = useState<MediaStream[]>([]);
   let interval: NodeJS.Timer | null = null;
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const { getColor } = useTheme();
-  const { user } = useSession();
+  const { participant } = useSession();
   const { isVideo } = useVideo();
   const { isAudio } = useAudio();
-  const { hasMicrophonePermission } = useMicrophone();
+  const { getMicrophonePermission } = useMicrophone();
   const isMounted = useIsMounted();
   const prevIsVideo = useRef<boolean>();
 
@@ -51,7 +52,7 @@ const VideoLocalView = ({
   const checkMicrophonePermissions = () => {
     (async () => {
       try {
-        const hasMicrophoneAccess = await hasMicrophonePermission();
+        const hasMicrophoneAccess = await getMicrophonePermission();
         setIsMicrophonePermission(hasMicrophoneAccess);
         if (hasMicrophoneAccess && interval) {
           clearInterval(interval);
@@ -72,10 +73,17 @@ const VideoLocalView = ({
   }, []);
 
   const clearVideoSrc = () => {
-    videoSrcObject?.getTracks().forEach((track) => {
-      track.stop();
+    videoStreams.forEach((stream) => {
+      stream.getTracks().forEach((track) => {
+        track.stop();
+      });
     });
-    setVideoSrcObject(null);
+    if (videoSrcObject) {
+      videoSrcObject.getTracks().forEach((track) => {
+        track.stop();
+      });
+      setVideoSrcObject(null);
+    }
   };
 
   const attachStream = () => {
@@ -97,17 +105,19 @@ const VideoLocalView = ({
           });
         });
     }
-    navigator.mediaDevices
-      .getUserMedia({
-        video,
-      })
-      .then((stream) => {
-        clearVideoSrc();
-        setVideoSrcObject(stream);
-      })
-      .catch(() => {
-        clearVideoSrc();
-      });
+    if (isVideo) {
+      navigator.mediaDevices
+        .getUserMedia({
+          video,
+        })
+        .then((stream) => {
+          setVideoSrcObject(stream);
+          setVideoStreams((prev) => [...prev, stream]);
+        })
+        .catch(() => {
+          clearVideoSrc();
+        });
+    }
   };
 
   useEffect(() => {
@@ -160,7 +170,7 @@ const VideoLocalView = ({
         <div className={styles.fallbackWrapper} data-testid="FallbackWrapper">
           {noVideoFallback || (
             <div className={styles.fallbackContent} data-testid="FallbackContent">
-              <Avatar participant={user || username} />
+              <Avatar participant={participant || username} />
             </div>
           )}
         </div>

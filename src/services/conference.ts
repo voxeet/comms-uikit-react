@@ -29,10 +29,7 @@ export default class ConferenceService {
   }
 
   public static join(conference: Conference, options: JoinOptions) {
-    return WebSDK.conference.join(conference, {
-      dvwc: true,
-      ...options,
-    });
+    return WebSDK.conference.join(conference, options);
   }
 
   public static stopVideo(participant: Participant) {

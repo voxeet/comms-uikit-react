@@ -6,10 +6,10 @@ The useCamera hook gathers functions responsible for managing cameras.
 
 | Name                    | Type                    | Description                                 |
 | ----------------------- | ----------------------- | ------------------------------------------- |
-| `getCameras`            | () => Promise<Camera[]> | Gets the list of the available cameras.     |
-| `selectCamera`          | (Camera) => void)       | Selects a camera.                           |
-| `getDefaultLocalCamera` | () => Promise<Camera>)  | Gets data of default camera.                |
-| `hasCameraPermission`   | () => Promise<boolean>) | Check status of browser camera permissions. |
+| `getCameras`            | () => Promise<MediaDeviceInfo[]> | Gets the list of the available cameras.     |
+| `selectCamera`          | (string) => Promise<string>       | Selects a camera.                           |
+| `getDefaultLocalCamera` | () => Promise<MediaDeviceInfo>  | Gets data of default camera.                |
+| `getCameraPermission`   | () => Promise<boolean> | Check status of browser camera permissions. |
 
 ## Examples
 
@@ -46,13 +46,13 @@ useEffect(() => {
 ### Check camera permission
 
 ```javascript
-const { hasCameraPermission } = useCamera();
+const { getCameraPermission } = useCamera();
 const [isCameraPermission, setIsCameraPermission] = useState(false);
 
 useEffect(() => {
   (async () => {
     try {
-      const hasAccess = await hasCameraPermission();
+      const hasAccess = await getCameraPermission();
       setIsCameraPermission(hasAccess);
     } catch {
       setIsCameraPermission(false);

@@ -7,9 +7,9 @@ The useConference hook gathers functions responsible for managing conferences.
 | Name               | Type                        | Description                           |
 | ------------------ | --------------------------- | ------------------------------------- |
 | `conference`       | Conference                  | The object of the current conference. |
-| `joinConference`   | (Conference) => void        | Joins a conference.                   |
-| `createConference` | (ConferenceOptions) => void | Creates a conference.                 |
-| `leaveConference`  | () => void)                 | Leaves a conference.                  |
+| `createConference` | (ConferenceOptions) => Promise<Conference> | Creates a conference.                 |
+| `joinConference`   | (Conference, JoinOptions) =>  Promise<Conference>      | Joins a conference.                   |
+| `leaveConference`  | () => Promise<void>                  | Leaves a conference.
 
 ## Examples
 

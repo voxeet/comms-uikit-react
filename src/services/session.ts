@@ -10,7 +10,7 @@ export default class SessionService {
     return WebSDK.session.close();
   }
 
-  public static getUser() {
+  public static getParticipant() {
     return WebSDK.session.participant;
   }
 

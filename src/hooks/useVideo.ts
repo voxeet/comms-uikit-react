@@ -1,9 +1,15 @@
 import { useContext } from 'react';
 
 import { CommsContext } from '../providers/CommsProvider';
+import type { UseVideo} from './types/Video';
 
-const useVideo = () => {
-  const { isVideo, toggleVideo, isLocalVideoLoading, resetVideo } = useContext(CommsContext);
+const useVideo: UseVideo = () => {
+  const {
+    isVideo,
+    toggleVideo,
+    isLocalVideoLoading,
+    resetVideo
+  } = useContext(CommsContext);
 
   return {
     isVideo,

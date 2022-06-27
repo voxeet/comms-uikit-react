@@ -1,6 +1,7 @@
 import MediaDevicesService from '../services/mediaDevices';
+import type { UseMicrophone } from './types/Microphone';
 
-const useMicrophone = () => {
+const useMicrophone: UseMicrophone = () => {
   const getMicrophones = async () => {
     return (await MediaDevicesService.enumerateAudioInputDevices()).filter((d) => d.deviceId) as MediaDeviceInfo[];
   };
@@ -9,22 +10,31 @@ const useMicrophone = () => {
     return MediaDevicesService.selectMicrophone(device);
   };
 
-  const hasMicrophonePermission = async () => {
+  const getMicrophonePermission = async () => {
     let permission = false;
-    const microphones = await getMicrophones();
-    for (let i = 0; i < microphones.length; i++) {
-      const mic = microphones[i];
-      if (mic.label.length > 0) {
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+
+      if (stream) {
         permission = true;
+        stream.getTracks().forEach((track) => {
+          track.stop();
+        });
       }
+    } catch (error) {
+      permission = false;
     }
+
     return permission;
   };
 
   return {
     getMicrophones,
     selectMicrophone,
-    hasMicrophonePermission,
+    getMicrophonePermission,
   };
 };
 

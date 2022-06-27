@@ -1,6 +1,7 @@
 import MediaDevicesService from '../services/mediaDevices';
+import type { UseCamera } from './types/Camera';
 
-const useCamera = () => {
+const useCamera: UseCamera = () => {
   const getCameras = async () => {
     return (await MediaDevicesService.enumerateVideoInputDevices()).filter((d) => d.deviceId) as MediaDeviceInfo[];
   };
@@ -29,15 +30,24 @@ const useCamera = () => {
     return localCamera || localCameras[0];
   };
 
-  const hasCameraPermission = async () => {
+  const getCameraPermission = async () => {
     let permission = false;
-    const cameras = await getCameras();
-    for (let i = 0; i < cameras.length; i++) {
-      const camera = cameras[i];
-      if (camera.label.length > 0) {
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+      });
+
+      if (stream) {
         permission = true;
+        stream.getTracks().forEach((track) => {
+          track.stop();
+        });
       }
+    } catch (error) {
+      permission = false;
     }
+
     return permission;
   };
 
@@ -45,7 +55,7 @@ const useCamera = () => {
     getCameras,
     selectCamera,
     getDefaultLocalCamera,
-    hasCameraPermission,
+    getCameraPermission,
   };
 };
 

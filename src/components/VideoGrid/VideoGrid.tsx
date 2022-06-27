@@ -32,9 +32,6 @@ const VideoGrid = ({
   renderMaxTile,
   ...props
 }: VideoGridProps) => {
-  if (participants.length === 0) {
-    return null;
-  }
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { getColor } = useTheme();
   const [width, setWidth] = useState(minWidth);
@@ -94,6 +91,10 @@ const VideoGrid = ({
     window.addEventListener('resize', tileWidth);
     return () => window.removeEventListener('resize', tileWidth);
   }, [participants.length, maxColumns]);
+
+  if (participants.length === 0) {
+    return null;
+  }
 
   return (
     <div data-testid={testID} ref={wrapperRef} className={styles.wrapper} style={{ margin: `0 -${gap}px` }} {...props}>

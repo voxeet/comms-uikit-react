@@ -1,5 +1,6 @@
 import type { ConferencePermission, ConferenceStatus } from '@voxeet/voxeet-web-sdk/types/models/Conference';
 import type Conference from '@voxeet/voxeet-web-sdk/types/models/Conference';
+import type ConferenceOptions from '@voxeet/voxeet-web-sdk/types/models/ConferenceOptions';
 import type { JoinOptions, ParticipantInfo } from '@voxeet/voxeet-web-sdk/types/models/Options';
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
 import { createContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
@@ -7,27 +8,32 @@ import { createContext, useState, useEffect, useMemo, useCallback, ReactNode } f
 import conferenceService from '../services/conference';
 import sdkService from '../services/sdk';
 import sessionService from '../services/session';
+import type { ParticipantStatus } from '../hooks/types/Participants';
 
-type ParticipantStatus = {
-  isVideo: boolean;
-  isSpeaking: boolean;
-  isLocal: boolean;
-  isRemoteAudio: boolean;
-  isLocalAudio: boolean;
+type DolbyIoWindow = {
+  dolbyio: {
+    isInitialized: boolean;
+  };
+}
+
+const dioWindow = window as Window & typeof globalThis & DolbyIoWindow;
+dioWindow.dolbyio = {
+  isInitialized: false,
 };
 
 type CommsContext = {
   openSession: (participantInfo: ParticipantInfo) => Promise<void>;
-  closeSession: () => void;
-  joinConference: (conference: Conference, options: JoinOptions) => Promise<void>;
+  closeSession: () => Promise<void>;
+  createConference: (options: ConferenceOptions) => Promise<Conference>;
+  joinConference: (conference: Conference, options: JoinOptions) => Promise<Conference>;
   leaveConference: () => Promise<void>;
-  toggleAudio: () => void;
+  toggleAudio: () => Promise<void>;
   isAudio: boolean;
-  toggleVideo: () => void;
+  toggleVideo: () => Promise<void>;
   isVideo: boolean;
   startParticipantAudio: (participant: Participant) => Promise<void>;
   stopParticipantAudio: (participant: Participant) => Promise<void>;
-  user: Participant | null;
+  participant: Participant | null;
   conference: Conference | null;
   conferenceStatus: ConferenceStatus | null;
   participants: Participant[];
@@ -36,38 +42,49 @@ type CommsContext = {
   };
   addIsSpeakingListener: (participant: Participant) => () => void;
   isLocalVideoLoading: boolean;
+  isLocalAudioLoading: boolean;
   resetVideo: () => void;
   resetAudio: () => void;
 };
 
 type CommsProviderProps = {
   children: ReactNode;
+
+  /**
+   * Client access token to use to initialize the SDK.
+   */
   token: string;
+
+  /**
+   * Function to use to refresh the client access token.
+   */
   refreshToken: () => Promise<string>;
 };
 
 export const CommsContext = createContext<CommsContext>({} as CommsContext);
 
 const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) => {
-  const [user, setUser] = useState<CommsContext['user']>(null);
+  const [participant, setParticipant] = useState<CommsContext['participant']>(null);
   const [conference, setConference] = useState<CommsContext['conference']>(null);
   const [participantsStatus, setParticipantsStatus] = useState<CommsContext['participantsStatus']>({});
   const [conferenceStatus, setConferenceStatus] = useState<CommsContext['conferenceStatus']>(null);
   const [participants, setParticipants] = useState<Map<string, Participant>>(new Map());
-  const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [isAudio, setIsAudio] = useState<boolean>(true);
   const [isVideo, setIsVideo] = useState<boolean>(true);
   const [isLocalVideoLoading, setIsLocalVideoLoading] = useState(false);
+  const [isLocalAudioLoading, setIsLocalAudioLoading] = useState(false);
 
   // INITIALIZATION
 
   useEffect(() => {
-    if (token && refreshToken) {
-      sdkService.initializeToken(token, refreshToken);
-      setIsInitialized(true);
-    } else {
-      // eslint-disable-next-line no-console
-      console.log('No initialization params passed');
+    if (!dioWindow.dolbyio.isInitialized) {
+      if (token && refreshToken) {
+        sdkService.initializeToken(token, refreshToken);
+        dioWindow.dolbyio.isInitialized = true;
+      } else {
+        // eslint-disable-next-line no-console
+        console.error('Initialization parameters missing.');
+      }
     }
   }, [token, refreshToken]);
 
@@ -77,17 +94,17 @@ const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) =>
       participants.forEach((p) => {
         map[p.id] = {
           isSpeaking: !!participantsStatus[p.id]?.isSpeaking,
-          isLocal: p.id === user?.id,
-          isRemoteAudio: p.id === user?.id ? p.audioTransmitting : p.audioReceivingFrom,
+          isLocal: p.id === participant?.id,
+          isRemoteAudio: p.id === participant?.id ? p.audioTransmitting : p.audioReceivingFrom,
           isLocalAudio: prev[p.id] ? prev[p.id].isLocalAudio : true,
           isVideo: p.streams[p.streams.length - 1]?.getVideoTracks().length > 0,
         };
       });
       return map;
     });
-  }, [participants, user]);
+  }, [participants, participant]);
 
-  const openSession = async (participantInfo: ParticipantInfo) => {
+  const openSession = async (participantInfo: ParticipantInfo): Promise<void> => {
     if (sessionService.isOpen()) return;
 
     const timeoutPromise = setTimeout(async () => {
@@ -96,18 +113,19 @@ const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) =>
     try {
       await sessionService.open(participantInfo);
       clearTimeout(timeoutPromise);
-      setUser(sessionService.getUser());
+      setParticipant(sessionService.getParticipant());
     } catch {
       clearTimeout(timeoutPromise);
-      setUser(null);
+      setParticipant(null);
     }
   };
 
-  const closeSession = async () => {
+  const closeSession = async (): Promise<void> => {
     await sessionService.close();
+    setParticipant(null);
   };
 
-  const startParticipantAudio = async (participant: Participant) => {
+  const startParticipantAudio = async (participant: Participant): Promise<void> => {
     const p = conferenceService.participants().get(participant.id);
     if (p) {
       await conferenceService.startAudio(p);
@@ -123,7 +141,7 @@ const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) =>
     }
   };
 
-  const stopParticipantAudio = async (participant: Participant) => {
+  const stopParticipantAudio = async (participant: Participant): Promise<void> => {
     const p = conferenceService.participants().get(participant.id);
     if (p) {
       await conferenceService.stopAudio(p);
@@ -139,15 +157,19 @@ const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) =>
     }
   };
 
-  const toggleAudio = async () => {
-    if (user) {
-      const localUser = conferenceService.participants().get(user.id);
+  const toggleAudio = async (): Promise<void> => {
+    if (participant) {
+      const localUser = conferenceService.participants().get(participant.id);
       if (localUser) {
         if (localUser.audioTransmitting) {
+          setIsLocalAudioLoading(true);
           await stopParticipantAudio(localUser);
+          setIsLocalAudioLoading(false);
           setIsAudio(false);
         } else {
+          setIsLocalAudioLoading(true);
           await startParticipantAudio(localUser);
+          setIsLocalAudioLoading(false);
           setIsAudio(true);
         }
       }
@@ -156,18 +178,18 @@ const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) =>
     }
   };
 
-  const toggleVideo = async () => {
-    if (user) {
-      const localUser = conferenceService.participants().get(user.id);
+  const toggleVideo = async (): Promise<void> => {
+    if (participant) {
+      const localUser = conferenceService.participants().get(participant.id);
       if (localUser) {
         if (localUser.streams[localUser.streams.length - 1]?.getVideoTracks().length > 0) {
           setIsLocalVideoLoading(true);
-          await conferenceService.stopVideo(user);
+          await conferenceService.stopVideo(participant);
           setIsLocalVideoLoading(false);
           setIsVideo(false);
         } else {
           setIsLocalVideoLoading(true);
-          await conferenceService.startVideo(user);
+          await conferenceService.startVideo(participant);
           setIsLocalVideoLoading(false);
           setIsVideo(true);
         }
@@ -179,19 +201,19 @@ const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) =>
 
   // CONFERENCE METHODS
 
-  const joinConference = useCallback(async (conference, joinOptions) => {
-    try {
-      const joinedConference = await conferenceService.join(conference, joinOptions);
-      setConference(joinedConference);
-    } catch (error) {
-      console.log(error);
-    }
+  const createConference = useCallback((conferenceOptions: ConferenceOptions): Promise<Conference> => {
+    return conferenceService.create(conferenceOptions);
   }, []);
 
-  const leaveConference = useCallback(async () => {
+  const joinConference = useCallback(async (conference: Conference, joinOptions: JoinOptions): Promise<Conference> => {
+    const joinedConference = await conferenceService.join(conference, joinOptions);
+    setConference(joinedConference);
+    return joinedConference;
+  }, []);
+
+  const leaveConference = useCallback(async (): Promise<void> => {
     await conferenceService.leave();
     await closeSession();
-    setUser(null);
     setConference(null);
     setParticipantsStatus({});
     setConferenceStatus(null);
@@ -285,28 +307,42 @@ const CommsProvider = ({ children, token, refreshToken }: CommsProviderProps) =>
     () => ({
       openSession,
       closeSession,
+      createConference,
       joinConference,
       leaveConference,
-      user,
+      participant,
       conference,
       conferenceStatus,
       participants: Array.from(participants.values()),
       participantsStatus,
-      isAudio: user?.id && participantsStatus[user.id] ? !!participantsStatus[user.id]?.isRemoteAudio : isAudio,
+      isAudio: participant?.id && participantsStatus[participant.id] ? !!participantsStatus[participant.id]?.isRemoteAudio : isAudio,
       toggleAudio,
       startParticipantAudio,
       stopParticipantAudio,
-      isVideo: user?.id && participantsStatus[user.id] ? !!participantsStatus[user.id]?.isVideo : isVideo,
+      isVideo: participant?.id && participantsStatus[participant.id] ? !!participantsStatus[participant.id]?.isVideo : isVideo,
       toggleVideo,
       addIsSpeakingListener,
       isLocalVideoLoading,
+      isLocalAudioLoading,
       resetVideo,
       resetAudio,
     }),
-    [user, conference, participants, participantsStatus, conferenceStatus, isAudio, isVideo, isLocalVideoLoading],
+    [
+      participant,
+      conference,
+      participants,
+      participantsStatus,
+      conferenceStatus,
+      isAudio,
+      isVideo,
+      isLocalVideoLoading,
+      isLocalAudioLoading,
+    ],
   );
 
-  return <CommsContext.Provider value={contextValue}>{isInitialized ? children : ''}</CommsContext.Provider>;
+  return (
+    <CommsContext.Provider value={contextValue}>{dioWindow.dolbyio.isInitialized ? children : ''}</CommsContext.Provider>
+  );
 };
 
 export default CommsProvider;

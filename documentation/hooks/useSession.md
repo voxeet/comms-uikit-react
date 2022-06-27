@@ -8,7 +8,7 @@ The useSession hook gathers functions responsible for managing sessions.
 | -------------- | -------- | ------------------------------------------------- |
 | `openSession`  | () => {} | Opens a new Dolby.io session.                     |
 | `closeSession` | () => {} | Closes the current Dolby.io session.              |
-| `user`         | User     | The object of the local participant in a session. |
+| `participant`  | Participant     | The object of the local participant in a session. |
 
 ## Examples
 
@@ -36,10 +36,10 @@ const close = async () => {
 <button onClick={close}>...</button>;
 ```
 
-### Get local user data
+### Get local participant data
 
 ```javascript
-const { user } = useSession();
+const { participant } = useSession();
 
-<p>{user.info.name}</p>;
+<p>{participant.info.name}</p>;
 ```

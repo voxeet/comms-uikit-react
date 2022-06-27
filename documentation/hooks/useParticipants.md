@@ -32,11 +32,9 @@ participants.map((p) => {
 
 ```javascript
 const { participantsStatus } = useParticipants();
-  const { isSpeaking } = participantsStatus[participant.id] || {};
+const { isSpeaking } = participantsStatus[participant.id] || {};
 
-let content;
-
-if(isSpeaking) {
+if (isSpeaking) {
     return <SpeakingIndicator>
 }
 

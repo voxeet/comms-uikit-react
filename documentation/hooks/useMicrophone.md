@@ -8,7 +8,7 @@ The useMicrophone hook gathers functions responsible for managing microphones.
 | ------------------------- | ----------------------- | ----------------------------------------------- |
 | `getMicrophones`          | () => Promise<Mic[]>    | Gets a list of the available microphones.       |
 | `selectMicrophone`        | (Mic) => void)          | Selects a microphone.                           |
-| `hasMicrophonePermission` | () => Promise<boolean>) | Check status of browser microphone permissions. |
+| `getMicrophonePermission` | () => Promise<boolean>) | Check status of browser microphone permissions. |
 
 ## Examples
 
@@ -38,13 +38,13 @@ const { toggleAudio } = useMicrophone();
 ### Check microphone permission
 
 ```javascript
-const { hasMicrophonePermission } = useMicrophone();
+const { getMicrophonePermission } = useMicrophone();
 const [isMicrophonePermission, setIsMicrophonePermission] = useState(false);
 
 useEffect(() => {
   (async () => {
     try {
-      const hasAccess = await hasMicrophonePermission();
+      const hasAccess = await getMicrophonePermission();
       setIsMicrophonePermission(hasAccess);
     } catch {
       setIsMicrophonePermission(false);

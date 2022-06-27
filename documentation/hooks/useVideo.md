@@ -7,7 +7,7 @@ The useVideo hook gathers functions responsible for managing state of video tran
 | Name                    | Type                    | Description                                 |
 | ----------------------- | ----------------------- | ------------------------------------------- |
 | `isVideo`               | boolean                 | Indicates video state of local user.        |
-| `toggleVideo`           | () => void)             | Toggles video of local user.                |
+| `toggleVideo`           | () => void             | Toggles video of local user.                |
 
 ## Examples
 
