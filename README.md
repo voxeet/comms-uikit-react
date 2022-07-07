@@ -269,6 +269,6 @@ Before using the package `@dolbyio/comms-uikit-react`, please review and accept 
 
 ## Third-Party licenses
 
-Direct licenses can be found [here](./third-party-licenses)
+Direct licenses can be found [here](./third-party-licenses.json)
 
 © Dolby, 2022
