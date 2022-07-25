@@ -13,7 +13,7 @@ The package consists of three basic elements:
 - **UI components**: Components that cover the most popular patterns of video conferencing applications.
 - **Video call components**: UI components with built-in logic for the most widely used video call features.
 
-If you want to see an example of an application created using this UIKit, you can also check our [video call application](https://github.com/dolbyio-samples/comms-app-react-videoconference).
+If you want to see an example of an application created using this UIKit, you can also check our [video call application](https://github.com/dolbyio-samples/comms-app-react-videocall).
 
 ## Getting Started
 
