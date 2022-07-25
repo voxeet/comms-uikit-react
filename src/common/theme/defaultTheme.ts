@@ -1,31 +1,44 @@
 const defaultTheme = {
   // COLORS
   colors: {
-    black: '#000000',
+    black: '#14141A',
     white: '#FFFFFF',
     background: '#39393F',
     infoSuccess: '#17CE55',
     infoInformation: '#1930E5',
     infoWarning: '#F09E00',
-    infoError: '#E31A1A',
+    infoError: '#E52222',
     transparent: 'transparent',
     blue: {
       300: '#D1DBF4',
       400: '#3E44FE',
+      600: '#3D74f4',
     },
     purple: {
-      400: '#BB5CFF',
+      25: '#FDFAFF',
+      50: '#F4E5FF',
+      100: '#EACCFF',
+      200: '#D599FF',
+      300: '#BF66FF',
+      400: '#AA33FF',
+      500: '#8829CC',
+      600: '#6E21A6',
+      700: '#551980',
+      800: '#3B1259',
+      900: '#220A33',
     },
     primary: {
-      100: '#F1E6FF',
-      200: '#DCBFFF',
-      300: '#C799FF',
-      400: '#B373FF',
-      500: '#9E4DFF',
-      600: '#8926FF',
-      700: '#7400FF',
-      800: '#5D00CC',
-      900: '#460099',
+      25: '#FDFAFF',
+      50: '#F4E5FF',
+      100: '#EACCFF',
+      200: '#D599FF',
+      300: '#BF66FF',
+      400: '#AA33FF',
+      500: '#8829CC',
+      600: '#6E21A6',
+      700: '#551980',
+      800: '#3B1259',
+      900: '#220A33',
     },
     secondary: {
       100: '#FCFDFF',
@@ -43,12 +56,13 @@ const defaultTheme = {
       500: '#D92626',
     },
     grey: {
-      100: '#E6E9F2',
-      200: '#CFD5E6',
+      50: '#F0F0F2',
+      100: '#E0E0E5',
+      200: '#BBBBBF',
       300: '#ADB6CC',
       400: '#8F99B3',
-      500: '#737D99',
-      600: '#606980',
+      500: '#6A6A6D',
+      600: '#535359',
       700: '#4D5466',
       800: '#393F4D',
       900: '#262A33',
@@ -112,9 +126,22 @@ const defaultTheme = {
   shadowRadius: 8, // mobile only
   shadowElevation: 3, // mobile only
   // FONTS
-  fontFamily: 'Mont',
+  fontFamily: 'Roboto',
   // BORDERS
   borderRadius: 24,
+  // SPACES
+  spaces: {
+    xxxs: 2,
+    xxs: 4,
+    xs: 8,
+    s: 16,
+    m: 24,
+    l: 32,
+    xl: 40,
+    xxl: 48,
+    xxxl: 56,
+    xxxxl: 64,
+  },
 };
 
 export default defaultTheme;

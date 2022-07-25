@@ -10,6 +10,7 @@ export type RecursivePartial<T> = {
 };
 
 export type ColorHues = {
+  25: string;
   50: string;
   100: string;
   200: string;
@@ -26,7 +27,8 @@ export type ColorKey = string;
 export type Colors = Record<string, Partial<ColorHues> | string>;
 
 export type Theme = {
-  colors: Colors & typeof defaultTheme['colors'];
+  colors: Colors;
+  spaces: typeof defaultTheme['spaces'];
   avatars: string[];
   // SHADOWS
   shadowColor?: string; // mobile only
@@ -46,5 +48,7 @@ export type CustomThemes = Record<string, RecursivePartial<Theme>>;
 export type test = CustomThemes['dark'];
 
 export type ThemeMode = keyof typeof customThemes;
+
+export type SpaceValues = keyof typeof defaultTheme['spaces'];
 
 export type Sizes = 'xxs' | 'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl' | 'xxxl';

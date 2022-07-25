@@ -1,0 +1,22 @@
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &.size {
+    &-xs {
+      width: 16px;
+      height: 16px;
+    }
+
+    &-s {
+      width: 18px;
+      height: 18px;
+    }
+
+    &-m {
+      width: 24px;
+      height: 24px;
+    }
+  }
+}

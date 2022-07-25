@@ -4,12 +4,12 @@ The useCamera hook gathers functions responsible for managing cameras.
 
 ## Members
 
-| Name                    | Type                    | Description                                 |
-| ----------------------- | ----------------------- | ------------------------------------------- |
-| `getCameras`            | () => Promise<MediaDeviceInfo[]> | Gets the list of the available cameras.     |
-| `selectCamera`          | (string) => Promise<string>       | Selects a camera.                           |
-| `getDefaultLocalCamera` | () => Promise<MediaDeviceInfo>  | Gets data of default camera.                |
-| `getCameraPermission`   | () => Promise<boolean> | Check status of browser camera permissions. |
+| Name                    | Type                                   | Description                                 |
+| ----------------------- | -------------------------------------- | ------------------------------------------- |
+| `getCameras`            | () => Promise<MediaDeviceInfo[]>       | Gets the list of the available cameras.     |
+| `selectCamera`          | (string) => Promise<string>            | Selects a camera.                           |
+| `getDefaultLocalCamera` | () => Promise<MediaDeviceInfo \| null> | Gets data of default camera.                |
+| `getCameraPermission`   | () => Promise<boolean>                 | Check status of browser camera permissions. |
 
 ## Examples
 

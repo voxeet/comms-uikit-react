@@ -11,7 +11,7 @@ The IconButton component is responsible for rectangular buttons that contain ico
 | `iconColor` ?           | ColorKey                          | -        | The color of the icon.                                                                                 |
 | `badge` ?               | boolean                           | false    | The small circular indicator that appears at the top of the button.                                    |
 | `badgeColor` ?          | ColorKey                          | -        | The color of the badge.                                                                                |
-| `badgeContentColor` ?   | ColorKey                          | -        | The color of the text that appears is in the badge.                                                    |
+| `badgeContentColor` ?   | ColorKey                          | -        | The color of text that appears is in the badge.                                                        |
 | `strokeColor` ?         | ColorKey                          | -        | The color of the button's border.                                                                      |
 | `size` ?                | 'xxs' , 'xs' , 's' , 'm'          | 'm'      | The size of the button.                                                                                |
 | `disabled` ?            | boolean                           | false    | The activity state.                                                                                    |
@@ -19,7 +19,7 @@ The IconButton component is responsible for rectangular buttons that contain ico
 | `onClick`               | Function                          | -        | The event handler property for processing click events on the button.                                  |
 | `testID` ?              | string                            | -        | The unique E2E test handler.                                                                           |
 | `style` ?               | CSSProperties                     | -        | The style of the layout.                                                                               |
-| `...HTMLButtonElement`? | Partial(HTMLDivElement)           | -        | Props that will be passed to the root button element                                                   |
+| `...HTMLButtonElement`? | Partial(HTMLDivElement)           | -        | Props that will be passed to the root of the button element.                                           |
 
 ## Examples
 

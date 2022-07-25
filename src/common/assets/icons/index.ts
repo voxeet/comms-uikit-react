@@ -20,6 +20,7 @@ import headphonesGradient from './headphones-gradient.svg';
 import headphones from './headphones.svg';
 import infoGradient from './info-gradient.svg';
 import info from './info.svg';
+import lossless from './lossless.svg';
 import microphoneGradient from './microphone-gradient.svg';
 import microphoneOffGradient from './microphone-off-gradient.svg';
 import microphoneOff from './microphone-off.svg';
@@ -84,6 +85,7 @@ const Icons = {
   handsetGradient,
   sendMessageGradient,
   speakerGradient,
+  lossless,
 };
 
 export default Icons;

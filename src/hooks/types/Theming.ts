@@ -42,6 +42,6 @@ export type Theming = {
    * Gets the gradient value of the theme.
    */
   getGradient: (color?: [ColorKey, ColorKey], fallback?: string) => string[];
-}
+};
 
 export type UseTheme = () => Theming & Theme;

@@ -3,14 +3,14 @@ import type { CustomThemes, RecursivePartial } from '../common/theme/types';
 import deepMerge from 'lodash.merge';
 import { createContext, useEffect, useMemo, useState } from 'react';
 
-type ThemeContext = {
+export type ThemeContext = {
   theme: Theme;
   activeTheme: ThemeMode;
   themes: CustomThemes;
   setActiveTheme: (value: ThemeMode) => void;
 };
 
-type ThemeProviderProps = {
+export type ThemeProviderProps = {
   children: React.ReactNode;
   theme?: RecursivePartial<Theme>;
   customThemes?: CustomThemes;
@@ -18,7 +18,7 @@ type ThemeProviderProps = {
 
 export const ThemeContext = createContext<ThemeContext>({
   theme: defaultTheme,
-} as ThemeContext);
+} as unknown as ThemeContext);
 
 const ThemeProvider = ({ children, theme, customThemes }: ThemeProviderProps) => {
   const [themes, setThemes] = useState<CustomThemes>(defaultCustomThemes);

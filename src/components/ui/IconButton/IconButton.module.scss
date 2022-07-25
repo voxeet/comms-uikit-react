@@ -1,0 +1,92 @@
+.iconBtn {
+  box-sizing: border-box;
+  position: relative;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .badgeContainer {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+
+    &.withDot {
+      top: 0;
+    }
+
+    &.withContent {
+      top: -8px;
+    }
+
+    &.rightBadge {
+      left: 100%;
+    }
+
+    &:not(.rightBadge) {
+      &.IconHasBackground {
+        bottom: unset;
+
+        &.withDot {
+          top: -4px;
+        }
+
+        &.withContent {
+          top: -24px;
+        }
+      }
+    }
+  }
+
+  &.size {
+    &-xxs {
+      width: 20px;
+      height: 20px;
+    }
+    &-xs {
+      width: 30px;
+      height: 30px;
+    }
+    &-s {
+      width: 40px;
+      height: 40px;
+    }
+    &-m {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  &.rectangular {
+    width: 72px;
+    height: 48px;
+  }
+
+  &.circle {
+    border-radius: 100%;
+    border: 2px solid;
+    width: 40px;
+    height: 40px;
+  }
+
+  &.disabled {
+    cursor: default;
+    pointer-events: none;
+  }
+
+  &:hover {
+    transition: 0.1s linear;
+
+    &.size {
+      &-m {
+        .badgeContainer.withContent {
+          top: -24px;
+          bottom: unset;
+        }
+      }
+    }
+  }
+}

@@ -1,7 +1,12 @@
+import { useContext } from 'react';
+
+import { CommsContext } from '../providers/CommsProvider';
 import MediaDevicesService from '../services/mediaDevices';
+
 import type { UseCamera } from './types/Camera';
 
 const useCamera: UseCamera = () => {
+  const { localCamera, setLocalCamera } = useContext(CommsContext);
   const getCameras = async () => {
     return (await MediaDevicesService.enumerateVideoInputDevices()).filter((d) => d.deviceId) as MediaDeviceInfo[];
   };
@@ -11,23 +16,15 @@ const useCamera: UseCamera = () => {
   };
 
   const getDefaultLocalCamera = async () => {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    let localCamera = null;
-    const localCameras = [];
-
+    const devices = await MediaDevicesService.enumerateVideoInputDevices();
     for (let i = 0; i < devices.length; i++) {
       const device = devices[i];
 
-      if (device.deviceId === 'default' && device.kind === 'videoinput') {
-        localCamera = device;
-
-        break;
-      }
-      if (device.kind === 'videoinput') {
-        localCameras.push(device);
+      if (device.deviceId === 'default') {
+        return device;
       }
     }
-    return localCamera || localCameras[0];
+    return null;
   };
 
   const getCameraPermission = async () => {
@@ -35,7 +32,10 @@ const useCamera: UseCamera = () => {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
+        video: {
+          width: { min: 1024, ideal: 1280, max: 1920 },
+          height: { min: 576, ideal: 720, max: 1080 },
+        },
       });
 
       if (stream) {
@@ -47,7 +47,6 @@ const useCamera: UseCamera = () => {
     } catch (error) {
       permission = false;
     }
-
     return permission;
   };
 
@@ -56,6 +55,8 @@ const useCamera: UseCamera = () => {
     selectCamera,
     getDefaultLocalCamera,
     getCameraPermission,
+    localCamera,
+    setLocalCamera,
   };
 };
 

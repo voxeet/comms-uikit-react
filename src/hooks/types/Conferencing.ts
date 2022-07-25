@@ -2,6 +2,13 @@ import type Conference from '@voxeet/voxeet-web-sdk/types/models/Conference';
 import type ConferenceOptions from '@voxeet/voxeet-web-sdk/types/models/ConferenceOptions';
 import type { JoinOptions } from '@voxeet/voxeet-web-sdk/types/models/Options';
 
+export type PrevConference = {
+  /** Participant name */
+  participant: string;
+  /** Conference name */
+  name: string;
+};
+
 export type Conferencing = {
   /**
    * The object of the current conference.
@@ -27,6 +34,11 @@ export type Conferencing = {
    * Leaves a conference.
    */
   leaveConference: () => Promise<void>;
-}
+
+  /**
+   * The object with simple data of the previously joined conference.
+   */
+  prevConference: PrevConference | null;
+};
 
 export type UseConference = () => Conferencing;

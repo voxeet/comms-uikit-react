@@ -1,10 +1,10 @@
+import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
+
 export type Video = {
   /**
    * Indicates video state of local user.
    */
   isVideo: boolean;
-
-  isLocalVideoLoading: boolean;
 
   /**
    * Toggles video of local user.
@@ -12,6 +12,9 @@ export type Video = {
   toggleVideo: () => Promise<void>;
 
   resetVideo: () => void;
-}
+
+  startParticipantVideo: (participant: Participant) => Promise<void>;
+  stopParticipantVideo: (participant: Participant) => Promise<void>;
+};
 
 export type UseVideo = () => Video;

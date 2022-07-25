@@ -14,7 +14,7 @@ The Text component is responsible for displaying text.
 | `align` ?             | 'left' / 'center' / 'right' | 'left'        | The preferred text alignment.                                                                     |
 | `style` ?             | React.CSSProperties         | -             | The additional styles.                                                                            |
 | `testID`?             | string                      | -             | The unique E2E test handler.                                                                      |
-| `...HTMLSpanElement`? | Partial(HTMLSpanElement)    | -             | Props that will be passed to the root span element                                                |
+| `...HTMLSpanElement`? | Partial(HTMLSpanElement)    | -             | Props that will be passed to the root of the span element.                                        |
 
 ## Examples
 

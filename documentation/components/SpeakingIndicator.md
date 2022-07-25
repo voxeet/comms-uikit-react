@@ -1,16 +1,16 @@
 # SpeakingIndicator
 
-The SpeakingIndicator component is responsible for indicating if the relevant user is speaking.
+The SpeakingIndicator component is responsible for indicating if a participant is actively talking.
 
 ## Props
 
-| Name                 | Type                    | Default | Description                                       |
-| -------------------- | ----------------------- | ------- | ------------------------------------------------- |
-| `backgroundColor`?   | ColorKey                | -       | The background color of the indicator.            |
-| `iconColor` ?        | ColorKey                | -       | The color of the displayed speaking icon.         |
-| `size` ?             | 's' , 'm'               | 'm'     | The size of the indicator.                        |
-| `testID` ?           | string                  | -       | The unique E2E test handler.                      |
-| `...HTMLDivElement`? | Partial(HTMLDivElement) | -       | Props that will be passed to the root div element |
+| Name                 | Type                    | Default | Description                                               |
+| -------------------- | ----------------------- | ------- | --------------------------------------------------------- |
+| `backgroundColor`?   | ColorKey                | -       | The background color of the indicator.                    |
+| `iconColor` ?        | ColorKey                | -       | The color of the displayed speaking icon.                 |
+| `size` ?             | 's' , 'm'               | 'm'     | The size of the indicator.                                |
+| `testID` ?           | string                  | -       | The unique E2E test handler.                              |
+| `...HTMLDivElement`? | Partial(HTMLDivElement) | -       | Props that will be passed to the root of the div element. |
 
 ## Examples
 

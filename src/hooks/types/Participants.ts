@@ -15,6 +15,10 @@ export type ParticipantStatus = {
 
 export type Participants = {
   /**
+   * Local participant.
+   */
+  participant: Participant | null;
+  /**
    * The list of conference participants.
    */
   participants: Participant[];
@@ -31,6 +35,6 @@ export type Participants = {
    * @param participant -  Participant to check the status.
    */
   addIsSpeakingListener: (participant: Participant) => () => void;
-}
+};
 
 export type UseParticipants = () => Participants;

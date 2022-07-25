@@ -10,7 +10,7 @@ The Button component is responsible for square and rectangular buttons.
 | `variant` ?             | 'primary' / 'secondary' / 'tertiary' | -       | The variant of style that allows you to distinguish between actions of different importance in the UI. |
 | `onClick` ?             | Function                             | -       | The event handler property for processing click events on the button.                                  |
 | `testID` ?              | string                               | -       | The unique E2E test handler.                                                                           |
-| `...HTMLButtonElement`? | Partial(HTMLDivElement)              | -       | Props that will be passed to the root button element                                                   |
+| `...HTMLButtonElement`? | Partial(HTMLDivElement)              | -       | Props that will be passed to the root of the button element.                                           |
 
 ## Examples
 

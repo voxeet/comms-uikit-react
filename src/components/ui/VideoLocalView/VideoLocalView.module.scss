@@ -1,0 +1,40 @@
+.videoWrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+
+  .spinnerWrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  video {
+    height: 100%;
+    min-width: 100%;
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    border-radius: 12px;
+  }
+
+  .indicator {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 1;
+  }
+}
+
+.fallbackWrapper {
+  flex: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.fallbackContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
