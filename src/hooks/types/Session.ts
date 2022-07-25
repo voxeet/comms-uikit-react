@@ -23,6 +23,6 @@ export type Session = {
    * @returns the version of the SDK.
    */
   getSDKVersion: () => string;
-}
+};
 
 export type UseSession = () => Session;

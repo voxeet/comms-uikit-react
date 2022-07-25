@@ -14,7 +14,4 @@ module.exports = {
   },
   verbose: true,
   setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
-  jest: {
-    setupFiles: ['jest-canvas-mock'],
-  },
 };

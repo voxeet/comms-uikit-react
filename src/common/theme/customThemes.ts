@@ -4,23 +4,38 @@ const customThemes: CustomThemes = {
   'Dark Graphite': {
     // COLORS
     colors: {
-      black: '#000000',
+      black: '#14141A',
       white: '#FFFFFF',
       background: '#1D1F26',
       infoSuccess: '#17CE55',
       infoInformation: '#1930E5',
       infoWarning: '#F09E00',
       infoError: '#E31A1A',
+      purple: {
+        25: '#FDFAFF',
+        50: '#F4E5FF',
+        100: '#EACCFF',
+        200: '#D599FF',
+        300: '#BF66FF',
+        400: '#AA33FF',
+        500: '#8829CC',
+        600: '#6E21A6',
+        700: '#551980',
+        800: '#3B1259',
+        900: '#220A33',
+      },
       primary: {
-        100: '#F1E6FF',
-        200: '#DCBFFF',
-        300: '#C799FF',
-        400: '#B37311',
-        500: '#9E4DFF',
-        600: '#8926FF',
-        700: '#7400FF',
-        800: '#5D00CC',
-        900: '#460099',
+        25: '#FDFAFF',
+        50: '#F4E5FF',
+        100: '#EACCFF',
+        200: '#D599FF',
+        300: '#BF66FF',
+        400: '#AA33FF',
+        500: '#8829CC',
+        600: '#6E21A6',
+        700: '#551980',
+        800: '#3B1259',
+        900: '#220A33',
       },
       secondary: {
         100: '#FCFDFF',
@@ -40,7 +55,7 @@ const customThemes: CustomThemes = {
       grey: {
         100: '#E6E9F2',
         200: '#CFD5E6',
-        300: '#ADB6CC',
+        300: '#959599',
         400: '#8F99B3',
         500: '#737D99',
         600: '#606980',
@@ -69,7 +84,7 @@ const customThemes: CustomThemes = {
     shadowRadius: 8, // mobile only
     shadowElevation: 3, // mobile only
     // FONTS
-    fontFamily: 'Mont',
+    fontFamily: 'Roboto',
     // BORDERS
     borderRadius: 24,
   },
@@ -77,7 +92,7 @@ const customThemes: CustomThemes = {
     // COLORS
     colors: {
       black: '#000000',
-      white: '#afafaf',
+      white: '#FFFFFF',
       background: '#0047AB',
       infoSuccess: '#17CE55',
       infoInformation: '#1930E5',
@@ -141,7 +156,7 @@ const customThemes: CustomThemes = {
     shadowRadius: 8, // mobile only
     shadowElevation: 3, // mobile only
     // FONTS
-    fontFamily: 'Mont',
+    fontFamily: 'Roboto',
     // BORDERS
     borderRadius: 24,
   },
@@ -213,7 +228,7 @@ const customThemes: CustomThemes = {
     shadowRadius: 8, // mobile only
     shadowElevation: 3, // mobile only
     // FONTS
-    fontFamily: 'Mont',
+    fontFamily: 'Roboto',
     // BORDERS
     borderRadius: 24,
   },

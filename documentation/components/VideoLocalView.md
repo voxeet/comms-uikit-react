@@ -14,7 +14,7 @@ The VideoLocalView component is responsible for displaying video from the local 
 | `indicator` ?        | boolean                 | true    | A boolean that indicates whether the component displays the IconIndicator component in top right corner. If set to true, IconIndicator is displayed. |
 | `audio` ?            | boolean                 | true    | A boolean responsible for enabling the local participant's microphone. If set to true, the component plays audio from the microphone.                |
 | `testID` ?           | string                  | -       | The unique E2E test handler.                                                                                                                         |
-| `...HTMLDivElement`? | Partial(HTMLDivElement) | -       | Props that will be passed to the root div element                                                                                                    |
+| `...HTMLDivElement`? | Partial(HTMLDivElement) | -       | Props that will be passed to the root of the div element.                                                                                            |
 
 ## Examples
 

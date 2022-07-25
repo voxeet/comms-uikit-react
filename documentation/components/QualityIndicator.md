@@ -11,7 +11,7 @@ The QualityIndicator component represents the quality of participants' audio and
 | `activeColor` ?      | ColorKey                | -       | The color of the active bars in the indicator.                                                                                                                                                                 |
 | `defaultColor` ?     | ColorKey                | -       | The color of the inactive bars in the indicator.                                                                                                                                                               |
 | `testID` ?           | string                  | -       | The unique E2E test handler.                                                                                                                                                                                   |
-| `...HTMLDivElement`? | Partial(HTMLDivElement) | -       | Props that will be passed to the root div element                                                                                                                                                              |
+| `...HTMLDivElement`? | Partial(HTMLDivElement) | -       | Props that will be passed to the root od the div element.                                                                                                                                                      |
 
 ## Examples
 

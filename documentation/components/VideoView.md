@@ -12,7 +12,7 @@ The VideoView component is responsible for displaying video stream of each confe
 | `noVideoFallback` ?  | () => ReactNode         | -       | The function that overwrites the default way of displaying streams. |
 | `isMirrored` ?       | boolean                 | false   | If true, video view is mirrored.                                    |
 | `testID` ?           | string                  | -       | The unique E2E test handler.                                        |
-| `...HTMLDivElement`? | Partial(HTMLDivElement) | -       | Props that will be passed to the root div element                   |
+| `...HTMLDivElement`? | Partial(HTMLDivElement) | -       | Props that will be passed to the root of the div element.           |
 
 ## Examples
 

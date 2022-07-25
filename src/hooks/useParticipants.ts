@@ -1,15 +1,17 @@
 import { useContext, useMemo } from 'react';
 
 import { CommsContext } from '../providers/CommsProvider';
+
 import type { UseParticipants } from './types/Participants';
 
-const DISPLAYED_STATUSES = [ 'Connected', 'Inactive' ];
+const DISPLAYED_STATUSES = ['Connected', 'Inactive'];
 
 const useParticipants: UseParticipants = () => {
   const {
     participants: rawParticipants,
     participantsStatus,
-    addIsSpeakingListener
+    addIsSpeakingListener,
+    participant,
   } = useContext(CommsContext);
 
   const participants = useMemo(() => {
@@ -17,6 +19,7 @@ const useParticipants: UseParticipants = () => {
   }, [rawParticipants]);
 
   return {
+    participant,
     participants,
     participantsStatus,
     addIsSpeakingListener,

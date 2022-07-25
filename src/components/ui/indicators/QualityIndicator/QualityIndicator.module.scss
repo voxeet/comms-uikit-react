@@ -1,0 +1,30 @@
+.quality {
+  box-sizing: border-box;
+  width: 26px;
+  height: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-radius: 6px;
+
+  .line {
+    width: 2px;
+    border-radius: 2px;
+  }
+
+  .first {
+    height: 4px;
+  }
+  .second {
+    height: 6px;
+  }
+  .third {
+    height: 8px;
+  }
+  .fourth {
+    height: 10px;
+  }
+  .fifth {
+    height: 12px;
+  }
+}

@@ -4,14 +4,14 @@ The Icon component is responsible for displaying icon files in SVG format.
 
 ## Props
 
-| Name                 | Type                         | Default   | Description                                       |
-| -------------------- | ---------------------------- | --------- | ------------------------------------------------- |
-| `name`               | IconsKeys                    | -         | The name of the icon file.                        |
-| `color`?             | ColorKey                     | -         | The color of the icon.                            |
-| `colorTone`?         | 'light' / 'default' / 'dark' | 'default' | The color tone of the icon.                       |
-| `size`?              | 'xxs' / 'xs' / 's' / 'm'     | 'm'       | The size of the icon.                             |
-| `testID`?            | string                       | -         | The unique E2E test handler.                      |
-| `...HTMLDivElement`? | Partial(HTMLDivElement)      | -         | Props that will be passed to the root div element |
+| Name                 | Type                         | Default   | Description                                               |
+| -------------------- | ---------------------------- | --------- | --------------------------------------------------------- |
+| `name`               | IconsKeys                    | -         | The name of the icon file.                                |
+| `color`?             | ColorKey                     | -         | The color of the icon.                                    |
+| `colorTone`?         | 'light' / 'default' / 'dark' | 'default' | The color tone of the icon.                               |
+| `size`?              | 'xxs' / 'xs' / 's' / 'm'     | 'm'       | The size of the icon.                                     |
+| `testID`?            | string                       | -         | The unique E2E test handler.                              |
+| `...HTMLDivElement`? | Partial(HTMLDivElement)      | -         | Props that will be passed to the root of the div element. |
 
 ## Available icons
 

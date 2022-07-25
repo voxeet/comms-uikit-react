@@ -94,4 +94,8 @@ export default class ConferenceService {
   public static leave() {
     return WebSDK.conference.leave();
   }
+
+  public static playBlockedAudio() {
+    return WebSDK.conference.playBlockedAudio();
+  }
 }
