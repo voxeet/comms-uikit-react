@@ -1,6 +1,6 @@
 {
   "name": "@dolbyio/comms-uikit-react",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "Dolby.io Communications UIKit for React",
   "license": "MIT",
   "main": "dist/index.es.js",

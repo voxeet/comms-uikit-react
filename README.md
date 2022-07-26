@@ -119,10 +119,8 @@ Let's proceed with our demo app.
 Import and wrap the application using [ThemeProvider](documentation/providers/ThemeProvider.md). In your `src/App.tsx` at the top of the file add `ThemeProvider` to existing import statement, next find `...` and replace it with:
 
 ```javascript
-<ThemeProvider theme={{ colors: { red: '#f111' } }}>...</ThemeProvider>
+<ThemeProvider>...</ThemeProvider>
 ```
-
-You can use `theme` prop to overwrite default theme.
 
 At this point your `src/App.tsx` should look like this:
 
@@ -132,7 +130,8 @@ import { CommsProvider, ThemeProvider } from '@dolbyio/comms-uikit-react';
 const App = () => {
   return (
     <CommsProvider token="YOUR_TOKEN_LIKE_eyJ0eXAiOiJKV1QiLCJhbGciOiq6bTQ673XENDLoQ">
-      <ThemeProvider theme={{ colors: { red: '#f111' } }}>...</ThemeProvider>
+      // Theme provider allows you to style your app, look at the section Theming system for more details
+      <ThemeProvider>...</ThemeProvider>
     </CommsProvider>
   );
 };
@@ -154,6 +153,7 @@ In the new line after `const App = () => {` paste this:
 
 ```javascript
 const [inMeeting, setInMeeting] = useState(false);
+// states name and alias store form values
 const [name, setName] = useState('');
 const [alias, setAlias] = useState('');
 const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -199,7 +199,9 @@ Our simplified logic suggest that we should render `Session` and `Conference` co
 ```javascript
 {
   (inMeeting && name.length > 2 && alias.length > 2) ? (
+    // Session wrapper component opens the user session
     <Session participantInfo={{ name }}>
+      // Conference wrapper component joins (and creates if needed) the conference
       <Conference audio video alias={alias}>
         <Layout>...</Layout>
       </Conference>
@@ -252,6 +254,7 @@ const App = () => {
       <ThemeProvider>
         {inMeeting && name.length > 2 && alias.length > 2 ? (
           <Session participantInfo={{ name }}>
+            // Conference allows to define if user should join with audio & video enabled
             <Conference audio video alias={alias}>
               <Layout>...</Layout>
             </Conference>
@@ -288,6 +291,7 @@ import { ..., ParticipantsList } from '@dolbyio/comms-uikit-react';
 Find `...` and use `ParticipantsList`:
 
 ```javascript
+// ParticipantsList display a participants index with basic controls. Texts displayed on list can be overwritten with props
 <ParticipantsList localText="you" muteText="mute" unmuteText="unmute" soundOnText="sound on" soundOffText="sound off" />
 ```
 
@@ -296,6 +300,7 @@ Find `...` and use `ParticipantsList`:
 To add a video grid, use the [ParticipantsGrid](documentation/components/ParticipantsGrid.md) component with the `localText` prop to display the name of the local participant. Again you have to update import statement with `ParticipantsGrid` and use under `<ParticipantsList>`.
 
 ```javascript
+// ParticipantsGrid display a grid of participants video streams.
 <ParticipantsGrid localText="you" />
 ```
 
@@ -307,9 +312,11 @@ Find `<ParticipantsGrid />` and paste this under:
 ```javascript
 <Space style={{ display: 'flex', justifyContent: 'center' }} mv="m">
   <Space mr="s">
+    // LocalToggleAudioButton allows to toggle audio transmission
     <LocalToggleAudioButton />
   </Space>
   <Space mr="s">
+    // LocalToggleVideoButton allows to toggle video transmission
     <LocalToggleVideoButton />
   </Space>
   {/* Leave */}
@@ -338,12 +345,15 @@ To manage the used devices, use the [CameraSelect](documentation/components/Came
 ```javascript
 <Space>
   <Space mb="s">
+    // CameraSelect allows user to select video input device
     <CameraSelect label="Camera" placeholder="Camera" labelColor="white" />
   </Space>
   <Space mb="s">
+    // CameraSelect allows user to select audio input device
     <MicrophoneSelect label="Microphone" placeholder="Microphone" labelColor="white" />
   </Space>
   <Space mb="s">
+    // CameraSelect allows user to select audio output device
     <SpeakersSelect label="Speakers" placeholder="Speakers" labelColor="white" />
   </Space>
 </Space>
@@ -391,15 +401,17 @@ Use our hook methods `openSession`, `createConference` and `joinConference`. To 
 
 ```javascript
 const createAndJoin = async () => {
+  // open uses session
   await openSession({
     name: 'John Doe',
   });
   const conferenceOptions = {
     alias: 'UIKita',
   };
-
+  // create a conference
   const conference = await createConference(conferenceOptions);
 
+  // enable or disable video on conference join
   const joinOptions = {
     constraints: {
       audio: true,
@@ -407,6 +419,7 @@ const createAndJoin = async () => {
     },
   };
 
+  // join a conference
   await joinConference(conference, joinOptions);
 };
 ```
