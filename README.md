@@ -6,7 +6,7 @@
 
 The Dolby.io Communications UIKit for React is designed to help React developers reduce the complexity of building and embedding a Dolby.io video call application for web.
 
-The package consists of three basic elements:
+The package consists of four basic elements:
 
 - **Providers**: The main components for initializing integration with Dolby.io Communications APIs and state management.
 - **Hooks**: Functions responsible for video calling logic of video calling applications.
