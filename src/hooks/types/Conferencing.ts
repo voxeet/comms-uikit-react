@@ -23,6 +23,13 @@ export type Conferencing = {
   createConference: (options: ConferenceOptions) => Promise<Conference>;
 
   /**
+   * Fetches a conference.
+   * @param id - The conference id.
+   * @returns the `Conference` object that represents the conference that was fetched.
+   */
+  fetchConference: (id: string) => Promise<Conference>;
+
+  /**
    * Joins a conference.
    * @param conference - The conference object.
    * @param options - The additional options for the joining participant.

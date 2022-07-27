@@ -4,21 +4,33 @@ import { useConference } from '../../../index';
 
 type ConferenceProps = {
   children: React.ReactNode;
-  alias: string;
-  audio: boolean;
-  video: boolean;
+  id?: string;
+  alias?: string;
+  audio?: boolean;
+  video?: boolean;
+  liveRecording?: boolean;
 };
 
-const Conference = ({ alias, audio, video, children }: ConferenceProps) => {
-  const { createConference, joinConference } = useConference();
+const Conference = ({ alias, id, audio = false, video = false, liveRecording = false, children }: ConferenceProps) => {
+  const { createConference, fetchConference, joinConference } = useConference();
   const [isReady, setIsReady] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
-      const conferenceOptions = {
-        alias,
-      };
-      const conf = await createConference(conferenceOptions);
+      let conference;
+      if (id) {
+        conference = await fetchConference(id);
+      } else if (alias) {
+        const createOptions = {
+          alias,
+          params: {
+            liveRecording,
+          },
+        };
+        conference = await createConference(createOptions);
+      } else {
+        return;
+      }
 
       const joinOptions = {
         constraints: {
@@ -32,7 +44,7 @@ const Conference = ({ alias, audio, video, children }: ConferenceProps) => {
         },
       };
 
-      await joinConference(conf, joinOptions);
+      await joinConference(conference, joinOptions);
       setIsReady(true);
     })();
   }, []);
