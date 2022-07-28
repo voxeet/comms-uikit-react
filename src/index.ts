@@ -75,3 +75,4 @@ export type { SelectProps, SelectOptionType } from './components/ui/Select/Selec
 export type { ValidationType } from './components/ui/Input/Input';
 export type { SelectDropdownProps } from './components/ui/Select/SelectDropdown';
 export type { IconButtonProps } from './components/ui/IconButton/IconButton';
+export type { ColorKey } from './common';

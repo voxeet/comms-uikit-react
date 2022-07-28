@@ -27,6 +27,7 @@ export type CommsContextType = {
   openSession: (participantInfo: ParticipantInfo) => Promise<void>;
   closeSession: () => Promise<void>;
   createConference: (options: ConferenceOptions) => Promise<Conference>;
+  fetchConference: (id: string) => Promise<Conference>;
   joinConference: (conference: Conference, options: JoinOptions) => Promise<Conference>;
   leaveConference: () => Promise<void>;
   toggleAudio: () => Promise<void>;
@@ -265,6 +266,10 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
     return conferenceService.create(conferenceOptions);
   }, []);
 
+  const fetchConference = useCallback((id: string): Promise<Conference> => {
+    return conferenceService.fetch(id);
+  }, []);
+
   const joinConference = useCallback(async (conference: Conference, joinOptions: JoinOptions): Promise<Conference> => {
     const joinedConference = await conferenceService.join(conference, joinOptions);
     setConference(joinedConference);
@@ -368,6 +373,7 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
       openSession,
       closeSession,
       createConference,
+      fetchConference,
       joinConference,
       leaveConference,
       participant,

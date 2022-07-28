@@ -29,6 +29,9 @@ describe('Conference component', () => {
     await waitFor(() => {
       expect(createConference).toBeCalledWith({
         alias,
+        params: {
+          liveRecording: false,
+        },
       });
       expect(joinConference).toBeCalledWith(undefined, {
         constraints: {
