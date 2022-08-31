@@ -39,7 +39,7 @@ const QualityIndicator = ({
       p="xxs"
       testID={testID}
       className={cx(styles.quality)}
-      style={{ backgroundColor: getColor(backgroundColor, 'whiteAlpha.500') }}
+      style={{ backgroundColor: getColor(backgroundColor, 'rgba(255, 255, 255, 0.36)') }}
       {...props}
     >
       <Space

@@ -69,6 +69,7 @@ const Input = ({
               onClick={clear}
               iconColor={getColor(textColor, 'black')}
               size="xxs"
+              style={{ padding: '0px' }}
             />
           </Space>
         )}

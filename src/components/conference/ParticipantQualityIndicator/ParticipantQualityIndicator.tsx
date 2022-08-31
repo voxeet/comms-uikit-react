@@ -18,20 +18,6 @@ const ParticipantQualityIndicator = ({ participant, testID, ...rest }: Participa
   // TODO - temporary way to show dynamic data in quality indicators
   //   TODO - in the future use quality level based on participant prop
 
-  // const generateRandomLevel = () => {
-  //   const values: QualityLevel[] = [-1, 1, 2, 3, 4, 5];
-  //   const interval = setInterval(async () => {
-  //     setQualityLevel(values[Math.floor(Math.random() * values.length) + 1]);
-  //   }, 5000);
-  //   return () => {
-  //     clearInterval(interval);
-  //   };
-  // };
-
-  // useEffect(() => {
-  //   return generateRandomLevel();
-  // }, []);
-
   return <QualityIndicator testID={testID} qualityLevel={qualityLevel} {...rest} />;
 };
 

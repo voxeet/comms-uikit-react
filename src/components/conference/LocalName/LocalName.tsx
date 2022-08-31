@@ -13,7 +13,9 @@ const LocalName = ({ text, ...rest }: LocalNameProps) => {
   if (!participant) return null;
 
   const { isSpeaking, isRemoteAudio, isLocalAudio } = participantsStatus[participant.id] || {};
-  return <Pill text={text || participant.info.name} active={isSpeaking && isRemoteAudio && isLocalAudio} {...rest} />;
+  return (
+    <Pill text={`${participant.info.name} (${text})`} active={isSpeaking && isRemoteAudio && isLocalAudio} {...rest} />
+  );
 };
 
 export default LocalName;

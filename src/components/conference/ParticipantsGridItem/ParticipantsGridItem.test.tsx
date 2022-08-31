@@ -43,7 +43,7 @@ describe('ParticipantsGridItem component', () => {
       },
     );
     await waitFor(() => {
-      expect(getByText(localText)).not.toBeNull();
+      expect(getByText(`Local (${localText})`)).not.toBeNull();
       expect(getByTestId('LocalSpeakingIndicator-speaking')).not.toBeNull();
     });
   });

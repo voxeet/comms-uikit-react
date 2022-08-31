@@ -1,6 +1,6 @@
 {
   "name": "@dolbyio/comms-uikit-react",
-  "version": "0.5.8",
+  "version": "0.5.11",
   "description": "Dolby.io Communications UIKit for React",
   "license": "MIT",
   "main": "dist/index.es.js",
@@ -12,15 +12,6 @@
     "type": "git",
     "url": "https://github.com/DolbyIO/comms-uikit-react.git"
   },
-  "contributors": [
-    "Adam Lorek <adam.lorek@dolby.com> (https://dolby.io)",
-    "Arkadiusz Kryk <arkadiusz.kryk@dolby.com> (https://dolby.io)",
-    "Joanna Okrajni <joanna.okrajni@dolby.com> (https://dolby.io)",
-    "Michał Gruszczak <michal.gruszczak@dolby.com> (https://dolby.io)",
-    "Monika Helfer <monika.helfer@dolby.com> (https://dolby.io)",
-    "Piotr Polus <piotr.polus@dolby.com> (https://dolby.io)",
-    "Terence O'Donoghue <terence.o'donoghue@dolby.com> (https://dolby.io)"
-  ],
   "keywords": [
     "web",
     "ui kit",
@@ -28,11 +19,11 @@
     "ui library"
   ],
   "peerDependencies": {
-    "react": "*"
+    "react": "*",
+    "@voxeet/voxeet-web-sdk": ">=3.6.0"
   },
   "dependencies": {
     "@emotion/react": "^11.9.0",
-    "@voxeet/voxeet-web-sdk": "3.6.0",
     "classnames": "^2.3.1",
     "color": "4.2.3",
     "lodash.merge": "^4.6.2",
@@ -57,7 +48,6 @@
     "jest": "^27.5.1",
     "jest-canvas-mock": "^2.3.1",
     "license-checker": "^25.0.1",
-    "react-dom": "^17.0.0",
     "rollup": "^2.66.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.2",

@@ -4,9 +4,13 @@ import { CommsContext } from '../providers/CommsProvider';
 import MediaDevicesService from '../services/mediaDevices';
 
 import type { UseCamera } from './types/Camera';
+import useTheme from './useTheme';
+
+const defaultCameras = ['default'];
 
 const useCamera: UseCamera = () => {
   const { localCamera, setLocalCamera } = useContext(CommsContext);
+  const { isDesktop } = useTheme();
   const getCameras = async () => {
     return (await MediaDevicesService.enumerateVideoInputDevices()).filter((d) => d.deviceId) as MediaDeviceInfo[];
   };
@@ -17,14 +21,16 @@ const useCamera: UseCamera = () => {
 
   const getDefaultLocalCamera = async () => {
     const devices = await MediaDevicesService.enumerateVideoInputDevices();
+    if (!isDesktop && devices.length) {
+      return devices[0];
+    }
     for (let i = 0; i < devices.length; i++) {
       const device = devices[i];
-
-      if (device.deviceId === 'default') {
+      if (defaultCameras.includes(device.deviceId)) {
         return device;
       }
     }
-    return null;
+    return devices[0] || null;
   };
 
   const getCameraPermission = async () => {
@@ -50,6 +56,16 @@ const useCamera: UseCamera = () => {
     return permission;
   };
 
+  const swapCamera = async () => {
+    const cameras = await getCameras();
+    if (!localCamera) {
+      return setLocalCamera(cameras[1]);
+    }
+    const activeCameraIndex = cameras.findIndex((camera) => localCamera.deviceId === camera.deviceId);
+    const swap: MediaDeviceInfo = cameras[activeCameraIndex === cameras.length - 1 ? 0 : activeCameraIndex + 1];
+    return setLocalCamera(swap);
+  };
+
   return {
     getCameras,
     selectCamera,
@@ -57,6 +73,7 @@ const useCamera: UseCamera = () => {
     getCameraPermission,
     localCamera,
     setLocalCamera,
+    swapCamera,
   };
 };
 

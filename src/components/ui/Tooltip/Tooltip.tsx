@@ -69,8 +69,13 @@ const Tooltip = ({ text, position, children, backgroundColor, textColor, testID,
           data-testid={testID}
           ref={tooltipRef}
         >
-          <Space p="xs" className={styles.content} style={{ backgroundColor: getColor(backgroundColor, 'background') }}>
-            <Text color={getColor(textColor, 'white')} type="captionSemiBold">
+          <Space
+            pv="xxs"
+            ph="xs"
+            className={styles.content}
+            style={{ backgroundColor: getColor(backgroundColor, 'grey.70008') }}
+          >
+            <Text color={getColor(textColor, 'white')} type="captionSmall">
               {text}
             </Text>
           </Space>

@@ -1,11 +1,15 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import type { IconsKeys, ColorKey } from '../../../common';
+import type { ColorKey } from '../../../common';
 import { useMemo, useState } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
+import type { IconComponentName } from '../../ui/Icon/IconComponents';
 import IconButton from '../../ui/IconButton/IconButton';
+import Space from '../../ui/Space/Space';
 import Tooltip from '../../ui/Tooltip/Tooltip';
 import type { TooltipProps } from '../../ui/Tooltip/Tooltip';
+
+import styles from './MediaButton.module.scss';
 
 export type MediaButtonProps = {
   activeBackgroundColor?: ColorKey | [ColorKey, ColorKey];
@@ -17,23 +21,23 @@ export type MediaButtonProps = {
   activeStrokeColor?: ColorKey;
   inactiveStrokeColor?: ColorKey;
   disabledStrokeColor?: ColorKey;
-  activeIcon: IconsKeys;
-  inactiveIcon: IconsKeys;
-  disabledIcon: IconsKeys;
+  activeIcon: IconComponentName;
+  inactiveIcon: IconComponentName;
+  disabledIcon: IconComponentName;
   activeTooltipText?: string;
   inactiveTooltipText?: string;
   tooltipPosition?: TooltipProps['position'];
   isActive: boolean;
   isDisabled: boolean;
-  size?: 's' | 'm';
+  size?: 's' | 'm' | 'l';
   onClick: () => void;
   testID?: string;
 };
 
 const MediaButton = ({
-  activeBackgroundColor = 'grey.800',
+  activeBackgroundColor = 'grey.600',
   inactiveBackgroundColor = 'white',
-  disabledBackgroundColor = 'grey.900',
+  disabledBackgroundColor = 'grey.800',
   activeIconColor = 'white',
   inactiveIconColor = 'primary.500',
   disabledIconColor = 'grey.300',
@@ -54,7 +58,7 @@ const MediaButton = ({
 }: MediaButtonProps) => {
   const [timedDisable, setTimedDisable] = useState(false);
 
-  const { theme } = useTheme();
+  const { theme, isDesktop } = useTheme();
 
   const handleOnClick = () => {
     setTimedDisable(true);
@@ -67,7 +71,7 @@ const MediaButton = ({
   const tooltipText = useMemo(() => {
     let text;
 
-    if (isDisabled || timedDisable) {
+    if (isDisabled) {
       return '';
     }
     if (isActive) {
@@ -77,12 +81,12 @@ const MediaButton = ({
     }
 
     return text;
-  }, [isActive, isDisabled, timedDisable]);
+  }, [isActive, isDisabled]);
 
   const iconName = useMemo(() => {
-    let icon: IconsKeys;
+    let icon: IconComponentName;
 
-    if (isDisabled || timedDisable) {
+    if (isDisabled) {
       return disabledIcon;
     }
 
@@ -93,12 +97,12 @@ const MediaButton = ({
     }
 
     return icon;
-  }, [isActive, isDisabled, timedDisable]);
+  }, [isActive, isDisabled]);
 
   const backgroundColor = useMemo(() => {
     let color: ColorKey | [ColorKey, ColorKey];
 
-    if (isDisabled || timedDisable) {
+    if (isDisabled) {
       return disabledBackgroundColor;
     }
 
@@ -109,12 +113,12 @@ const MediaButton = ({
     }
 
     return color;
-  }, [isActive, isDisabled, timedDisable, theme]);
+  }, [isActive, isDisabled, theme]);
 
   const iconColor = useMemo(() => {
     let color: ColorKey;
 
-    if (isDisabled || timedDisable) {
+    if (isDisabled) {
       return disabledIconColor;
     }
 
@@ -125,12 +129,12 @@ const MediaButton = ({
     }
 
     return color;
-  }, [isActive, isDisabled, timedDisable, theme]);
+  }, [isActive, isDisabled, theme]);
 
   const strokeColor: ColorKey = useMemo(() => {
     let color: ColorKey;
 
-    if (isDisabled || timedDisable) {
+    if (isDisabled) {
       return disabledStrokeColor;
     }
 
@@ -141,22 +145,25 @@ const MediaButton = ({
     }
 
     return color;
-  }, [isActive, isDisabled, timedDisable, theme]);
+  }, [isActive, isDisabled, theme]);
 
   return (
-    <Tooltip position={tooltipPosition} text={tooltipText}>
-      <IconButton
-        testID={testID}
-        backgroundColor={backgroundColor}
-        iconColor={iconColor}
-        strokeColor={strokeColor}
-        icon={iconName}
-        size={size}
-        onClick={handleOnClick}
-        disabled={isDisabled || timedDisable}
-        style={{ opacity: isDisabled ? 0.8 : 1 }}
-      />
-    </Tooltip>
+    <Space className={styles.container}>
+      <Tooltip position={tooltipPosition} text={isDesktop ? tooltipText : ''}>
+        <IconButton
+          testID={testID}
+          backgroundColor={backgroundColor}
+          iconColor={iconColor}
+          strokeColor={strokeColor}
+          icon={iconName}
+          size={size}
+          onClick={handleOnClick}
+          disabled={isDisabled}
+          style={{ opacity: isDisabled ? 0.8 : 1 }}
+        />
+      </Tooltip>
+      {timedDisable && <Space fw fh className={styles.backdrop} />}
+    </Space>
   );
 };
 

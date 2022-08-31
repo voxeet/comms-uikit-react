@@ -6,7 +6,19 @@ import { ThemeContext } from '../providers/ThemeProvider';
 import type { UseTheme } from './types/Theming';
 
 const useTheme: UseTheme = () => {
-  const { theme, themes, activeTheme, setActiveTheme } = useContext(ThemeContext);
+  const {
+    theme,
+    themes,
+    activeTheme,
+    setActiveTheme,
+    windowDimensions,
+    isMobile,
+    isMobileSmall,
+    isTablet,
+    isDesktop,
+    isLandscape,
+    isPortrait,
+  } = useContext(ThemeContext);
 
   const availableThemes = useMemo(() => (themes ? Object.keys(themes) : []), [themes]);
 
@@ -68,6 +80,14 @@ const useTheme: UseTheme = () => {
     [theme],
   );
 
+  const windowWidth = useMemo(() => {
+    return windowDimensions?.width;
+  }, [windowDimensions?.width]);
+
+  const windowHeight = useMemo(() => {
+    return windowDimensions?.height;
+  }, [windowDimensions?.height]);
+
   return {
     theme,
     themes,
@@ -77,6 +97,14 @@ const useTheme: UseTheme = () => {
     getColorOrGradient,
     getColor,
     getGradient,
+    windowWidth,
+    windowHeight,
+    isMobile,
+    isMobileSmall,
+    isTablet,
+    isDesktop,
+    isLandscape,
+    isPortrait,
     ...theme,
   };
 };

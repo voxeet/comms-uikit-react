@@ -1,13 +1,17 @@
 $height: 48px;
 
 .uiSelect {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   .label {
     text-align: left;
   }
   .wrapper {
     position: relative;
-    min-width: 317px;
+    min-width: 270px;
     width: 100%;
+    max-width: 380px;
 
     &.isOpen {
       .control {

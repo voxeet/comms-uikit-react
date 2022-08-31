@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 // eslint-disable-next-line import/no-extraneous-dependencies
+import cx from 'classnames';
 import { useEffect, useRef, useState } from 'react';
 
 import useAudio from '../../../hooks/useAudio';
@@ -22,8 +23,15 @@ export type VideoViewProps = React.HTMLAttributes<HTMLDivElement> & {
   noVideoFallback?: React.ReactNode;
   username?: string;
   indicator?: boolean;
+  cameraReverseButton?: boolean;
   audio?: boolean;
+  disabled?: boolean;
 };
+
+enum FacingModes {
+  Env = 'environment',
+  User = 'user',
+}
 
 const VideoLocalView = ({
   testID,
@@ -33,17 +41,20 @@ const VideoLocalView = ({
   username,
   indicator = true,
   audio = true,
+  cameraReverseButton = true,
+  disabled = false,
   ...props
 }: VideoViewProps) => {
   const [videoSrcObject, setVideoSrcObject] = useState<MediaStream | null>(null);
   const [videoStreams, setVideoStreams] = useState<MediaStream[]>([]);
+  const [isUsingRearCamera, setIsUsingRearCamera] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { getColor } = useTheme();
+  const { getColor, isDesktop, isTablet } = useTheme();
   const { isVideo } = useVideo();
   const { isAudio } = useAudio();
   const { getMicrophonePermission } = useMicrophone();
-  const { localCamera } = useCamera();
+  const { localCamera, swapCamera } = useCamera();
   const isMounted = useIsMounted();
   const prevIsVideo = useRef<boolean>();
 
@@ -104,6 +115,14 @@ const VideoLocalView = ({
           video,
         })
         .then((stream) => {
+          if (!isDesktop) {
+            const { facingMode } = stream.getTracks()[0].getCapabilities();
+            if (facingMode?.[0] === FacingModes.Env) {
+              setIsUsingRearCamera(true);
+            } else {
+              setIsUsingRearCamera(false);
+            }
+          }
           setVideoSrcObject(stream);
           setVideoStreams((prev) => [...prev, stream]);
         })
@@ -116,8 +135,8 @@ const VideoLocalView = ({
 
   useEffect(() => {
     clearVideoSrc();
-    attachStream();
-  }, [localCamera]);
+    if (localCamera) attachStream();
+  }, [localCamera, disabled]);
 
   useEffect(() => {
     return () => {
@@ -125,7 +144,7 @@ const VideoLocalView = ({
         clearVideoSrc();
       }
     };
-  }, [isMounted, videoSrcObject]);
+  }, [isMounted, videoSrcObject, disabled]);
 
   useEffect(() => {
     if (prevIsVideo.current === false && isVideo) {
@@ -135,7 +154,7 @@ const VideoLocalView = ({
     if (!isVideo) {
       clearVideoSrc();
     }
-  }, [isVideo]);
+  }, [isVideo, disabled]);
 
   useEffect(() => {
     prevIsVideo.current = isVideo;
@@ -151,20 +170,41 @@ const VideoLocalView = ({
     }
   }, [videoRef, videoSrcObject]);
 
+  const reverseCamera = async () => {
+    await swapCamera();
+  };
+
+  const handleDoubleClick = async () => {
+    if (!isDesktop) {
+      await reverseCamera();
+    }
+  };
+
+  const isBigAvatar = isTablet || isDesktop;
+
   return (
     <Space
-      className={styles.videoWrapper}
+      onDoubleClick={handleDoubleClick}
+      className={cx(styles.videoWrapper, !isDesktop && styles.mobile)}
       testID={testID}
       style={{ backgroundColor: getColor('grey.700'), width, height }}
       {...props}
     >
-      {videoSrcObject && isVideo ? (
-        <video ref={videoRef} muted autoPlay playsInline width={width} height={height} />
+      {videoSrcObject && isVideo && !disabled ? (
+        <video
+          ref={videoRef}
+          muted
+          autoPlay
+          playsInline
+          width={width}
+          height={height}
+          className={cx({ [styles.rearCamera]: isUsingRearCamera })}
+        />
       ) : (
         <Space fw fh className={styles.fallbackWrapper} testID="FallbackWrapper">
           {noVideoFallback || (
             <Space fh className={styles.fallbackContent} testID="FallbackContent">
-              <LocalAvatar testID="LocalAvatar" username={username} />
+              <LocalAvatar size={isBigAvatar ? 'l' : 'm'} testID="LocalAvatar" username={username} />
             </Space>
           )}
         </Space>
@@ -172,6 +212,11 @@ const VideoLocalView = ({
       {indicator && (
         <Space className={styles.indicator}>
           <IconIndicator icon={isAudio && isMicrophonePermission ? 'microphone' : 'microphoneOff'} />
+        </Space>
+      )}
+      {cameraReverseButton && !isDesktop && (
+        <Space onClick={reverseCamera} className={styles.cameraReverse}>
+          <IconIndicator icon="cameraReverse" />
         </Space>
       )}
     </Space>

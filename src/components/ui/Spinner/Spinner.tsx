@@ -1,14 +1,18 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { ColorKey } from '../../../common';
-import cx from 'classnames';
 
 import useTheme from '../../../hooks/useTheme';
+import IconComponents from '../Icon/IconComponents';
 import Space from '../Space/Space';
 import Text from '../Text/Text';
 
 import styles from './Spinner.module.scss';
 
 export type SpinnerProps = React.HTMLAttributes<HTMLDivElement> & {
+  /**
+   * The size of an individual dot - the spinner size will scale automatically
+   */
+  size?: number;
   spinnerColor?: ColorKey;
   textContent?: string | number;
   textContentColor?: ColorKey;
@@ -16,7 +20,8 @@ export type SpinnerProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 const Spinner = ({
-  spinnerColor = 'primary.500',
+  size = 32,
+  spinnerColor = 'primary.400',
   textContent,
   textContentColor = 'grey.100',
   testID,
@@ -26,22 +31,19 @@ const Spinner = ({
 
   const fillColor = getColor(spinnerColor);
 
+  const Loader = IconComponents.loader;
+
   return (
     <Space testID={testID} className={styles.container} {...props}>
       <Space className={styles.spinnerSection}>
-        <Space className={styles.spinnerContainer}>
-          <Space className={cx(styles.square, styles.one)}>
-            <Space testID="dot" className={cx(styles.dot, styles.tl)} style={{ backgroundColor: fillColor }} />
-            <Space className={cx(styles.dot, styles.tr)} style={{ backgroundColor: fillColor }} />
-            <Space className={cx(styles.dot, styles.br)} style={{ backgroundColor: fillColor }} />
-            <Space className={cx(styles.dot, styles.bl)} style={{ backgroundColor: fillColor }} />
-          </Space>
-          <Space className={cx(styles.square, styles.two)}>
-            <Space className={cx(styles.dot, styles.t)} style={{ backgroundColor: fillColor }} />
-            <Space className={cx(styles.dot, styles.r)} style={{ backgroundColor: fillColor }} />
-            <Space className={cx(styles.dot, styles.b)} style={{ backgroundColor: fillColor }} />
-            <Space className={cx(styles.dot, styles.l)} style={{ backgroundColor: fillColor }} />
-          </Space>
+        <Space
+          className={styles.spinnerContainer}
+          style={{
+            height: size,
+            width: size,
+          }}
+        >
+          <Loader testID="dots" fill={fillColor} />
         </Space>
       </Space>
       {textContent && (

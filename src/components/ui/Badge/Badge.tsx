@@ -9,7 +9,7 @@ import Text from '../Text/Text';
 import styles from './Badge.module.scss';
 
 export type BadgeProps = React.HTMLAttributes<HTMLDivElement> & {
-  content?: React.ReactNode;
+  content?: string | number | boolean;
   backgroundColor?: ColorKey;
   contentColor?: ColorKey;
   testID?: string;
@@ -26,7 +26,12 @@ const Badge = ({ content, backgroundColor = 'grey.700', contentColor = 'white', 
       {...props}
     >
       {content && (
-        <Text type="captionSemiBold" align="center" color={contentColor}>
+        <Text
+          type="captionSemiBold"
+          align="center"
+          color={contentColor}
+          style={{ fontWeight: '500', letterSpacing: '0.03em' }}
+        >
           {content}
         </Text>
       )}

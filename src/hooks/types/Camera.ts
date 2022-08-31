@@ -34,6 +34,10 @@ export type Camera = {
    * @param camera - MediaDeviceInfo object or null
    */
   setLocalCamera: (camera: Partial<MediaDeviceInfo> | null) => void;
+  /**
+   * Switch between front and rear camera.
+   */
+  swapCamera: () => Promise<void>;
 };
 
 export type UseCamera = () => Camera;

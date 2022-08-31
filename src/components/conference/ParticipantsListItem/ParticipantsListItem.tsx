@@ -61,11 +61,6 @@ const ParticipantsListItem = ({
               </>
             )}
           </Space>
-          {/* <Space className={styles.role}>
-            <Text type="captionRegular" color="grey.100">
-              {participant.type}
-            </Text>
-          </div> */}
         </Space>
         <Space className={styles.actionsSection}>
           <Space className={styles.actionButton}>

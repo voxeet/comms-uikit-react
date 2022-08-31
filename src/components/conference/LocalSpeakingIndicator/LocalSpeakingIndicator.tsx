@@ -1,9 +1,10 @@
 import type { ColorKey } from '../../../common';
+import soundWave from '../../../common/assets/lottie/soundWaveLottie.json';
 
 import useParticipants from '../../../hooks/useParticipants';
 import useSession from '../../../hooks/useSession';
+import AnimationIndicator from '../../ui/indicators/AnimationIndicator/AnimationIndicator';
 import IconIndicator from '../../ui/indicators/IconIndicator/IconIndicator';
-import SpeakingIndicator from '../../ui/indicators/SpeakingIndicator/SpeakingIndicator';
 
 type LocalSpeakingIndicatorProps = {
   activeBackgroundColor?: ColorKey;
@@ -44,10 +45,11 @@ const LocalSpeakingIndicator = ({
 
   if (isSpeaking) {
     return (
-      <SpeakingIndicator
+      <AnimationIndicator
+        animationData={soundWave}
         testID={`${testID}-speaking`}
         backgroundColor={activeBackgroundColor}
-        iconColor={activeIconColor}
+        contentColor={activeIconColor}
       />
     );
   }

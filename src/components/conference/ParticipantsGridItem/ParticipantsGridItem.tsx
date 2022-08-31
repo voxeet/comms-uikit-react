@@ -1,4 +1,5 @@
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
+import cx from 'classnames';
 import React, { useEffect } from 'react';
 
 import useParticipants from '../../../hooks/useParticipants';
@@ -19,10 +20,12 @@ type ParticipantsGridItemProps = {
 };
 
 const ParticipantsGridItem = React.memo(({ participant, localText }: ParticipantsGridItemProps) => {
-  const { getColor } = useTheme();
+  const { getColor, isMobileSmall, isMobile } = useTheme();
   const { addIsSpeakingListener, participantsStatus } = useParticipants();
 
   const { isSpeaking, isRemoteAudio, isLocalAudio, isLocal } = participantsStatus[participant.id] || {};
+
+  const isSmartphone = isMobileSmall || isMobile;
 
   useEffect(() => {
     return addIsSpeakingListener(participant);
@@ -31,7 +34,7 @@ const ParticipantsGridItem = React.memo(({ participant, localText }: Participant
   return (
     <Space
       testID="ParticipantsGridItem"
-      className={styles.item}
+      className={cx(styles.item, { [styles.mobile]: isSmartphone })}
       style={{
         borderColor: isSpeaking && isRemoteAudio && isLocalAudio ? getColor('purple.400') : getColor('transparent'),
       }}
@@ -47,11 +50,6 @@ const ParticipantsGridItem = React.memo(({ participant, localText }: Participant
         ) : (
           <ParticipantName testID="ParticipantName" participant={participant} />
         )}
-        {/* {isLocal ? (
-          <LocalQualityIndicator testID="LocalQualityIndicator" />
-        ) : (
-          <ParticipantQualityIndicator testID="ParticipantQualityIndicator" participant={participant} />
-        )} */}
       </Space>
       <Space className={styles.talking}>
         {isLocal ? (

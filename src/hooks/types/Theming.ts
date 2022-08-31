@@ -42,6 +42,39 @@ export type Theming = {
    * Gets the gradient value of the theme.
    */
   getGradient: (color?: [ColorKey, ColorKey], fallback?: string) => string[];
+  /**
+   * Gets the current window width.
+   */
+  windowWidth: number | undefined;
+  /**
+   * /**
+   * Gets the current window height.
+   */
+  windowHeight: number | undefined;
+  /**
+   * Informs if current device is mobile.
+   */
+  isMobile: boolean;
+  /**
+   * Informs if current device is mobile and has less than 375px width.
+   */
+  isMobileSmall: boolean;
+  /**
+   * Informs if current device is tablet.
+   */
+  isTablet: boolean;
+  /**
+   * Informs if current device is desktop.
+   */
+  isDesktop: boolean;
+  /**
+   * Informs if current device screen is in landscape mode.
+   */
+  isLandscape: boolean;
+  /**
+   * Informs if current device is in portrait mode.
+   */
+  isPortrait: boolean;
 };
 
 export type UseTheme = () => Theming & Theme;

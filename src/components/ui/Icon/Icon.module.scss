@@ -4,6 +4,11 @@
   align-items: center;
 
   &.size {
+    &-xxs {
+      width: 10px;
+      height: 10px;
+    }
+
     &-xs {
       width: 16px;
       height: 16px;
@@ -15,6 +20,10 @@
     }
 
     &-m {
+      width: 24px;
+      height: 24px;
+    }
+    &-l {
       width: 24px;
       height: 24px;
     }

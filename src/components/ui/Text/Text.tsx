@@ -52,6 +52,7 @@ export type TextType =
   | 'caption'
   | 'captionSmall'
   | 'captionSmallDemiBold'
+  | 'captionSmallDemiBoldMobile'
   | 'quoteLarge'
   | 'quoteSmall'
   | 'button'
