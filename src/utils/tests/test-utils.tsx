@@ -2,6 +2,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import '../../../__mocks__/MediaStream.mock';
 import '../../../__mocks__/documentExec.mock';
+import '../../../__mocks__/WindowOrientation.mock';
 import 'jest-canvas-mock';
 import { render, RenderOptions } from '@testing-library/react';
 

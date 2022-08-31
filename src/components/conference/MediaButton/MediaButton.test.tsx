@@ -47,7 +47,7 @@ describe('MediaButton component', () => {
     );
     const element = getByTestId(testID);
     const iconElement = getByTestId('icon');
-    expect(element).toHaveStyle(`background: ${colors.grey[800]}`);
+    expect(element).toHaveStyle(`background: ${colors.grey[600]}`);
     expect(element).toHaveStyle(`border-color: ${colors.transparent}`);
     expect(iconElement).toHaveAttribute('fill', colors.white);
   });

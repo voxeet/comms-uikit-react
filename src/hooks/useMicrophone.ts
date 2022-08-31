@@ -1,12 +1,16 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 
 import { CommsContext } from '../providers/CommsProvider';
 import MediaDevicesService from '../services/mediaDevices';
 
 import type { UseMicrophone } from './types/Microphone';
+import useTheme from './useTheme';
+
+const defaultMics = ['default'];
 
 const useMicrophone: UseMicrophone = () => {
   const { localMicrophone, setLocalMicrophone } = useContext(CommsContext);
+  const { isDesktop } = useTheme();
   const getMicrophones = async () => {
     return (await MediaDevicesService.enumerateAudioInputDevices()).filter((d) => d.deviceId) as MediaDeviceInfo[];
   };
@@ -35,14 +39,33 @@ const useMicrophone: UseMicrophone = () => {
     return permission;
   };
 
-  const getDefaultLocalMicrophone = async () => {
-    const devices = await MediaDevicesService.enumerateAudioInputDevices();
-    for (let i = 0; i < devices.length; i++) {
-      const device = devices[i];
+  useEffect(() => {
+    if (!localMicrophone) {
+      (async () => {
+        const defaultMic = await getDefaultLocalMicrophone();
+        setLocalMicrophone(defaultMic);
+      })();
+    }
+  }, []);
 
-      if (device.deviceId === 'default') {
-        return device;
+  const getDefaultLocalMicrophone = async () => {
+    if (await getMicrophonePermission()) {
+      const devices = await MediaDevicesService.enumerateAudioInputDevices();
+      /*
+       * in case of mobile we cannot determine default mic based on deviceId which is uuid.
+       * We also need to check if deviceId exists  since some first calls to get devices
+       * returns generic 'audioinput' without deviceId  as  index 0 device
+       */
+      if (devices.length && !isDesktop && devices[0].deviceId) {
+        return devices[0];
       }
+      for (let i = 0; i < devices.length; i++) {
+        const device = devices[i];
+        if (defaultMics.includes(device.deviceId)) {
+          return device;
+        }
+      }
+      return devices[0].deviceId ? devices[0] : null;
     }
     return null;
   };

@@ -1,35 +1,30 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Icons, ColorKey } from '../../../common';
-import type { IconsKeys, Sizes } from '../../../common';
+import type { Sizes, ColorKey } from '../../../common';
 import cx from 'classnames';
 import Color from 'color';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
 import Space from '../Space/Space';
 
 import styles from './Icon.module.scss';
+import IconComponents from './IconComponents';
+import type { IconComponentName } from './IconComponents';
 
 export type ColorTone = 'light' | 'default' | 'dark';
 
 export type IconProps = React.HTMLAttributes<HTMLDivElement> & {
-  name: IconsKeys;
+  name: IconComponentName;
   color?: ColorKey;
   colorTone?: ColorTone;
-  size?: Extract<Sizes, 'xxs' | 'xs' | 's' | 'm'>;
+  size?: Extract<Sizes, 'xxs' | 'xs' | 's' | 'm' | 'l'>;
   testID?: string;
-};
-const IconSizes = {
-  xxs: 10,
-  xs: 14,
-  s: 18,
-  m: 24,
 };
 
 const Icon = ({ name, color, colorTone = 'default', size = 'm', testID, ...props }: IconProps) => {
   const { getColor, theme } = useTheme();
 
-  const IconSVG = Icons[name];
+  const IconSVG = IconComponents[name];
 
   const handleFillColor = useMemo(() => {
     let fillColor = getColor(color, 'white');
@@ -43,7 +38,7 @@ const Icon = ({ name, color, colorTone = 'default', size = 'm', testID, ...props
 
   return (
     <Space testID={testID} className={cx(styles.icon, styles[`size-${size}`])} {...props}>
-      <IconSVG data-testid="icon" width={IconSizes[size]} height={IconSizes[size]} fill={handleFillColor} />
+      <IconSVG testID="icon" fill={handleFillColor} />
     </Space>
   );
 };

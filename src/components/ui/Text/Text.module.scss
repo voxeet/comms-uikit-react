@@ -118,14 +118,21 @@
 
     &-captionSmall {
       font-size: 12px;
-      line-height: 1.33em;
+      line-height: 1em;
       font-weight: 500;
       letter-spacing: 0.03em;
     }
 
     &-captionSmallDemiBold {
       font-size: 12px;
-      line-height: 1.33em;
+      line-height: 1em;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    &-captionSmallDemiBoldMobile {
+      font-size: 10px;
+      line-height: 1em;
       font-weight: 600;
       letter-spacing: 0.03em;
     }

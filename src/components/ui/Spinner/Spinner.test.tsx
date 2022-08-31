@@ -6,7 +6,7 @@ import Spinner from './Spinner';
 
 const testID = 'testID';
 const textTestID = 'SpinnerText';
-const dotTestID = 'dot';
+const dotTestID = 'dots';
 const spinnerColor = 'secondary.500';
 const textContent = 'Hello World';
 const textContentColor = 'grey.100';
@@ -20,8 +20,8 @@ describe('Spinner component', () => {
   });
   test('Passes given styles without props', () => {
     const { getByTestId } = render(<Spinner testID={testID} />);
-    const dotElement = getByTestId(dotTestID);
-    expect(dotElement).toHaveStyle(`backgroundColor: ${colors.primary[500]}`);
+    const dotsElement = getByTestId(dotTestID);
+    expect(dotsElement).toHaveAttribute('fill', colors.primary[400]);
   });
   test('Passes given styles with props', () => {
     const { getByTestId } = render(
@@ -32,9 +32,9 @@ describe('Spinner component', () => {
         textContentColor={textContentColor}
       />,
     );
-    const dotElement = getByTestId(dotTestID);
+    const dotsElement = getByTestId(dotTestID);
     const textElement = getByTestId(textTestID);
-    expect(dotElement).toHaveStyle(`backgroundColor: ${colors.secondary[500]}`);
+    expect(dotsElement).toHaveAttribute('fill', colors.secondary[500]);
     expect(textElement).toHaveTextContent(`Hello World`);
     expect(textElement).toHaveStyle(`color: ${colors.grey[100]}`);
   });

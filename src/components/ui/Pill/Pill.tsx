@@ -23,7 +23,7 @@ const Pill = ({ text, active = false, size = 'm', testID, ...props }: PillProps)
         display: 'inline-flex',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 6,
+        borderRadius: 4,
         height: 20,
         transition: 'color 0.3s, background-color 0.3s',
         maxWidth: 140,
@@ -36,6 +36,7 @@ const Pill = ({ text, active = false, size = 'm', testID, ...props }: PillProps)
         },
       }}
       ph="xs"
+      pv="xxxs"
       testID={testID}
       title={text}
       {...props}
@@ -43,7 +44,7 @@ const Pill = ({ text, active = false, size = 'm', testID, ...props }: PillProps)
       <Text
         color={active ? getColor('purple.400') : getColor('white')}
         testID={testID && `${testID}-text`}
-        type={size === 'm' ? 'captionSmallDemiBold' : 'captionSmallRegular'}
+        type={size === 'm' ? 'captionSmallDemiBold' : 'captionSmallDemiBoldMobile'}
       >
         {text}
       </Text>

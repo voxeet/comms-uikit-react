@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import type { ColorKey, IconsKeys, Sizes } from '../../../common';
+import type { ColorKey, Sizes } from '../../../common';
 import cx from 'classnames';
 import Color from 'color';
 import { useState, useMemo, ButtonHTMLAttributes } from 'react';
@@ -7,6 +7,7 @@ import { useState, useMemo, ButtonHTMLAttributes } from 'react';
 import useTheme from '../../../hooks/useTheme';
 import Badge from '../Badge/Badge';
 import Icon, { ColorTone } from '../Icon/Icon';
+import type { IconComponentName } from '../Icon/IconComponents';
 import Space from '../Space/Space';
 
 import styles from './IconButton.module.scss';
@@ -15,15 +16,15 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
   variant?: 'square' | 'rectangular' | 'circle';
   backgroundColor?: ColorKey | [ColorKey, ColorKey];
   iconColor?: ColorKey;
-  badge?: boolean | React.ReactNode;
+  badge?: string | number | boolean;
   badgeColor?: ColorKey;
   badgeContentColor?: ColorKey;
   badgeHoverContent?: string;
   rightBadge?: boolean;
   strokeColor?: ColorKey;
-  size?: Extract<Sizes, 'xxs' | 'xs' | 's' | 'm'>;
+  size?: Extract<Sizes, 'xxs' | 'xs' | 's' | 'm' | 'l'>;
   disabled?: boolean;
-  icon: IconsKeys;
+  icon: IconComponentName;
   onClick: () => void;
   testID?: string;
   style?: React.CSSProperties;
@@ -48,7 +49,8 @@ const IconButton = ({
   ...props
 }: IconButtonProps) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { getColorOrGradient, getColor, theme } = useTheme();
+  const [isTouched, setIsTouched] = useState(false);
+  const { getColorOrGradient, getColor, theme, isDesktop } = useTheme();
 
   const isGradient = useMemo(() => {
     return Array.isArray(backgroundColor);
@@ -57,28 +59,32 @@ const IconButton = ({
   const handleIconColorTone = useMemo(() => {
     let colorTone: ColorTone = 'default';
 
-    if (isHovered && !disabled) colorTone = 'light';
+    if ((isHovered && !disabled && isDesktop) || (isTouched && !disabled && !isDesktop)) colorTone = 'light';
     else return colorTone;
 
     return colorTone;
-  }, [iconColor, disabled, isHovered, theme]);
+  }, [iconColor, disabled, isHovered, theme, isDesktop, isTouched]);
 
   const handleBackgroundColor = useMemo(() => {
     let color = getColorOrGradient(backgroundColor, 'grey.800');
 
     if (!isGradient && backgroundColor !== 'transparent') {
       if (backgroundColor) color = getColor(backgroundColor as string);
-      if (isHovered && !disabled) color = Color(color).lighten(0.2).hex();
+      if ((isHovered && !disabled && isDesktop) || (isTouched && !disabled && !isDesktop))
+        color = Color(color).lighten(0.2).hex();
       else color = getColor(backgroundColor as string, 'grey.800');
     }
 
-    if (backgroundColor === 'transparent' && isHovered) {
+    if (
+      (backgroundColor === 'transparent' && isHovered && isDesktop) ||
+      (backgroundColor === 'transparent' && isTouched && !isDesktop)
+    ) {
       color = getColor('grey.500');
     }
 
     // GRADIENT
     if (isGradient && backgroundColor) {
-      if (isHovered && !disabled)
+      if ((isHovered && !disabled && isDesktop) || (isTouched && !disabled && !isDesktop))
         color = `linear-gradient(99.69deg, ${Color(color[0]).lighten(0.2).hex()} -10.66%, ${Color(color[1])
           .lighten(0.2)
           .hex()} 114.64%)`;
@@ -86,7 +92,7 @@ const IconButton = ({
     }
 
     return color as string;
-  }, [backgroundColor, disabled, isHovered, theme]);
+  }, [backgroundColor, disabled, isHovered, theme, isDesktop, isTouched]);
 
   const handleBadgeContent = useMemo(() => {
     let content;
@@ -95,20 +101,20 @@ const IconButton = ({
       content = badge;
     }
 
-    if (isHovered && badgeHoverContent) {
+    if (isHovered && badgeHoverContent && isDesktop) {
       content = badgeHoverContent;
     }
 
     return content;
-  }, [badge, badgeHoverContent, isHovered]);
+  }, [badge, badgeHoverContent, isHovered, isDesktop]);
 
   const handleBadgePosition = useMemo(() => {
-    if (isHovered || (backgroundColor !== 'transparent' && !isHovered)) {
+    if ((isHovered && isDesktop) || (backgroundColor !== 'transparent' && !isHovered)) {
       return styles.IconHasBackground;
     }
 
     return styles.IconHasNoBackground;
-  }, [backgroundColor, isHovered]);
+  }, [backgroundColor, isHovered, isDesktop]);
 
   return (
     <button
@@ -130,6 +136,8 @@ const IconButton = ({
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={() => setIsTouched(true)}
+      onTouchEnd={() => setIsTouched(false)}
       disabled={disabled}
       {...props}
     >
@@ -137,9 +145,11 @@ const IconButton = ({
         <Space
           className={cx(
             styles.badgeContainer,
+            !isDesktop && styles.mobile,
             handleBadgeContent ? styles.withContent : styles.withDot,
             handleBadgePosition,
-            rightBadge && !isHovered && styles.rightBadge,
+            rightBadge && !isDesktop && styles.rightBadge,
+            rightBadge && !isHovered && isDesktop && styles.rightBadge,
           )}
         >
           <Badge

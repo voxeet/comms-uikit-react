@@ -1,9 +1,10 @@
 import type { ColorKey } from '../../../common';
+import soundWave from '../../../common/assets/lottie/soundWaveLottie.json';
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
 
 import useParticipants from '../../../hooks/useParticipants';
+import AnimationIndicator from '../../ui/indicators/AnimationIndicator/AnimationIndicator';
 import IconIndicator from '../../ui/indicators/IconIndicator/IconIndicator';
-import SpeakingIndicator from '../../ui/indicators/SpeakingIndicator/SpeakingIndicator';
 
 type ParticipantSpeakingIndicatorProps = {
   participant: Participant;
@@ -45,10 +46,11 @@ const ParticipantSpeakingIndicator = ({
 
   if (isSpeaking) {
     return (
-      <SpeakingIndicator
+      <AnimationIndicator
+        animationData={soundWave}
         testID={`${testID}-speaking`}
         backgroundColor={activeBackgroundColor}
-        iconColor={activeIconColor}
+        contentColor={activeIconColor}
       />
     );
   }

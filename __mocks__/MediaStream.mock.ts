@@ -69,3 +69,5 @@ Object.defineProperty(global.navigator, 'mediaDevices', {
     enumerateDevices: mockEnumerateDevices,
   },
 });
+
+export default {};

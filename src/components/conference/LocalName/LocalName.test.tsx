@@ -33,7 +33,7 @@ describe('LocalName component', () => {
       },
     });
     await waitFor(() => {
-      expect(getByText(localUserText)).not.toBeNull();
+      expect(getByText(`Local (${localUserText})`)).not.toBeNull();
       expect(getByTestId(testID)).not.toHaveStyle(`background: ${colors.white}`);
     });
   });

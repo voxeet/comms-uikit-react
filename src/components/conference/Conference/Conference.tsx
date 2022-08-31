@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
-import { useConference } from '../../../index';
+import useConference from '../../../hooks/useConference';
 
 type ConferenceProps = {
   children: React.ReactNode;
@@ -12,15 +12,27 @@ type ConferenceProps = {
 };
 
 const Conference = ({ alias, id, audio = false, video = false, liveRecording = false, children }: ConferenceProps) => {
-  const { createConference, fetchConference, joinConference } = useConference();
-  const [isReady, setIsReady] = useState<boolean>(false);
+  const {
+    conference: currentConference,
+    createConference,
+    fetchConference,
+    joinConference,
+    leaveConference,
+  } = useConference();
+
+  const timeout: { current: NodeJS.Timeout | null } = useRef(null);
 
   useEffect(() => {
-    (async () => {
+    timeout.current = setTimeout(async () => {
       let conference;
+
       if (id) {
+        if (currentConference?.id === id) return;
+        if (currentConference) await leaveConference();
         conference = await fetchConference(id);
       } else if (alias) {
+        if (currentConference?.alias === alias) return;
+        if (currentConference) await leaveConference();
         const createOptions = {
           alias,
           params: {
@@ -45,11 +57,18 @@ const Conference = ({ alias, id, audio = false, video = false, liveRecording = f
       };
 
       await joinConference(conference, joinOptions);
-      setIsReady(true);
-    })();
-  }, []);
+      timeout.current = null;
+    }, 200);
 
-  if (!isReady) return null;
+    return () => {
+      if (timeout.current) {
+        clearTimeout(timeout.current);
+      } else {
+        leaveConference();
+      }
+    };
+  }, []);
+  if (currentConference?.id !== id && currentConference?.alias !== alias) return null;
 
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>;

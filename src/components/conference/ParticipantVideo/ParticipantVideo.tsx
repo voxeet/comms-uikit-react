@@ -1,13 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
 
-import VideoView, { VideoViewProps } from '../../ui/VideoView/VideoView';
+import VideoTile, { VideoTileProps } from '../../ui/VideoTile/VideoTile';
 
-type ParticipantVideoProps = Partial<Omit<VideoViewProps, 'isMirrored'>>;
+type ParticipantVideoProps = Partial<Omit<VideoTileProps, 'isMirrored'>>;
 
 const ParticipantVideo = ({ participant, ...rest }: ParticipantVideoProps) => {
   if (!participant) return null;
 
-  return <VideoView participant={participant} {...rest} />;
+  return <VideoTile participant={participant} {...rest} />;
 };
 
 export default ParticipantVideo;

@@ -16,6 +16,10 @@
     -webkit-transform: scaleX(-1);
     transform: scaleX(-1);
     border-radius: 12px;
+    &.rearCamera {
+      -webkit-transform: unset;
+      transform: unset;
+    }
   }
 
   .indicator {
@@ -23,6 +27,23 @@
     top: 16px;
     right: 16px;
     z-index: 1;
+  }
+
+  .cameraReverse {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 1;
+  }
+
+  &.mobile {
+    .indicator {
+      top: auto;
+      right: auto;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
   }
 }
 

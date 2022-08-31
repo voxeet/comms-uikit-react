@@ -3,12 +3,14 @@ import type Conference from '@voxeet/voxeet-web-sdk/types/models/Conference';
 import type ConferenceOptions from '@voxeet/voxeet-web-sdk/types/models/ConferenceOptions';
 import type { JoinOptions, ParticipantInfo } from '@voxeet/voxeet-web-sdk/types/models/Options';
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
-import { createContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 
+import { BlockedAudioState } from '../hooks/types/Audio';
 import type { ParticipantStatus } from '../hooks/types/Participants';
 import conferenceService from '../services/conference';
 import sdkService from '../services/sdk';
 import sessionService from '../services/session';
+import { throwErrorMessage } from '../utils/throwError.util';
 
 import '../style/font.css';
 
@@ -33,6 +35,7 @@ export type CommsContextType = {
   toggleAudio: () => Promise<void>;
   isAudio: boolean;
   toggleVideo: () => Promise<void>;
+  playBlockedAudio: () => Promise<void>;
   isVideo: boolean;
   startParticipantAudio: (participant: Participant) => Promise<void>;
   stopParticipantAudio: (participant: Participant) => Promise<void>;
@@ -58,6 +61,10 @@ export type CommsContextType = {
   setLocalMicrophone: React.Dispatch<React.SetStateAction<Partial<MediaDeviceInfo> | null>>;
   localSpeakers: Partial<MediaDeviceInfo> | null;
   setLocalSpeakers: React.Dispatch<React.SetStateAction<Partial<MediaDeviceInfo> | null>>;
+  blockedAudioState: BlockedAudioState;
+  setBlockedAudioState: React.Dispatch<React.SetStateAction<BlockedAudioState>>;
+  isPageMuted: boolean;
+  toggleMuteParticipants: () => void;
 };
 
 export type CommsProviderProps = {
@@ -80,6 +87,12 @@ export type CommsProviderProps = {
 
 export const CommsContext = createContext<CommsContextType>({} as CommsContextType);
 
+/*
+ * For storing users previously muted , in case of page mute trigger.
+ */
+
+const singleParticipantMutedSet = new Set();
+
 const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderProps) => {
   const [participant, setParticipant] = useState<CommsContextType['participant']>(null);
   const [conference, setConference] = useState<CommsContextType['conference']>(null);
@@ -96,6 +109,9 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
   const [localCamera, setLocalCamera] = useState<CommsContextType['localCamera']>(null);
   const [localMicrophone, setLocalMicrophone] = useState<CommsContextType['localMicrophone']>(null);
   const [localSpeakers, setLocalSpeakers] = useState<CommsContextType['localSpeakers']>(null);
+
+  const [blockedAudioState, setBlockedAudioState] = useState<BlockedAudioState>(BlockedAudioState.INACTIVATED);
+  const [isPageMuted, setIsPageMuted] = useState(false);
 
   // INITIALIZATION
 
@@ -120,12 +136,25 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
     const map: CommsContextType['participantsStatus'] = {};
     setParticipantsStatus((prev) => {
       participantsArray.forEach((p) => {
+        const isVideoFromStreamEnabled = p.streams[p.streams.length - 1]?.getVideoTracks().length > 0;
+        const isLocal = p.id === participant?.id;
+
+        const remoteLocalAudioStatus = () => {
+          let status = true;
+          if (prev[p.id]?.isLocalAudio !== undefined) {
+            status = prev[p.id]?.isLocalAudio;
+          } else {
+            status = true;
+          }
+          return status;
+        };
+
         map[p.id] = {
           isSpeaking: !!participantsStatus[p.id]?.isSpeaking,
-          isLocal: p.id === participant?.id,
-          isRemoteAudio: p.id === participant?.id ? p.audioTransmitting : p.audioReceivingFrom,
-          isLocalAudio: prev[p.id] ? prev[p.id].isLocalAudio : true,
-          isVideo: p.streams[p.streams.length - 1]?.getVideoTracks().length > 0,
+          isLocal,
+          isRemoteAudio: isLocal ? p.audioTransmitting : p.audioReceivingFrom,
+          isLocalAudio: isLocal ? isAudio : remoteLocalAudioStatus(),
+          isVideo: isLocal ? isVideoFromStreamEnabled && isVideo : isVideoFromStreamEnabled,
         };
       });
       return map;
@@ -162,10 +191,11 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
     setParticipant(null);
   };
 
-  const startParticipantAudio = async (participant: Participant): Promise<void> => {
+  const startParticipantAudio = async (participant: Participant, isBatch?: boolean): Promise<void> => {
     const p = conferenceService.participants().get(participant.id);
     if (p) {
       await conferenceService.startAudio(p);
+      if (!isBatch) singleParticipantMutedSet.delete(participant.id);
       setParticipantsStatus((participantsStatus) => {
         return {
           ...participantsStatus,
@@ -178,10 +208,11 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
     }
   };
 
-  const stopParticipantAudio = async (participant: Participant): Promise<void> => {
+  const stopParticipantAudio = async (participant: Participant, isBatch?: boolean): Promise<void> => {
     const p = conferenceService.participants().get(participant.id);
     if (p) {
       await conferenceService.stopAudio(p);
+      if (!isBatch) singleParticipantMutedSet.add(participant.id);
       setParticipantsStatus((participantsStatus) => {
         return {
           ...participantsStatus,
@@ -191,6 +222,25 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
           },
         };
       });
+    }
+  };
+
+  const toggleMuteParticipants = async () => {
+    const onlyRemoteNotMutedParticipants = participantsArray.filter(
+      (p: Participant) => p.id !== participant?.id && !singleParticipantMutedSet.has(p.id),
+    );
+    try {
+      await Promise.all(
+        onlyRemoteNotMutedParticipants.map(async (participant) => {
+          if (!isPageMuted) {
+            return stopParticipantAudio(participant, true);
+          }
+          return startParticipantAudio(participant, true);
+        }),
+      );
+      setIsPageMuted((prevState) => !prevState);
+    } catch (e) {
+      throwErrorMessage(e);
     }
   };
 
@@ -260,6 +310,10 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
     }
   };
 
+  const playBlockedAudio = async (): Promise<void> => {
+    await conferenceService.playBlockedAudio();
+  };
+
   // CONFERENCE METHODS
 
   const createConference = useCallback((conferenceOptions: ConferenceOptions): Promise<Conference> => {
@@ -322,9 +376,9 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
     setConferenceStatus(status);
   };
 
-  const onParticipantsChange = (participant: Participant) => {
+  const onParticipantsChange = async (participant: Participant) => {
+    const p = participants.get(participant.id);
     setParticipants((participants) => {
-      const p = participants.get(participant.id);
       return new Map(
         participants.set(participant.id, {
           ...p,
@@ -333,6 +387,9 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
         } as Participant),
       );
     });
+    if (!p && isPageMuted) {
+      await stopParticipantAudio(participant, true);
+    }
   };
 
   const onStreamsChange = (participant: Participant) => {
@@ -359,14 +416,16 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
   useEffect(() => {
     const unsubscribers: Array<() => void> = [
       conferenceService.onConferenceStatusChange(onConferenceStatusChange),
-      conferenceService.onParticipantsChange(onParticipantsChange),
       conferenceService.onStreamsChange(onStreamsChange),
-      // conferenceService.onPermissionsChange(onPermissionsChange),
     ];
     return () => {
       unsubscribers.forEach((u) => u());
     };
   }, []);
+
+  useEffect(() => {
+    return conferenceService.onParticipantsChange(onParticipantsChange);
+  }, [isPageMuted]);
 
   const contextValue: CommsContextType = useMemo(() => {
     return {
@@ -386,6 +445,7 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
           ? !!participantsStatus[participant.id]?.isRemoteAudio
           : isAudio,
       toggleAudio,
+      playBlockedAudio,
       startParticipantAudio,
       stopParticipantAudio,
       startParticipantVideo,
@@ -403,6 +463,10 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
       setLocalMicrophone,
       localSpeakers,
       setLocalSpeakers,
+      blockedAudioState,
+      setBlockedAudioState,
+      isPageMuted,
+      toggleMuteParticipants,
       ...value,
     };
   }, [
@@ -420,6 +484,9 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
     setLocalMicrophone,
     localSpeakers,
     setLocalSpeakers,
+    blockedAudioState,
+    isPageMuted,
+    toggleMuteParticipants,
   ]);
 
   return (

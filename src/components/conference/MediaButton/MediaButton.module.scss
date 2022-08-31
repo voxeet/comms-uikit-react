@@ -1,0 +1,10 @@
+.container {
+  position: relative;
+
+  .backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: transparent;
+  }
+}

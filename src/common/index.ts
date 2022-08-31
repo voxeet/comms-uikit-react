@@ -1,7 +1,3 @@
-// Assets
-export { default as Icons } from './assets/icons';
-export type { IconsKeys } from './assets/icons';
-
 // Constants
 // export { default as Colors } from './constants/colors';
 

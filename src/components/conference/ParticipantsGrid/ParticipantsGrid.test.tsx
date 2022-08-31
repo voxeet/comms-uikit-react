@@ -45,7 +45,7 @@ describe('ParticipantsGrid component', () => {
     });
 
     await waitFor(() => {
-      expect(getByText(localText)).not.toBeNull();
+      expect(getByText(`Local (${localText})`)).not.toBeNull();
     });
   });
 
@@ -63,7 +63,7 @@ describe('ParticipantsGrid component', () => {
       },
     });
 
-    expect(getByText(localText)).not.toBeNull();
+    expect(getByText(`Local (${localText})`)).not.toBeNull();
     expect(getByText(remoteName)).not.toBeNull();
   });
 });

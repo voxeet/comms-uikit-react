@@ -2,14 +2,14 @@
 
 ## Overview
 
-This UIKit is designed to help React developers reduce the complexity of building a Dolby.io video call application for the web.
+The Dolby.io Communications UIKit for React is designed to help React developers reduce the complexity of building a Dolby.io video call application for web.
 
-The package consists of four elements:
+The package consists of four basic elements:
 
-- Providers: These provide the integration with the [Dolby.io](https://dolby.io/) Communications APIs and associated state management.
-- Hooks: Functions that provide reusable, shared logic for video calling applications.
-- UI components: Basic elements that cover popular UI patterns of web applications.
-- Video call components: UI components composed with hooks that provide widely used video call features.
+- Providers: The main components for initializing integration with [Dolby.io](https://dolby.io/) Communications APIs and state management.
+- Hooks: Functions responsible for video call logic of video call applications.
+- UI components: Components that cover the most popular patterns of video conferencing applications.
+- Video call components: UI components with built-in logic for the most widely used video call features.
 
 > If you prefer to get started by reviewing a complete code sample of this guide, see [the example here](examples/example_App.js).
 
@@ -19,31 +19,32 @@ The package consists of four elements:
 
 ## Getting Started
 
-- [Prerequisites](#prerequisites)
-- [How to use this guide](#how-to-use-this-guide)
-- [Setup](#setup)
-- [Steps](#steps)
-  - [Connect your app to Dolby.io](#connect-your-app-to-dolbyio)
-    - [Initialise the SDK](#initialise-the-sdk)
-    - [Open a session](#open-a-session)
-  - [Add video call components](#add-video-call-components)
-    - [Create a conference](#create-a-conference)
-    - [Display participants](#display-participants)
-    - [Display video](#display-video)
-    - [Show user controls](#show-user-controls)
-    - [Change input or output devices](#change-input-or-output-devices)
-    - [Leave a conference](#leave-a-conference)
-- [Optional Features](#optional-features)
-  - [Hooks](#hooks)
-  - [Theming](#theming)
-- [License](#license)
+  - [Prerequisites](#prerequisites)
+  - [How to use this guide](#how-to-use-this-guide)
+  - [Setup](#setup)
+  - [Steps](#steps)
+    - [Connect your app to Dolby.io](#connect-your-app-to-dolbyio)
+      - [Initialize the SDK](#initialize-the-sdk)
+      - [Open a session](#open-a-session)
+    - [Add video call components](#add-video-call-components)
+      - [Join or leave a conference](#join-or-leave-a-conference)
+      - [Display participants](#display-participants)
+      - [Display video](#display-video)
+      - [Show user controls](#show-user-controls)
+      - [Change input or output devices](#change-input-or-output-devices)
+  - [Optional Features](#optional-features)
+    - [Hooks](#hooks)
+    - [Theming](#theming)
+  - [License](#license)
 
 ## Prerequisites
 
-- An account with Dolby.io. [Sign up](https://dashboard.dolby.io/signup/) if you don't have one, it's free!
-- A Dolby.io [client access token](https://dashboard.dolby.io/dashboard/applications/summary).
-- [Node.js 16.x](https://nodejs.org/en/) or later.
-- A supported browser, either Chrome 100+, Safari 15+, Firefox 100+, or Edge 100+.
+- A [Dolby.io](https://dashboard.dolby.io/signup/) account
+- A working webcam and microphone
+- A Dolby.io [client access token](https://dashboard.dolby.io/dashboard/applications/summary)
+- [Voxeet Web SDK >=3.6.0](https://www.npmjs.com/package/@voxeet/voxeet-web-sdk) or later
+- [Node.js 16.x](https://nodejs.org/en/) or later
+- A supported browser, either Chrome 100+, Safari 15+, Firefox 100+, or Edge 100+
 
 ## How to use this guide
 
@@ -62,11 +63,11 @@ npx create-react-app my-app
 # Change into the app directory
 cd my-app
 
-# Install the UI kit with npm...
-npm install @dolbyio/comms-uikit-react --save
+# Install the Voxeet SDK and UI kit with npm...
+npm install @voxeet/voxeet-web-sdk @dolbyio/comms-uikit-react --save
 
 # ...or yarn (skip this if you used npm)
-yarn add @dolbyio/comms-uikit-react
+yarn add @voxeet/voxeet-web-sdk @dolbyio/comms-uikit-react
 
 # Start the dev server
 npm start
@@ -78,9 +79,9 @@ npm start
 
 This section will guide you on opening a connection to the Dolby.io APIs, which will enable the use of video calling features in your app.
 
-#### Initialise the SDK
+#### Initialize the SDK
 
-Dolby.io integration is provided by a `CommsProvider` component, which should be imported and configured at the root of your web app, eg. `src/App.js`.
+Dolby.io integration is provided by a `CommsProvider` component (for communication with our APIs) and a `ThemeProvider` component (provides the look and feel), which should be imported and configured at the root of your web app, eg. `src/App.js`.
 
 ```javascript
 // src/App.js
@@ -88,95 +89,141 @@ Dolby.io integration is provided by a `CommsProvider` component, which should be
 import logo from './logo.svg';
 import './App.css';
 
-// 1. Import `CommsProvider` from the UI kit.
-import { CommsProvider } from '@dolbyio/comms-uikit-react';
+// 1. Import `CommsProvider` and `ThemeProvider` from the UI kit.
+import { CommsProvider, ThemeProvider } from '@dolbyio/comms-uikit-react';
 
-// 2. Define the `CommsProvider` configuration: we need two props, a `token` and an async function that refreshes it.
+// 2. Define the `CommsProvider` configuration. We need two properties, a `token` and an async function that refreshes it.
 const token = 'YOUR_CLIENT_ACCESS_TOKEN_HERE';
 const refreshToken = async () => token;
 
-// 3. Wrap the existing app code with the configured `CommsProvider`, passing in the `token` and `refreshToken` props.
+// 3. Wrap the existing app code with `ThemeProvider` and the configured `CommsProvider`, passing in the `token` and `refreshToken` properties. We'll also add a fixed height to the app as we'll need this later in the guide.
 function App() {
   return (
-    <CommsProvider token={token} refreshToken={refreshToken}>
-      <div className="App">...</div>
-    </CommsProvider>
+    <ThemeProvider>
+      <CommsProvider token={token} refreshToken={refreshToken}>
+        <div className="App" style={{ height: 400 }}>
+          ...
+        </div>
+      </CommsProvider>
+    </ThemeProvider>
   );
 }
 
 export default App;
 ```
 
-> This approach is only for demo purposes. To properly initialise your app for production, see our guides to [API Authentication](https://docs.dolby.io/communications-apis/docs/guides-api-authentication#initialize-the-sdk-with-secure-authentication) and [Client Authentication](https://docs.dolby.io/communications-apis/docs/guides-client-authentication).
+> This approach is only for demo purposes. To properly initialize your app for production, see [API Authentication](https://docs.dolby.io/communications-apis/docs/guides-api-authentication#initialize-the-sdk-with-secure-authentication) and [Client Authentication](https://docs.dolby.io/communications-apis/docs/guides-client-authentication).
 
 #### Open a session
 
-A session is a connection between the client application and the Dolby.io Communications API.
+A session is a connection between the client application and the Dolby.io Communications APIs.
 
 ```javascript
 // src/App.js
 
 // 1. Import `Session` from the UI kit.
-import { CommsProvider, Session } from '@dolbyio/comms-uikit-react';
+import { CommsProvider, ThemeProvider, Session } from '@dolbyio/comms-uikit-react';
 
-// 2. Define the `Session` configuration: you should provide a name using a `participantInfo` object, eg. the name of the participant who established the session.
+// 2. Define the `Session` configuration. You should provide a name using a `participantInfo` object, eg. the name of the participant who established the session.
 const participantInfo = { name: 'John Doe' };
 
-// 3. Insert the `Session` component, along with the `participantInfo` prop, anywhere inside of `CommsProvider`.
+// 3. Insert the `Session` component, along with the `participantInfo` property, anywhere inside of `CommsProvider`.
 function App() {
   return (
-    <CommsProvider token={token} refreshToken={refreshToken}>
-      <div className="App">
-        <Session participantInfo={participantInfo}>...</Session>
-      </div>
-    </CommsProvider>
+    <ThemeProvider>
+      <CommsProvider token={token} refreshToken={refreshToken}>
+        <div className="App" style={{ height: 400 }}>
+          <Session participantInfo={participantInfo}>...</Session>
+        </div>
+      </CommsProvider>
+    </ThemeProvider>
   );
 }
 ```
 
-> If you would like to create a session using your own component, refer to our [useSession](documentation/hooks/useSession.md) hook.
+> If you would like to create a session using your own component, refer to the [useSession](documentation/hooks/useSession.md) hook.
 
 ### Add video call components
 
 Once your app has made the connection to Dolby.io, you can access its video call features.
 
-#### Create a conference
+#### Join or leave a conference
 
 A conference connects participants to one another, enabling them to communicate using audio and/or video.
 
 ```javascript
 // src/App.js
 
-// 1. Import `Conference` from the UI kit.
-import { CommsProvider, Session, Conference } from '@dolbyio/comms-uikit-react';
+// 1. Import `Conference`, `JoinConferenceButton` and `LeaveConferenceButton` from the UI kit.
+import {
+  CommsProvider,
+  ThemeProvider,
+  Session,
+  Conference,
+  JoinConferenceButton,
+  LeaveConferenceButton,
+} from '@dolbyio/comms-uikit-react';
 
-// 2. Define the `Conference` configuration: you can specify whether to join the conference with audio and/or video enabled, in addition to an alias which can be made visible to all participants.
-const audio = true;
-const video = true;
-const alias = 'My Meeting';
+// 2. import `useState` from React.
+import { useState } from 'react';
 
-/*
-  3. Insert the `Conference` component, along with the `audio`, `video` and `alias` props, anywhere inside of `Session`.
+// 3. Define the `JoinConferenceButton` configuration. You can specify whether to join the conference with audio and/or video enabled, in addition to a meetingName and username (usually the name of current user) which can be made visible to all participants.
 
-  IMPORTANT: Rendering a <Conference /> component will establish a call using Dolby.io - if you're using your free minutes for this demo, remember to leave the conference or close the browser tab when you're done!
-*/
+const joinOptions = {
+  constraints: {
+    audio: true,
+    video: true,
+  },
+};
+
+const meetingName = 'My Meeting';
+const username = 'John Doe';
+
+// 4. Define the tooltips that are shown when hovering over the Join or Leave buttons.
+const joinTooltipText = 'Join meeting';
+const leaveTooltipText = 'Leave meeting';
 
 function App() {
+  // 5. Define the state for the conference ID.
+  const [conferenceId, setConferenceId] = useState();
+
+  /*
+  6. Insert the `Conference`, `JoinConferenceButton` and `LeaveConferenceButton` components, along with the `joinOptions` and `meetingName` properties, anywhere inside of `Session`. We want to show "JoinConferenceButton" when there's no conference ID, and "Conference" (which includes the `LeaveConferenceButton`) when there is.
+
+  We also pass `setConferenceId` as a callback to the `onSuccess` properties for both buttons which will set (or unset) the conference ID when the action is successful.
+
+  IMPORTANT: Rendering a <Conference /> component will establish a call using Dolby.io, If you are using your free minutes for this demo, remember to leave the conference or close the browser tab when you're done!
+*/
+
   return (
-    <CommsProvider token={token} refreshToken={refreshToken}>
-      <div className="App">
-        <Session participantInfo={participantInfo}>
-          <Conference audio={audio} video={video} alias={alias}>
-            ...
-          </Conference>
-        </Session>
-      </div>
-    </CommsProvider>
+    <ThemeProvider>
+      <CommsProvider token={token} refreshToken={refreshToken}>
+        <div className="App" style={{ height: 400 }}>
+          <Session participantInfo={participantInfo}>
+            {!conferenceId ? (
+              <JoinConferenceButton
+                joinOptions={joinOptions}
+                meetingName={meetingName}
+                username={username}
+                tooltipText={joinTooltipText}
+                onSuccess={(id) => setConferenceId(id)}
+              >
+                Join Video Call
+              </JoinConferenceButton>
+            ) : (
+              <Conference id={conferenceId}>
+                <LeaveConferenceButton tooltipText={leaveTooltipText} onSuccess={() => setConferenceId(null)} />
+              </Conference>
+            )}
+          </Session>
+        </div>
+      </CommsProvider>
+    </ThemeProvider>
   );
 }
 ```
 
-> If you would like to create a conference using your own component, refer to our [useConference](documentation/hooks/useConference.md) hook.
+> If you would like to create, join or leave a conference using your own components, refer to the [useConference](documentation/hooks/useConference.md) hook.
 
 #### Display participants
 
@@ -186,39 +233,41 @@ The `ParticipantsList` component can display a list of participants in the curre
 // src/App.js
 
 // 1. Import `ParticipantsList` from the UI kit.
-import { CommsProvider, Session, Conference, ParticipantsList } from '@dolbyio/comms-uikit-react';
+import { CommsProvider, ThemeProvider, Session, Conference, ParticipantsList } from '@dolbyio/comms-uikit-react';
 
-// 2. Define the `ParticipantsList` configuration: you can customise the text shown for each participant and their status.
+// 2. Define the `ParticipantsList` configuration. You can customize the text shown for each participant and their status.
 const localText = 'you'; // The local participant's name.
 const muteText = 'mute'; // Displayed in a tooltip when a participant is not muted.
 const unmuteText = 'unmute'; // Displayed in a tooltip when a participant is muted.
 const soundOnText = 'sound on'; // Displayed in a tooltip when a participant is speaking.
 const soundOffText = 'sound off'; // Displayed in a tooltip when a participant is not speaking.
 
-// 3. Insert the `ParticipantsList` component, along with the text props, anywhere inside of `Conference`.
+// 3. Insert the `ParticipantsList` component, along with the text properties, anywhere inside of `Conference`.
 function App() {
   return (
-    <CommsProvider token={token} refreshToken={refreshToken}>
-      <div className="App">
-        <Session participantInfo={participantInfo}>
-          <Conference audio={audio} video={video} alias={alias}>
-            {/*} Code from previous examples has been removed for brevity */}
-            <ParticipantsList
-              localText={localText}
-              muteText={muteText}
-              unmuteText={unmuteText}
-              soundOnText={soundOnText}
-              soundOffText={soundOffText}
-            />
-          </Conference>
-        </Session>
-      </div>
-    </CommsProvider>
+    <ThemeProvider>
+      <CommsProvider token={token} refreshToken={refreshToken}>
+        <div className="App" style={{ height: 400 }}>
+          <Session participantInfo={participantInfo}>
+            <Conference id={conferenceId}>
+              {/*} Code from previous examples has been removed for brevity */}
+              <ParticipantsList
+                localText={localText}
+                muteText={muteText}
+                unmuteText={unmuteText}
+                soundOnText={soundOnText}
+                soundOffText={soundOffText}
+              />
+            </Conference>
+          </Session>
+        </div>
+      </CommsProvider>
+    </ThemeProvider>
   );
 }
 ```
 
-> If you would like to display participants using your own component, refer to our [useParticipants](documentation/hooks/useParticipants.md) hook.
+> If you would like to display participants using your own component, refer to the [useParticipants](documentation/hooks/useParticipants.md) hook.
 
 #### Display video
 
@@ -228,24 +277,26 @@ The `ParticipantsGrid` component displays the video streams of conference partic
 // src/App.js
 
 // 1. Import `ParticipantsGrid` from the UI kit.
-import { CommsProvider, Session, Conference, ParticipantsGrid } from '@dolbyio/comms-uikit-react';
+import { CommsProvider, ThemeProvider, Session, Conference, ParticipantsGrid } from '@dolbyio/comms-uikit-react';
 
-// 2. Define the `ParticipantsGrid` configuration: you can customise the text shown for the current participant and their status.
+// 2. Define the `ParticipantsGrid` configuration. You can customize the text shown for the current participant and their status.
 const localText = 'you'; // The local participant's name.
 
-// 3. Insert the `ParticipantsGrid` component, along with the `localText` prop, anywhere inside of `Conference`.
+// 3. Insert the `ParticipantsGrid` component, along with the `localText` property, anywhere inside of `Conference`.
 function App() {
   return (
-    <CommsProvider token={token} refreshToken={refreshToken}>
-      <div className="App">
-        <Session participantInfo={participantInfo}>
-          <Conference audio={audio} video={video} alias={alias}>
-            {/*} Code from previous examples has been removed for brevity */}
-            <ParticipantsGrid localText={localText} />
-          </Conference>
-        </Session>
-      </div>
-    </CommsProvider>
+    <ThemeProvider>
+      <CommsProvider token={token} refreshToken={refreshToken}>
+        <div className="App" style={{ height: 400 }}>
+          <Session participantInfo={participantInfo}>
+            <Conference id={conferenceId}>
+              {/*} Code from previous examples has been removed for brevity */}
+              <ParticipantsGrid localText={localText} />
+            </Conference>
+          </Session>
+        </div>
+      </CommsProvider>
+    </ThemeProvider>
   );
 }
 ```
@@ -260,6 +311,7 @@ The `LocalToggleAudioButton` and `LocalToggleVideoButton` components enable the 
 // 1. Import `LocalToggleAudioButton` and `LocalToggleVideoButton` from the UI kit.
 import {
   CommsProvider,
+  ThemeProvider,
   Session,
   Conference,
   LocalToggleAudioButton,
@@ -269,22 +321,24 @@ import {
 // 2. Insert the `LocalToggleAudioButton` and `LocalToggleVideoButton` components anywhere inside of `Conference`.
 function App() {
   return (
-    <CommsProvider token={token} refreshToken={refreshToken}>
-      <div className="App">
-        <Session participantInfo={participantInfo}>
-          <Conference audio={audio} video={video} alias={alias}>
-            {/*} Code from previous examples has been removed for brevity */}
-            <LocalToggleAudioButton />
-            <LocalToggleVideoButton />
-          </Conference>
-        </Session>
-      </div>
-    </CommsProvider>
+    <ThemeProvider>
+      <CommsProvider token={token} refreshToken={refreshToken}>
+        <div className="App" style={{ height: 400 }}>
+          <Session participantInfo={participantInfo}>
+            <Conference id={conferenceId}>
+              {/*} Code from previous examples has been removed for brevity */}
+              <LocalToggleAudioButton />
+              <LocalToggleVideoButton />
+            </Conference>
+          </Session>
+        </div>
+      </CommsProvider>
+    </ThemeProvider>
   );
 }
 ```
 
-> If you would like to control audio or video using your own components, refer to our [useAudio](documentation/hooks/useAudio.md) and [useVideo](documentation/hooks/useVideo.md) hooks.
+> If you would like to control audio or video using your own components, refer to the [useAudio](documentation/hooks/useAudio.md) and [useVideo](documentation/hooks/useVideo.md) hooks.
 
 #### Change input or output devices
 
@@ -296,6 +350,7 @@ The local participant can change their preferred camera, microphone or output sp
 // 1. Import `CameraSelect`, `MicrophoneSelect` and `SpeakersSelect` from the UI kit.
 import {
   CommsProvider,
+  ThemeProvider,
   Session,
   Conference,
   CameraSelect,
@@ -313,68 +368,36 @@ const microphonePlaceholder = 'Choose a microphone';
 const speakersLabel = 'Speaker';
 const speakersPlaceholder = 'Choose a speaker';
 
-// 3. Insert the `CameraSelect`, `MicrophoneSelect` and `SpeakersSelect` components, along with the `label` and `placeholder` props, anywhere inside of `Conference`.
+// 3. Insert the `CameraSelect`, `MicrophoneSelect` and `SpeakersSelect` components, along with the `label` and `placeholder` properties, anywhere inside of `Conference`.
 function App() {
   return (
-    <CommsProvider token={token} refreshToken={refreshToken}>
-      <div className="App">
-        <Session participantInfo={participantInfo}>
-          <Conference audio={audio} video={video} alias={alias}>
-            {/*} Code from previous examples has been removed for brevity */}
-            <CameraSelect label={cameraLabel} placeholder={cameraPlaceholder} />
-            <MicrophoneSelect label={microphoneLabel} placeholder={microphonePlaceholder} />
-            <SpeakersSelect label={speakersLabel} placeholder={speakersPlaceholder} />
-          </Conference>
-        </Session>
-      </div>
-    </CommsProvider>
+    <ThemeProvider>
+      <CommsProvider token={token} refreshToken={refreshToken}>
+        <div className="App" style={{ height: 400 }}>
+          <Session participantInfo={participantInfo}>
+            <Conference id={conferenceId}>
+              {/*} Code from previous examples has been removed for brevity */}
+              <CameraSelect label={cameraLabel} placeholder={cameraPlaceholder} />
+              <MicrophoneSelect label={microphoneLabel} placeholder={microphonePlaceholder} />
+              <SpeakersSelect label={speakersLabel} placeholder={speakersPlaceholder} />
+            </Conference>
+          </Session>
+        </div>
+      </CommsProvider>
+    </ThemeProvider>
   );
 }
 ```
 
-> If you would like to control input devices using your own components, refer to our [useCamera](documentation/hooks/useCamera.md), [useMicrophone](documentation/hooks/useMicrophone.md) and [useSpeaker](documentation/hooks/useSpeaker.md) hooks.
-
-#### Leave a conference
-
-The `LeaveConferenceButton` component, when pressed, will enable the local participant to leave the conference.
-
-```javascript
-// src/App.js
-
-// 1. Import `LeaveConferenceButton` from the UI kit.
-import { CommsProvider, Session, Conference, LeaveConferenceButton } from '@dolbyio/comms-uikit-react';
-
-// 2. Define the `LeaveConferenceButton` configuration: you can customise the text shown in a tooltip when hovering over the button.
-const tooltipText = 'Leave';
-
-// 3. Insert the `LeaveConferenceButton` component, along with the `tooltipText` prop, anywhere inside of `Conference`.
-function App() {
-  return (
-    <CommsProvider token={token} refreshToken={refreshToken}>
-      <div className="App">
-        <Session participantInfo={participantInfo}>
-          <Conference audio={audio} video={video} alias={alias}>
-            {/*} Code from previous examples has been removed for brevity */}
-            <LeaveConferenceButton tooltipText={tooltipText} />
-          </Conference>
-        </Session>
-      </div>
-    </CommsProvider>
-  );
-}
-```
-
-> If you would like to leave a conference using your own component, refer to our [useConference](documentation/hooks/useConference.md) hook.
+> If you would like to control input devices using your own components, refer to the [useCamera](documentation/hooks/useCamera.md), [useMicrophone](documentation/hooks/useMicrophone.md) and [useSpeaker](documentation/hooks/useSpeaker.md) hooks.
 
 ## Optional Features
 
 ### Hooks
 
-The UI components referenced in this guide use custom hooks to connect to the [Dolby.io Communications APIs](https://docs.dolby.io/communications-apis/docs).
+The UI components use custom hooks to connect to the [Dolby.io Communications APIs](https://docs.dolby.io/communications-apis/docs).
 
-If you would like to connect to our APIs using your own UI components, we have exported these hooks for your convenience which will enable you to add conferencing features to your application as needed.
-
-Click on the name of the hook for detailed usage instructions.
+If you would like to connect to the Dolby.io Communications APIs using your own UI components, you can use the following exported hooks to add conferencing features to your application:
 
 | Hook                                                      | Description                                                                                              |
 | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
@@ -389,7 +412,9 @@ Click on the name of the hook for detailed usage instructions.
 
 ### Theming
 
-An optional `ThemeProvider` component enables customisation. For detailed usage information for the component, see [ThemeProvider](documentation/providers/ThemeProvider.md). To see the complete range of values that can be overriden, refer to the [default theme](src/theme/defaultTheme.ts).
+Themes allow you to customize all design aspects of your project in order to meet the specific needs of your business or brand and have a consistent tone of your application. Themes allow you to configure colors of components, the darkness of surfaces, level of shadow, and the opacity of ink elements.
+
+The optional `ThemeProvider` component enables customization. For detailed usage information for the component, see [ThemeProvider](documentation/providers/ThemeProvider.md). To see the complete range of values that can be overridden, refer to the [default theme](src/theme/defaultTheme.ts).
 
 ```javascript
 // src/App.js
@@ -397,19 +422,21 @@ An optional `ThemeProvider` component enables customisation. For detailed usage 
 // 1. Import `ThemeProvider` from the UI kit.
 import { CommsProvider, ThemeProvider } from '@dolbyio/comms-uikit-react';
 
-// 2. Define a custom theme: any values provided here will be merged with the default theme.
+// 2. Define a custom theme. Any values provided here will be merged with the default theme.
 const theme = {
-  colors: {
-    background: 'white',
+  grey: {
+    100: 'cyan', // This will change basic Text elements and the borders around certain UI elements to cyan
   },
 };
 
-// 3. Wrap the existing app code with the configured `ThemeProvider`, passing in the `theme` prop.
+// 3. Pass the custom theme object into the ThemeProvider's `theme` property.
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CommsProvider token={token} refreshToken={refreshToken}>
-        <div className="App">...</div>
+        <div className="App" style={{ height: 400 }}>
+          ...
+        </div>
       </CommsProvider>
     </ThemeProvider>
   );

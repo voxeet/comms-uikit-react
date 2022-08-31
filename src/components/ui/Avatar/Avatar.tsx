@@ -54,8 +54,7 @@ const Avatar = ({ participant, size = 'l', borderColor, testID, ...props }: Avat
     if (name) {
       firstValue = name.charAt(0);
       const nameArray = name.split(' ');
-      lastValue =
-        nameArray[0] !== name.split(' ')[nameArray.length - 1] ? nameArray[nameArray.length - 1].charAt(0) : '';
+      lastValue = nameArray.length > 1 ? nameArray[nameArray.length - 1].charAt(0) : '';
     }
     return [firstValue, lastValue];
   }, [name]);

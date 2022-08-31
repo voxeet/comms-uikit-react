@@ -1,15 +1,16 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import type { IconsKeys, ColorKey, Sizes } from '../../../../common';
+import type { ColorKey, Sizes } from '../../../../common';
 import cx from 'classnames';
 
 import useTheme from '../../../../hooks/useTheme';
 import Icon from '../../Icon/Icon';
+import type { IconComponentName } from '../../Icon/IconComponents';
 import Space from '../../Space/Space';
 
 import styles from './IconIndicator.module.scss';
 
 export type IconIndicatorProps = React.HTMLAttributes<HTMLDivElement> & {
-  icon: IconsKeys;
+  icon: IconComponentName;
   backgroundColor?: ColorKey;
   iconColor?: ColorKey;
   size?: Extract<Sizes, 's' | 'm'>;
@@ -23,7 +24,7 @@ const IconIndicator = ({ icon, backgroundColor, iconColor, size = 'm', testID, .
       testID={testID}
       className={cx(styles.indicator, styles[`size-${size}`])}
       style={{
-        backgroundColor: getColor(backgroundColor, 'whiteAlpha.500'),
+        backgroundColor: getColor(backgroundColor, 'rgba(255, 255, 255, 0.36)'),
       }}
       {...props}
     >

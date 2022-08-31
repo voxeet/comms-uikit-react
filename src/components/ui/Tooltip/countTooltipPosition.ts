@@ -8,16 +8,16 @@ type TooltipPositionArguments = {
 
 export const countTooltipPosition = ({ position, wrapperRect, tooltipRect }: TooltipPositionArguments) => {
   const style = {
-    bottom: 0,
     left: 0,
+    top: 0,
   };
   if (wrapperRect && tooltipRect) {
     if (position === 'bottom') {
-      const bottom = document.body.clientHeight - (wrapperRect.top + window.pageYOffset + wrapperRect.height + 38 + 5);
-      style.bottom = bottom >= 0 ? bottom : 4;
+      const top = wrapperRect.bottom + 10; // The default distance between the target element and tooltip is 10px
+      style.top = top;
     } else {
-      const bottom = document.body.clientHeight - (wrapperRect.top + window.pageYOffset - 5);
-      style.bottom = bottom >= 0 ? bottom : 4;
+      const top = wrapperRect.top - 36; // By default, the tooltip height is 36px. Therefore the distance between the target element and tooltip is 10px.
+      style.top = top;
     }
     const left = wrapperRect.left - tooltipRect.width / 2 + wrapperRect.width / 2;
     style.left = left >= 0 ? left : 4;
