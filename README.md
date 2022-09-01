@@ -414,7 +414,7 @@ If you would like to connect to the Dolby.io Communications APIs using your own 
 
 Themes allow you to customize all design aspects of your project in order to meet the specific needs of your business or brand and have a consistent tone of your application. Themes allow you to configure colors of components, the darkness of surfaces, level of shadow, and the opacity of ink elements.
 
-The optional `ThemeProvider` component enables customization. For detailed usage information for the component, see [ThemeProvider](documentation/providers/ThemeProvider.md). To see the complete range of values that can be overridden, refer to the [default theme](src/theme/defaultTheme.ts).
+The `ThemeProvider` component enables customisation. When used as is, it will provide a default look and feel for your app, but customisation is possible. For more information, see [ThemeProvider](documentation/providers/ThemeProvider.md).
 
 ```javascript
 // src/App.js
