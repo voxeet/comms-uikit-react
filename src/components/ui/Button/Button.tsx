@@ -15,21 +15,25 @@ const Button: FunctionComponent<ButtonProps> = ({
   danger = false,
   testID,
   variant = 'primary',
+  className,
   ...props
-}) => (
-  <button
-    className={cx(
-      variant === 'primary' && styles.primaryButton,
-      variant === 'secondary' && styles.secondaryButton,
-      variant === 'tertiary' && styles.tertiaryButton,
-      danger && styles.danger,
-    )}
-    data-testid={testID}
-    type="button"
-    {...props}
-  >
-    {children}
-  </button>
-);
+}) => {
+  return (
+    <button
+      className={cx(
+        variant === 'primary' && styles.primaryButton,
+        variant === 'secondary' && styles.secondaryButton,
+        variant === 'tertiary' && styles.tertiaryButton,
+        danger && styles.danger,
+        className,
+      )}
+      data-testid={testID}
+      type="button"
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
 
 export default Button;

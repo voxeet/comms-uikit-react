@@ -19,10 +19,10 @@ const LeaveConferenceButton = ({
 }: LeaveConferenceButtonProps) => {
   const { leaveConference } = useConference();
   const handleLeaveConference = async () => {
+    await leaveConference();
     if (onSuccess) {
       onSuccess();
     }
-    await leaveConference();
   };
   return (
     <Tooltip position={tooltipPosition} text={tooltipText}>

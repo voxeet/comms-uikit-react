@@ -14,7 +14,7 @@ const LocalName = ({ text, ...rest }: LocalNameProps) => {
 
   const { isSpeaking, isRemoteAudio, isLocalAudio } = participantsStatus[participant.id] || {};
   return (
-    <Pill text={`${participant.info.name} (${text})`} active={isSpeaking && isRemoteAudio && isLocalAudio} {...rest} />
+    <Pill text={participant.info.name} label={text} active={isSpeaking && isRemoteAudio && isLocalAudio} {...rest} />
   );
 };
 

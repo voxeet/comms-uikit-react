@@ -3,14 +3,14 @@
 import Space from '../Space/Space';
 import Text, { TextProps } from '../Text/Text';
 
-import styles from './Select.module.scss';
+import styles from './Dropdown.module.scss';
 
-type SelectLabelProps = {
+type DropdownLabelProps = {
   label: string;
   testID?: string;
 } & Partial<TextProps>;
 
-const SelectLabel = ({ label, testID, ...props }: SelectLabelProps) => {
+const DropdownLabel = ({ label, testID, ...props }: DropdownLabelProps) => {
   return (
     <Space testID={testID} mt="xxs" mb="xs" ml="s" className={styles.label}>
       <Text type="captionSemiBold" {...props}>
@@ -20,4 +20,4 @@ const SelectLabel = ({ label, testID, ...props }: SelectLabelProps) => {
   );
 };
 
-export default SelectLabel;
+export default DropdownLabel;

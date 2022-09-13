@@ -1,6 +1,6 @@
 $height: 48px;
 
-.uiSelect {
+.uiDropdown {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -25,7 +25,9 @@ $height: 48px;
 
   .control,
   .option {
-    padding: 0 45px 0 17px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
     cursor: pointer;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -41,8 +43,13 @@ $height: 48px;
     }
   }
 
+  .control {
+    padding: 0 48px 0 16px;
+  }
+
   .option {
     background: none;
+    padding: 0 16px;
   }
 
   .dropdownContent {

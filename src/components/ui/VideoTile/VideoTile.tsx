@@ -2,7 +2,7 @@
 import type { MediaStreamWithType } from '@voxeet/voxeet-web-sdk/types/models/MediaStream';
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
 import cx from 'classnames';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import useParticipants from '../../../hooks/useParticipants';
 import useTheme from '../../../hooks/useTheme';
@@ -33,8 +33,9 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
   const { isLocal } = participantsStatus[participant.id] || {};
   const [isLoading, setIsLoading] = useState(true);
   const [currentStream, setCurrentStream] = useState<MediaStreamWithType | null>(null);
-  const [isUserFacingCamera, setIsUserFacingCamera] = useState(isMirrored);
+  const [isMirrorStream, setIsMirrorStream] = useState(isMirrored);
   const [scale, setScale] = useState(1);
+  const [isPiPEnabled, setIsPiPEnabled] = useState(false);
 
   const isSmartphone = isMobileSmall || isMobile;
 
@@ -45,8 +46,9 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
   useEffect(() => {
     if (participant.streams?.length) {
       const stream = participant.streams[participant.streams.length - 1];
-      const facingUserMode = stream.getVideoTracks()[0]?.getSettings()?.facingMode === 'user';
-      setIsUserFacingCamera((isMirrored && isDesktop) || facingUserMode);
+      const facingMode = stream.getVideoTracks()[0]?.getSettings()?.facingMode;
+      const facingUserMode = facingMode === 'user';
+      setIsMirrorStream(facingMode ? facingUserMode : isMirrored);
       setCurrentStream(participant.streams[participant.streams.length - 1]);
     }
   }, [participant]);
@@ -59,6 +61,25 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
       setIsLoading(true);
     }
   }, [currentStream]);
+
+  useEffect(() => {
+    if (!document.pictureInPictureEnabled || !videoRef.current) return;
+    videoRef.current.addEventListener('enterpictureinpicture', () => {
+      setIsPiPEnabled(true);
+    });
+    videoRef.current.addEventListener('leavepictureinpicture', () => {
+      setIsPiPEnabled(false);
+    });
+    // eslint-disable-next-line consistent-return
+    return () => {
+      videoRef.current?.removeEventListener('enterpictureinpicture', () => {
+        setIsPiPEnabled(true);
+      });
+      videoRef.current?.removeEventListener('leavepictureinpicture', () => {
+        setIsPiPEnabled(false);
+      });
+    };
+  }, []);
 
   const handleLoadedVideo = () => {
     setTimeout(() => {
@@ -78,21 +99,29 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
   };
 
   const setVideoScale = () => {
+    if (isPiPEnabled) {
+      return setScale(1);
+    }
     const scale = autoVideoScale(wrapperRef.current, videoRef.current, currentStream) || 1;
-    setScale(scale);
+    return setScale(scale);
   };
 
+  const postponedSetScale = useCallback(() => {
+    setTimeout(() => {
+      setVideoScale();
+    }, 100);
+  }, [currentStream]);
+
   useEffect(() => {
-    videoRef.current?.addEventListener('resize', () => {
-      setTimeout(() => {
-        setVideoScale();
-      }, 100);
-    });
+    videoRef.current?.addEventListener('resize', postponedSetScale);
+    return () => {
+      videoRef.current?.removeEventListener('resize', postponedSetScale);
+    };
   }, [currentStream]);
 
   useEffect(() => {
     setVideoScale();
-  }, [participants.length, isMobileSmall, isMobile, isDesktop]);
+  }, [participants.length, isMobileSmall, isMobile, isDesktop, isPiPEnabled]);
 
   const avatarSize = useMemo(() => {
     if (isSmartphone) {
@@ -122,10 +151,10 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
           muted
           autoPlay
           playsInline
-          className={cx({ [styles.mirrored]: isUserFacingCamera, [styles.isLoading]: isLoading })}
+          className={cx({ [styles.isLoading]: isLoading })}
           onLoadedData={handleLoadedVideo}
           style={{
-            transform: `translate(-50%, -50%) scale(${!isUserFacingCamera ? '' : '-'}${scale}, ${scale})`,
+            transform: `translate(-50%, -50%) scale(${!isMirrorStream || isPiPEnabled ? '' : '-'}${scale}, ${scale})`,
           }}
         />
       ) : (

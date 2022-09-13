@@ -12,8 +12,6 @@ import sdkService from '../services/sdk';
 import sessionService from '../services/session';
 import { throwErrorMessage } from '../utils/throwError.util';
 
-import '../style/font.css';
-
 type DolbyIoWindow = {
   dolbyio: {
     isInitialized: boolean;
@@ -159,7 +157,7 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
       });
       return map;
     });
-  }, [participantsArray, participant]);
+  }, [participantsArray, participant, isVideo]);
 
   useEffect(() => {
     if (participant && participant.info.name && conference) {
@@ -298,11 +296,11 @@ const CommsProvider = ({ children, token, refreshToken, value }: CommsProviderPr
       const localUser = conferenceService.participants().get(participant.id);
       if (localUser) {
         if (localUser.streams[localUser.streams.length - 1]?.getVideoTracks().length > 0) {
-          setIsVideo(false);
           await conferenceService.stopVideo(participant);
+          setIsVideo(false);
         } else {
-          setIsVideo(true);
           await conferenceService.startVideo(participant);
+          setIsVideo(true);
         }
       }
     } else {

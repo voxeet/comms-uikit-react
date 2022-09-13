@@ -1,24 +1,36 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { ColorKey } from '../../../common';
 import cx from 'classnames';
+import type { DropdownOptionType } from 'src/components/ui/Dropdown/Dropdown';
 
 import useTheme from '../../../hooks/useTheme';
+import Icon from '../Icon/Icon';
+import Space from '../Space/Space';
 import Text from '../Text/Text';
 
-import type { SelectOptionType } from './Select';
-import styles from './Select.module.scss';
-import type { SelectDropdownProps } from './SelectDropdown';
+import styles from './Dropdown.module.scss';
+import type { DropdownListProps } from './DropdownList';
 
-type SelectOptionProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> & {
-  option: SelectOptionType;
+type DropdownOptionProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> & {
   isActive: boolean;
   color?: ColorKey;
-  onChange: SelectDropdownProps['onChange'];
+  iconColor?: ColorKey;
+  onChange: DropdownListProps['onChange'];
   testID?: string;
+  option: DropdownOptionType;
 };
 
-export const SelectOption = ({ option, isActive, color, onChange, testID, ...props }: SelectOptionProps) => {
+export const DropdownOption = ({
+  option,
+  isActive,
+  color,
+  iconColor,
+  onChange,
+  testID,
+  ...props
+}: DropdownOptionProps) => {
   const { getColor } = useTheme();
+
   return (
     <button
       data-testid={testID}
@@ -34,6 +46,11 @@ export const SelectOption = ({ option, isActive, color, onChange, testID, ...pro
       onClick={() => onChange(option)}
       {...props}
     >
+      {option.icon && (
+        <Space pr="xs">
+          <Icon name={option.icon} color={iconColor || 'grey.300'} />
+        </Space>
+      )}
       {typeof option.label === 'string' ? (
         <Text type="bodySmall" color={color || getColor('grey.500')}>
           {option.label}
@@ -41,6 +58,7 @@ export const SelectOption = ({ option, isActive, color, onChange, testID, ...pro
       ) : (
         option.label
       )}
+      {isActive && <Icon name="successFilled" color="success.600" />}
     </button>
   );
 };

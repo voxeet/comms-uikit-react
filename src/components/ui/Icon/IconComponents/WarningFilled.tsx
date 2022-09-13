@@ -1,7 +1,7 @@
 /* eslint-disable react/destructuring-assignment */
 import type { SVGComponent } from './index';
 
-const Warning = (props: SVGComponent) => (
+const WarningFilled = (props: SVGComponent) => (
   <svg
     width="100%"
     height="100%"
@@ -16,4 +16,4 @@ const Warning = (props: SVGComponent) => (
   </svg>
 );
 
-export default Warning;
+export default WarningFilled;

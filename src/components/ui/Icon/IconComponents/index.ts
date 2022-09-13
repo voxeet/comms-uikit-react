@@ -47,7 +47,7 @@ import SpeakerGradient from './SpeakerGradient';
 import SpeakerOff from './SpeakerOff';
 import SpeakerOffGradient from './SpeakerOffGradient';
 import SuccessFilled from './SuccessFilled';
-import Warning from './Warning';
+import WarningFilled from './WarningFilled';
 
 const IconComponents = {
   arrowLeft: ArrowLeft,
@@ -97,7 +97,7 @@ const IconComponents = {
   speakerOff: SpeakerOff,
   speakerOffGradient: SpeakerOffGradient,
   successFilled: SuccessFilled,
-  warning: Warning,
+  warningFilled: WarningFilled,
 };
 
 export default IconComponents;

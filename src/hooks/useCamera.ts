@@ -30,6 +30,14 @@ const useCamera: UseCamera = () => {
         return device;
       }
     }
+    if (devices.length > 1) {
+      /*
+       * For sake of using external cameras as default we need to exclude FaceTime from default cameras pool ,
+       * Safari integration is picking FaceTime cameras (always labelled FaceTime) as default
+       */
+      const devicesWithoutFaceTimeCameras = devices.filter((device) => !device.label.includes('FaceTime'));
+      return devicesWithoutFaceTimeCameras[0];
+    }
     return devices[0] || null;
   };
 
