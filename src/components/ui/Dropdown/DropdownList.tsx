@@ -4,23 +4,23 @@ import type { ColorKey } from '../../../common';
 import useTheme from '../../../hooks/useTheme';
 import Space from '../Space/Space';
 
-import type { SelectOptionType } from './Select';
-import styles from './Select.module.scss';
-import { SelectOption } from './SelectOption';
-import useSelect from './useSelect';
+import type { DropdownOptionType } from './Dropdown';
+import styles from './Dropdown.module.scss';
+import { DropdownOption } from './DropdownOption';
+import useDropdown from './useDropdown';
 
-export type SelectDropdownProps = {
+export type DropdownListProps = {
   backgroundColor?: ColorKey;
   color?: ColorKey;
-  options: SelectOptionType[];
-  onChange: (value: SelectOptionType) => void;
+  options: DropdownOptionType[];
+  onChange: (value: DropdownOptionType) => void;
   testID?: string;
 };
 
-const SelectDropdown = ({ backgroundColor, color, options, onChange, testID }: SelectDropdownProps) => {
-  const { isOpen, setIsOpen, selected } = useSelect();
+const DropdownList = ({ backgroundColor, color, options, onChange, testID }: DropdownListProps) => {
+  const { isOpen, setIsOpen, selected } = useDropdown();
   const { getColor } = useTheme();
-  const handleOnChange = (item: SelectOptionType) => {
+  const handleOnChange = (item: DropdownOptionType) => {
     onChange(item);
     setIsOpen(false);
   };
@@ -47,7 +47,7 @@ const SelectDropdown = ({ backgroundColor, color, options, onChange, testID }: S
       >
         <Space className={styles.dropdownContent}>
           {options.map((option) => (
-            <SelectOption
+            <DropdownOption
               isActive={selected?.value === option.value}
               option={option}
               key={option.value}
@@ -62,4 +62,4 @@ const SelectDropdown = ({ backgroundColor, color, options, onChange, testID }: S
   return null;
 };
 
-export default SelectDropdown;
+export default DropdownList;

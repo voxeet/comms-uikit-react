@@ -2,10 +2,10 @@ import type { ColorKey } from '../../../common';
 import { useEffect, useState } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
-import Select, { type SelectOptionType } from '../../ui/Select/Select';
-import SelectControl from '../../ui/Select/SelectControl';
-import SelectDropdown from '../../ui/Select/SelectDropdown';
-import SelectLabel from '../../ui/Select/SelectLabel';
+import Dropdown, { type DropdownOptionType } from '../../ui/Dropdown/Dropdown';
+import DropdownControl from '../../ui/Dropdown/DropdownControl';
+import DropdownLabel from '../../ui/Dropdown/DropdownLabel';
+import DropdownList from '../../ui/Dropdown/DropdownList';
 
 import { ThemeOption } from './ThemeOption';
 
@@ -19,16 +19,16 @@ type ThemeSelectProps = {
 };
 
 const ThemeSelect = ({
-  labelColor = 'black',
-  textColor = 'black',
+  labelColor = 'grey.500',
+  textColor = 'grey.500',
   backgroundColor = 'white',
   label,
   placeholder,
   testID,
 }: ThemeSelectProps) => {
   const { availableThemes, activeTheme, setActiveTheme } = useTheme();
-  const [options, setOptions] = useState<SelectOptionType[]>([]);
-  const [activeOption, setActiveOption] = useState<SelectOptionType | null>(null);
+  const [options, setOptions] = useState<DropdownOptionType[]>([]);
+  const [activeOption, setActiveOption] = useState<DropdownOptionType | null>(null);
 
   useEffect(() => {
     setOptions(() => {
@@ -46,16 +46,16 @@ const ThemeSelect = ({
     }));
   }, [activeTheme]);
 
-  const onChange = (option: SelectOptionType) => {
+  const onChange = (option: DropdownOptionType) => {
     setActiveTheme(option.value);
   };
 
   return (
-    <Select testID={testID} selected={activeOption}>
-      <SelectLabel label={label} color={labelColor} />
-      <SelectControl placeholder={placeholder} color={textColor} backgroundColor={backgroundColor} />
-      <SelectDropdown onChange={onChange} options={options} color={textColor} backgroundColor={backgroundColor} />
-    </Select>
+    <Dropdown testID={testID} selected={activeOption}>
+      <DropdownLabel label={label} color={labelColor} />
+      <DropdownControl placeholder={placeholder} color={textColor} backgroundColor={backgroundColor} />
+      <DropdownList onChange={onChange} options={options} color={textColor} backgroundColor={backgroundColor} />
+    </Dropdown>
   );
 };
 

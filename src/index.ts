@@ -21,10 +21,10 @@ export { default as IconButton } from './components/ui/IconButton/IconButton';
 export { default as Input } from './components/ui/Input/Input';
 export { default as Layout } from './components/ui/Layout/Layout';
 export { default as Pill } from './components/ui/Pill/Pill';
-export { default as Select } from './components/ui/Select/Select';
-export { default as SelectLabel } from './components/ui/Select/SelectLabel';
-export { default as SelectControl } from './components/ui/Select/SelectControl';
-export { default as SelectDropdown } from './components/ui/Select/SelectDropdown';
+export { default as Dropdown } from './components/ui/Dropdown/Dropdown';
+export { default as DropdownLabel } from './components/ui/Dropdown/DropdownLabel';
+export { default as DropdownControl } from './components/ui/Dropdown/DropdownControl';
+export { default as DropdownList } from './components/ui/Dropdown/DropdownList';
 export { default as Spinner } from './components/ui/Spinner/Spinner';
 export { default as Text } from './components/ui/Text/Text';
 export { default as Toast } from './components/ui/Toast/Toast';
@@ -71,9 +71,9 @@ export { default as ConferenceName } from './components/conference/ConferenceNam
 
 // Types
 export type { TextProps } from './components/ui/Text/Text';
-export type { SelectProps, SelectOptionType } from './components/ui/Select/Select';
+export type { DropdownProps, DropdownOptionType } from './components/ui/Dropdown/Dropdown';
 export type { ValidationType } from './components/ui/Input/Input';
-export type { SelectDropdownProps } from './components/ui/Select/SelectDropdown';
+export type { DropdownListProps } from './components/ui/Dropdown/DropdownList';
 export type { IconButtonProps } from './components/ui/IconButton/IconButton';
 export type { ColorKey } from './common';
 export { BlockedAudioState as BlockedAudioStateType } from './hooks/types/Audio';

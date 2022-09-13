@@ -21,7 +21,7 @@ export const ThemeOption = ({ value }: ThemeOptionProps) => {
           } 50%)`,
         }}
       />
-      <Text color="black">{value}</Text>
+      <Text color="gray.500">{value}</Text>
     </Space>
   );
 };

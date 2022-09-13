@@ -3,6 +3,8 @@ import type { CustomThemes, RecursivePartial } from '../common/theme/types';
 import deepMerge from 'lodash.merge';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
+import '../style/font.css';
+
 export type WindowDimensions = {
   width: number;
   height: number;

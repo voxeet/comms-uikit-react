@@ -22,7 +22,17 @@ type RejoinConferenceButtonProps = Partial<ButtonProps> & {
   testID?: string;
 };
 
-const RejoinConferenceButton = ({ text, onStart, onSuccess, testID, style, ...rest }: RejoinConferenceButtonProps) => {
+const customBorderWidth = 2;
+
+const RejoinConferenceButton = ({
+  text,
+  onStart,
+  onSuccess,
+  testID,
+  style,
+  className,
+  ...rest
+}: RejoinConferenceButtonProps) => {
   const { getColor } = useTheme();
   const { openSession } = useSession();
   const { createConference, joinConference, prevConference } = useConference();
@@ -108,15 +118,14 @@ const RejoinConferenceButton = ({ text, onStart, onSuccess, testID, style, ...re
       variant="tertiary"
       testID={testID}
       style={{
-        width: 400,
-        height: 56,
         backgroundColor: getColor('black'),
-        borderColor: getColor('white'),
+        borderWidth: customBorderWidth,
         ...style,
       }}
+      className={className}
       {...rest}
     >
-      <Text type="buttonDefault">{text}</Text>
+      <Text type="button">{text}</Text>
     </Button>
   );
 };

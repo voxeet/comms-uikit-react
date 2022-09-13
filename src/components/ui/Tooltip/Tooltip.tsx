@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { ColorKey } from '../../../common';
 import cx from 'classnames';
+import Color from 'color';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
@@ -45,6 +46,14 @@ const Tooltip = ({ text, position, children, backgroundColor, textColor, testID,
     [position, wrapperRect, tooltipRect, isActive],
   );
 
+  const tooltipBackgroundColor = useMemo(() => {
+    if (backgroundColor) {
+      return getColor(backgroundColor);
+    }
+
+    return Color(getColor('grey.700')).fade(0.2).hexa(); // fade(0.2) means reduce 0.5 opacity
+  }, [backgroundColor]);
+
   const handleMouseEnter = () => {
     setRects();
     setIsActive(true);
@@ -69,12 +78,7 @@ const Tooltip = ({ text, position, children, backgroundColor, textColor, testID,
           data-testid={testID}
           ref={tooltipRef}
         >
-          <Space
-            pv="xxs"
-            ph="xs"
-            className={styles.content}
-            style={{ backgroundColor: getColor(backgroundColor, 'grey.70008') }}
-          >
+          <Space pv="xxs" ph="xs" className={styles.content} style={{ backgroundColor: tooltipBackgroundColor }}>
             <Text color={getColor(textColor, 'white')} type="captionSmall">
               {text}
             </Text>

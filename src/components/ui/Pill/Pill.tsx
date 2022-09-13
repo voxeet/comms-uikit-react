@@ -9,12 +9,13 @@ type PillSize = Extract<Sizes, 's' | 'm'>;
 
 export type PillProps = React.HTMLAttributes<HTMLDivElement> & {
   text?: string;
+  label?: string;
   active?: boolean;
   size?: PillSize;
   testID?: string;
 };
 
-const Pill = ({ text, active = false, size = 'm', testID, ...props }: PillProps) => {
+const Pill = ({ text, label, active = false, size = 'm', testID, ...props }: PillProps) => {
   const { getColor } = useTheme();
 
   return (
@@ -29,7 +30,7 @@ const Pill = ({ text, active = false, size = 'm', testID, ...props }: PillProps)
         maxWidth: 140,
         backgroundColor: active ? getColor('white') : `rgba(255, 255, 255, 0.4)`,
         backdropFilter: active ? 'none' : 'blur(8px)',
-        '> span': {
+        '> span:first-of-type': {
           overflow: 'hidden',
           whiteSpace: 'nowrap',
           textOverflow: 'ellipsis',
@@ -48,6 +49,18 @@ const Pill = ({ text, active = false, size = 'm', testID, ...props }: PillProps)
       >
         {text}
       </Text>
+      {label && (
+        <>
+          <span>&nbsp;</span>
+          <Text
+            color={active ? getColor('purple.400') : getColor('white')}
+            testID={testID && `${testID}-text-local`}
+            type={size === 'm' ? 'captionSmallDemiBold' : 'captionSmallDemiBoldMobile'}
+          >
+            {`(${label})`}
+          </Text>
+        </>
+      )}
     </Space>
   );
 };

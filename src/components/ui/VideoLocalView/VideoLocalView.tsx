@@ -1,11 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import cx from 'classnames';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import useAudio from '../../../hooks/useAudio';
 import useCamera from '../../../hooks/useCamera';
-import useMicrophone from '../../../hooks/useMicrophone';
 import useTheme from '../../../hooks/useTheme';
 import useVideo from '../../../hooks/useVideo';
 import { throwErrorMessage } from '../../../utils/throwError.util';
@@ -26,6 +25,7 @@ export type VideoViewProps = React.HTMLAttributes<HTMLDivElement> & {
   cameraReverseButton?: boolean;
   audio?: boolean;
   disabled?: boolean;
+  isMicrophonePermission?: boolean;
 };
 
 enum FacingModes {
@@ -43,37 +43,22 @@ const VideoLocalView = ({
   audio = true,
   cameraReverseButton = true,
   disabled = false,
+  isMicrophonePermission,
   ...props
 }: VideoViewProps) => {
   const [videoSrcObject, setVideoSrcObject] = useState<MediaStream | null>(null);
   const [videoStreams, setVideoStreams] = useState<MediaStream[]>([]);
   const [isUsingRearCamera, setIsUsingRearCamera] = useState(false);
-
   const videoRef = useRef<HTMLVideoElement>(null);
+
   const { getColor, isDesktop, isTablet } = useTheme();
   const { isVideo } = useVideo();
   const { isAudio } = useAudio();
-  const { getMicrophonePermission } = useMicrophone();
-  const { localCamera, swapCamera } = useCamera();
-  const isMounted = useIsMounted();
+  const { localCamera, swapCamera, getCameraPermission } = useCamera();
+
   const prevIsVideo = useRef<boolean>();
 
-  const [isMicrophonePermission, setIsMicrophonePermission] = useState<boolean>(false);
-
-  const checkMicrophonePermissions = () => {
-    (async () => {
-      try {
-        const hasMicrophoneAccess = await getMicrophonePermission();
-        setIsMicrophonePermission(hasMicrophoneAccess);
-      } catch {
-        setIsMicrophonePermission(false);
-      }
-    })();
-  };
-
-  useEffect(() => {
-    checkMicrophonePermissions();
-  }, []);
+  const isMounted = useIsMounted();
 
   const clearVideoSrc = () => {
     videoStreams.forEach((stream) => {
@@ -89,7 +74,8 @@ const VideoLocalView = ({
     }
   };
 
-  const attachStream = () => {
+  const attachStream = async () => {
+    await getCameraPermission();
     const video: MediaStreamConstraints['video'] = {
       width: { min: 1024, ideal: 1280, max: 1920 },
       height: { min: 576, ideal: 720, max: 1080 },
@@ -135,7 +121,9 @@ const VideoLocalView = ({
 
   useEffect(() => {
     clearVideoSrc();
-    if (localCamera) attachStream();
+    if (localCamera) {
+      attachStream();
+    }
   }, [localCamera, disabled]);
 
   useEffect(() => {
@@ -168,7 +156,7 @@ const VideoLocalView = ({
         videoRef.current.srcObject = null;
       }
     }
-  }, [videoRef, videoSrcObject]);
+  }, [videoSrcObject]);
 
   const reverseCamera = async () => {
     await swapCamera();
@@ -214,7 +202,7 @@ const VideoLocalView = ({
           <IconIndicator icon={isAudio && isMicrophonePermission ? 'microphone' : 'microphoneOff'} />
         </Space>
       )}
-      {cameraReverseButton && !isDesktop && (
+      {cameraReverseButton && !isDesktop && isVideo && !disabled && (
         <Space onClick={reverseCamera} className={styles.cameraReverse}>
           <IconIndicator icon="cameraReverse" />
         </Space>
@@ -223,4 +211,4 @@ const VideoLocalView = ({
   );
 };
 
-export default VideoLocalView;
+export default React.memo(VideoLocalView);

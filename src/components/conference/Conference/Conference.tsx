@@ -25,9 +25,10 @@ const Conference = ({ alias, id, audio = false, video = false, liveRecording = f
   useEffect(() => {
     timeout.current = setTimeout(async () => {
       let conference;
-
       if (id) {
-        if (currentConference?.id === id) return;
+        if (currentConference?.id === id) {
+          return;
+        }
         if (currentConference) await leaveConference();
         conference = await fetchConference(id);
       } else if (alias) {
@@ -43,7 +44,6 @@ const Conference = ({ alias, id, audio = false, video = false, liveRecording = f
       } else {
         return;
       }
-
       const joinOptions = {
         constraints: {
           audio,

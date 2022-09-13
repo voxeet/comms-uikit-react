@@ -11,16 +11,16 @@ export const value = {
     audioQuality: -1,
     audioTransmitting: true,
     _audioReceivingStopped: true,
-    id: '97cce9d4-0503-3862-b62b-6fbf28e3544f',
+    id: '53undkfjn3o489847839',
     status: 'Connected',
     type: 'user',
     active: false,
   },
   conference: {
     alias: 'dolbyio',
-    id: '924d59a4-2380-43f6-bc8e-7ade8549cee3',
+    id: '5678ikmgrnebdhjcvklbmgnremkls',
     isNew: true,
-    pinCode: 'FAKEPIN_924d59a4-2380-43f6-bc8e-7ade8549cee3',
+    pinCode: 'FAKEPIN_5678ikmgrnebdhjcvklbmgnremkls',
   },
   participants: [
     {
@@ -39,7 +39,7 @@ export const value = {
       audioQuality: -1,
       audioTransmitting: true,
       _audioReceivingStopped: true,
-      id: '97cce9d4-0503-3862-b62b-6fbf28e3544f',
+      id: '53undkfjn3o489847839',
       status: 'Connected',
       type: 'user',
       audioReceivingFrom: false,
@@ -60,21 +60,21 @@ export const value = {
       audioQuality: -1,
       audioTransmitting: true,
       _audioReceivingStopped: true,
-      id: '97cce9d4-0503-3862-b62b-123123123',
+      id: '4uhhbvkjbekjrb3383939393',
       status: 'Connected',
       type: 'user',
       audioReceivingFrom: false,
     },
   ],
   participantsStatus: {
-    '97cce9d4-0503-3862-b62b-6fbf28e3544f': {
+    '53undkfjn3o489847839': {
       isSpeaking: true,
       isLocal: true,
       isRemoteAudio: true,
       isLocalAudio: true,
       isVideo: true,
     },
-    '97cce9d4-0503-3862-b62b-123123123': {
+    '4uhhbvkjbekjrb3383939393': {
       isSpeaking: true,
       isLocal: false,
       isRemoteAudio: true,
@@ -89,10 +89,10 @@ export const value = {
     name: 'dolbyio',
   },
   localCamera: {
-    deviceId: '78627590193aee3432525252525258f989d312673678b0dbd05274565e',
+    deviceId: '57348hfrekjnvbhyhujivhbuhijfr',
     kind: 'videoinput',
     label: 'FaceTime HD Camera',
-    groupId: 'f3f3517c334252525252508ba739594092c157928973d89e2277',
+    groupId: 'tyu7gjnb4hueifkmnbhhtuiroel',
   },
   conferenceStatus: null,
   localMicrophone: null,

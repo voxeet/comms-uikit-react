@@ -2,12 +2,14 @@
 import type { ColorKey } from '../../../common';
 
 import useTheme from '../../../hooks/useTheme';
+import Icon from '../Icon/Icon';
+import Space from '../Space/Space';
 import Text from '../Text/Text';
 
-import styles from './Select.module.scss';
-import useSelect from './useSelect';
+import styles from './Dropdown.module.scss';
+import useDropdownControl from './useDropdown';
 
-type SelectControlProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+type DropdownControlProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   placeholder: string;
   color?: ColorKey;
   borderColor?: ColorKey;
@@ -15,8 +17,8 @@ type SelectControlProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   testID?: string;
 };
 
-const SelectControl = ({ placeholder, color, backgroundColor, testID, ...props }: SelectControlProps) => {
-  const { isOpen, selected, toggle } = useSelect();
+const DropdownControl = ({ placeholder, color, backgroundColor, testID, ...props }: DropdownControlProps) => {
+  const { isOpen, selected, toggle } = useDropdownControl();
   const { getColor } = useTheme();
 
   const content = () => {
@@ -57,10 +59,15 @@ const SelectControl = ({ placeholder, color, backgroundColor, testID, ...props }
       onClick={toggle}
       {...props}
     >
+      {selected && selected.icon && (
+        <Space pr="xs">
+          <Icon name={selected.icon} color="grey.300" />
+        </Space>
+      )}
       {content()}
       <div css={{ borderColor: color || getColor('grey.500') }} className={styles.dropdownArrow} />
     </button>
   );
 };
 
-export default SelectControl;
+export default DropdownControl;

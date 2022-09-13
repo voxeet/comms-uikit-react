@@ -13,6 +13,8 @@ type CopyConferenceLinkButtonProps = Partial<Omit<IconButtonProps, 'onClick'>> &
   tooltipText?: string;
   successText?: string;
   url: string;
+  width?: number;
+  height?: number;
   tooltipPosition?: TooltipProps['position'];
   testID?: string;
   children?: ReactNode;
@@ -23,6 +25,8 @@ const CopyConferenceLinkButton = ({
   successText,
   tooltipPosition = 'top',
   url,
+  width = 143,
+  height = 40,
   testID,
   children,
   icon = 'copy',
@@ -61,7 +65,7 @@ const CopyConferenceLinkButton = ({
   return (
     <Tooltip position={tooltipPosition} text={isDesktop ? desktopTooltipText : ''}>
       {children ? (
-        <Button testID={testID} variant="primary" onClick={copy}>
+        <Button style={{ width, height }} testID={testID} variant="primary" onClick={copy}>
           <Space mr="xs">{children}</Space>
           <Icon name={icon} size="s" />
         </Button>

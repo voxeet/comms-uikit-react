@@ -21,14 +21,12 @@
     opacity: 1;
     transition: opacity 0.3s;
     transform: translate(-50%, -50%);
-    &.mirrored {
-      -webkit-transform: scaleX(-1);
-      transform: translate(-50%, -50%) scaleX(-1);
-    }
+
     &.isLoading {
       opacity: 0;
     }
   }
+
   span {
     position: absolute;
     top: 50%;

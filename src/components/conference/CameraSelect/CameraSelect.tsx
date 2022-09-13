@@ -5,13 +5,10 @@ import useCamera from '../../../hooks/useCamera';
 import useConference from '../../../hooks/useConference';
 import { deviceInfoToOptions } from '../../../utils/deviceInfoToOptions.util';
 import { throwErrorMessage } from '../../../utils/throwError.util';
-import Icon from '../../ui/Icon/Icon';
-import Select, { type SelectOptionType } from '../../ui/Select/Select';
-import SelectControl from '../../ui/Select/SelectControl';
-import SelectDropdown from '../../ui/Select/SelectDropdown';
-import SelectLabel from '../../ui/Select/SelectLabel';
-import styles from '../../ui/Select/SelectOption.module.scss';
-import Space from '../../ui/Space/Space';
+import Dropdown, { type DropdownOptionType } from '../../ui/Dropdown/Dropdown';
+import DropdownControl from '../../ui/Dropdown/DropdownControl';
+import DropdownLabel from '../../ui/Dropdown/DropdownLabel';
+import DropdownList from '../../ui/Dropdown/DropdownList';
 
 type CameraSelectProps = {
   labelColor?: ColorKey;
@@ -24,14 +21,14 @@ type CameraSelectProps = {
 
 const CameraSelect = ({
   labelColor = 'black',
-  textColor = 'black',
+  textColor = 'grey.500',
   backgroundColor = 'white',
   label,
   placeholder,
   testID,
 }: CameraSelectProps) => {
-  const [selectedDevice, setSelectedDevice] = useState<SelectOptionType | null>(null);
-  const [devices, setDevices] = useState<SelectOptionType[]>([]);
+  const [selectedDevice, setSelectedDevice] = useState<DropdownOptionType | null>(null);
+  const [devices, setDevices] = useState<DropdownOptionType[]>([]);
   const { getCameras, selectCamera, localCamera, setLocalCamera } = useCamera();
   const { conference } = useConference();
 
@@ -41,19 +38,15 @@ const CameraSelect = ({
       const { options, defaultDevice } = deviceInfoToOptions({
         data: cameraDevices,
         local: localCamera?.deviceId,
-        renderLabel: (label: string) => (
-          <Space className={styles.option}>
-            <Icon name="camera" color="black" />
-            <Space tag="span">{label}</Space>
-          </Space>
-        ),
+        renderLabel: (label: string) => label,
+        icon: 'camera',
       });
       setDevices(options);
       setSelectedDevice(defaultDevice);
     })();
   }, []);
 
-  const onChange = async (e: SelectOptionType) => {
+  const onChange = async (e: DropdownOptionType) => {
     setSelectedDevice(e);
     if (conference) {
       try {
@@ -62,7 +55,6 @@ const CameraSelect = ({
         throwErrorMessage(error);
       }
     }
-    // @ts-expect-error deviceInfoOptions includes e.info
     setLocalCamera(e.info);
   };
 
@@ -70,11 +62,11 @@ const CameraSelect = ({
     return null;
   }
   return (
-    <Select testID={testID} selected={selectedDevice}>
-      <SelectLabel label={label} color={labelColor} />
-      <SelectControl placeholder={placeholder} color={textColor} backgroundColor={backgroundColor} />
-      <SelectDropdown onChange={onChange} options={devices} color={textColor} backgroundColor={backgroundColor} />
-    </Select>
+    <Dropdown testID={testID} selected={selectedDevice}>
+      <DropdownLabel label={label} color={labelColor} />
+      <DropdownControl placeholder={placeholder} color={textColor} backgroundColor={backgroundColor} />
+      <DropdownList onChange={onChange} options={devices} color={textColor} backgroundColor={backgroundColor} />
+    </Dropdown>
   );
 };
 

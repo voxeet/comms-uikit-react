@@ -17,6 +17,7 @@ export type ToastProps = React.HTMLAttributes<HTMLDivElement> & {
   textColor?: ColorKey;
   variant?: 'default' | 'success' | 'info' | 'warning' | 'error';
   testID?: string;
+  duration?: number;
 };
 
 const Toast = ({
@@ -26,6 +27,7 @@ const Toast = ({
   textColor = 'white',
   testID,
   variant = 'default',
+  duration = 2000,
   ...props
 }: ToastProps) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -33,7 +35,6 @@ const Toast = ({
   useEffect(() => {
     setIsVisible(true);
     if (variant !== 'default') return undefined;
-    const duration = 3000;
     const visibilityTimeout = setTimeout(() => {
       setIsVisible(false);
     }, duration);
@@ -50,7 +51,7 @@ const Toast = ({
         return 'info';
       case 'warning':
       case 'error':
-        return 'warning';
+        return 'warningFilled';
       default:
         return iconName || 'info';
     }
