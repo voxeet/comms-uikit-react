@@ -1,9 +1,14 @@
+.container {
+  overflow: hidden;
+}
+
 .wrapper {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   height: 100%;
+  overflow: hidden;
 }
 
 .content {
@@ -11,37 +16,15 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+  align-content: center;
 }
 
-.videoItem {
-  box-sizing: border-box;
-}
-
-.maxTile {
-  box-sizing: border-box;
-}
-
-.maxTileWrapper {
-  height: 100%;
-  position: relative;
-  &.desktop {
-    height: 0;
-    padding-bottom: 56.25%; /* 16:9 */
-  }
-}
-
-.maxTileContent {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  border-radius: 12px;
+.tileWrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  > span > span {
-    display: inline-block;
-    margin-right: 5px;
-  }
+}
+
+.maxTileWrapper {
+  position: relative;
 }

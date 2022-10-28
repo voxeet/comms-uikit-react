@@ -1,5 +1,6 @@
-/* eslint-disable react/jsx-props-no-spreading */
+import { Status as RecordingStatus } from '../../../hooks/types/misc';
 import useConference from '../../../hooks/useConference';
+import useRecording from '../../../hooks/useRecording';
 import IconButton, { IconButtonProps } from '../../ui/IconButton/IconButton';
 import Tooltip, { TooltipProps } from '../../ui/Tooltip/Tooltip';
 
@@ -18,7 +19,14 @@ const LeaveConferenceButton = ({
   ...rest
 }: LeaveConferenceButtonProps) => {
   const { leaveConference } = useConference();
+
+  const { isLocalUserRecordingOwner, status, stopRecording } = useRecording();
+
   const handleLeaveConference = async () => {
+    if (isLocalUserRecordingOwner && status === RecordingStatus.Active) {
+      await stopRecording();
+    }
+
     await leaveConference();
     if (onSuccess) {
       onSuccess();

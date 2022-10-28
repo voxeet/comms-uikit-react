@@ -4,7 +4,6 @@
   align-items: center;
   border: none;
   border-radius: 6px;
-  height: 48px;
   min-width: 128px;
   padding: 12px;
   font-family: 'Roboto';
@@ -17,96 +16,18 @@
   text-transform: uppercase;
 }
 
-.primaryButton {
-  @extend .button;
-  background: #aa33ff;
-  color: white;
-
-  &:disabled {
-    background: #bbbbbf;
-  }
-
-  &:not(&:disabled):hover {
-    background: #8829cc;
-    box-shadow: 0px 8px 14px rgba(106, 106, 109, 0.28);
-  }
-
-  &.danger:not(&:disabled):hover {
-    background: #e52222;
-    box-shadow: 0px 8px 14px rgba(106, 106, 109, 0.28);
-  }
-
-  &:not(&:disabled):active {
-    background: #6e21a6;
-  }
-
-  &.danger {
-    background: #e52222;
-  }
+.size-l {
+  height: 48px;
 }
 
-.secondaryButton {
-  @extend .button;
-  background: white;
-  border: 2px solid #aa33ff;
-  color: #aa33ff;
-
-  .buttonText {
-    flex: 1;
-    border-radius: inherit;
-    padding: 15px;
-    background: white;
-  }
-
-  &:disabled {
-    background: white;
-    border: 2px solid #bbbbbf;
-    color: #bbbbbf;
-  }
-
-  &:not(&:disabled):hover {
-    border: solid 2px #8829cc;
-    color: #8829cc;
-    box-shadow: 0px 8px 14px rgba(106, 106, 109, 0.28);
-  }
-
-  &.danger:not(&:disabled):hover {
-    background: #e52222;
-    box-shadow: 0px 8px 14px rgba(106, 106, 109, 0.28);
-  }
-
-  &:not(&:disabled):active {
-    border: 2px solid #6e21a6;
-    color: #6e21a6;
-  }
-
-  &.danger {
-    border: 2px solid #e52222;
-    color: #e52222;
-  }
+.size-m {
+  height: 44px;
 }
 
-// TODO: This is placeholder styling until the design for light mode is confirmed
-.tertiaryButton {
-  @extend .button;
-  border: solid 1px black;
-
-  background: white;
-  color: black;
-
-  &:disabled {
-    border: solid 1px #cfd5e6;
-    color: #cfd5e6;
-  }
+.size-s {
+  height: 40px;
 }
 
-.dangerButton {
-  @extend .button;
-  background: #e52222;
-  color: white;
-
-  &:not(&:disabled):hover {
-    background: #e52222;
-    box-shadow: 0px 8px 14px rgba(106, 106, 109, 0.28);
-  }
+.fullWidth {
+  min-width: 100%;
 }

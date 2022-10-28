@@ -1,5 +1,4 @@
-import { defaultTheme as theme } from '../../../common';
-
+import theme from '../../../theme/defaultTheme';
 import { createParticipant, createParticipantStatus } from '../../../utils/tests/dataCreators.util';
 import { render, waitFor } from '../../../utils/tests/test-utils';
 

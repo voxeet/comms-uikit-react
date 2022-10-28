@@ -1,7 +1,5 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import type { ColorKey } from '../../../common';
-
 import useTheme from '../../../hooks/useTheme';
+import type { ColorKey } from '../../../theme/types';
 import Space from '../Space/Space';
 
 import type { DropdownOptionType } from './Dropdown';

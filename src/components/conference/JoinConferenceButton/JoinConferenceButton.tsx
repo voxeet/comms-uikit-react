@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import type { JoinOptions } from '@voxeet/voxeet-web-sdk/types/models/Options';
 
 import useConference from '../../../hooks/useConference';

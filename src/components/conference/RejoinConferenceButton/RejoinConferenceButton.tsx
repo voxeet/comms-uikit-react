@@ -1,17 +1,4 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import { useEffect, useState } from 'react';
-
-import {
-  Button,
-  useAudio,
-  useCamera,
-  useConference,
-  useMicrophone,
-  useSession,
-  useTheme,
-  useVideo,
-  Text,
-} from '../../../index';
+import { Button, useAudio, useCamera, useConference, useMicrophone, useSession, useVideo, Text } from '../../../index';
 import { throwErrorMessage } from '../../../utils/throwError.util';
 import type { ButtonProps } from '../../ui/Button/Button';
 
@@ -22,8 +9,6 @@ type RejoinConferenceButtonProps = Partial<ButtonProps> & {
   testID?: string;
 };
 
-const customBorderWidth = 2;
-
 const RejoinConferenceButton = ({
   text,
   onStart,
@@ -33,37 +18,12 @@ const RejoinConferenceButton = ({
   className,
   ...rest
 }: RejoinConferenceButtonProps) => {
-  const { getColor } = useTheme();
   const { openSession } = useSession();
   const { createConference, joinConference, prevConference } = useConference();
   const { getCameraPermission } = useCamera();
   const { isVideo } = useVideo();
   const { getMicrophonePermission } = useMicrophone();
   const { isAudio } = useAudio();
-  const [isCameraPermission, setIsCameraPermission] = useState(false);
-  const [isMicrophonePermission, setIsMicrophonePermission] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const hasAccess = await getCameraPermission();
-        setIsCameraPermission(hasAccess);
-      } catch {
-        setIsCameraPermission(false);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const hasAccess = await getMicrophonePermission();
-        setIsMicrophonePermission(hasAccess);
-      } catch {
-        setIsMicrophonePermission(false);
-      }
-    })();
-  }, []);
 
   const rejoin = async () => {
     if (prevConference) {
@@ -71,6 +31,8 @@ const RejoinConferenceButton = ({
         if (onStart) {
           onStart(true);
         }
+        const isCameraPermission = await getCameraPermission();
+        const isMicrophonePermission = await getMicrophonePermission();
         await openSession({
           name: prevConference.participant,
         });
@@ -115,11 +77,9 @@ const RejoinConferenceButton = ({
   return (
     <Button
       onClick={rejoin}
-      variant="tertiary"
+      variant="secondary"
       testID={testID}
       style={{
-        backgroundColor: getColor('black'),
-        borderWidth: customBorderWidth,
         ...style,
       }}
       className={className}

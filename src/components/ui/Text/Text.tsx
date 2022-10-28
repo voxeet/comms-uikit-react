@@ -1,8 +1,7 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import type { ColorKey } from '../../../common';
 import cx from 'classnames';
 
 import useTheme from '../../../hooks/useTheme';
+import type { ColorKey } from '../../../theme/types';
 
 import styles from './Text.module.scss';
 

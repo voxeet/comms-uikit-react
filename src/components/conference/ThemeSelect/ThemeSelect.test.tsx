@@ -1,5 +1,4 @@
-import { defaultTheme } from '../../../common';
-
+import defaultTheme from '../../../theme/defaultTheme';
 import { fireEvent, render, screen, waitFor } from '../../../utils/tests/test-utils';
 
 import ThemeSelect from './ThemeSelect';

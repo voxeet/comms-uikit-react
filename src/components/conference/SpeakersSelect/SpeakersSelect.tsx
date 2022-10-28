@@ -1,8 +1,8 @@
-import type { ColorKey } from '../../../common';
 import { useEffect, useState } from 'react';
 
 import useConference from '../../../hooks/useConference';
 import useSpeaker from '../../../hooks/useSpeaker';
+import type { ColorKey } from '../../../theme/types';
 import { deviceInfoToOptions } from '../../../utils/deviceInfoToOptions.util';
 import { throwErrorMessage } from '../../../utils/throwError.util';
 import Dropdown, { type DropdownOptionType } from '../../ui/Dropdown/Dropdown';
@@ -55,7 +55,7 @@ const SpeakersSelect = ({
         throwErrorMessage(error);
       }
     }
-    setLocalSpeakers(e.info);
+    setLocalSpeakers(e.info as MediaDeviceInfo);
   };
 
   if (devices.length === 0) {

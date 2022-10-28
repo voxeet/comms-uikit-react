@@ -1,5 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
-
 import useConference from '../../../hooks/useConference';
 import Text, { TextProps } from '../../ui/Text/Text';
 

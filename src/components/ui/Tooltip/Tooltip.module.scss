@@ -1,3 +1,5 @@
+@import '../../../style/zIndex';
+
 .wrapper {
   position: relative;
   display: inline-block;
@@ -5,7 +7,7 @@
 
 .tooltip {
   position: fixed;
-  z-index: 999;
+  z-index: $zI_tooltip;
   display: flex;
   flex-direction: row;
   justify-content: center;

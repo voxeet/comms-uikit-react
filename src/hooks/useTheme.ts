@@ -1,9 +1,9 @@
-import type { ColorKey } from '../common';
-import { useCallback, useContext, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
-import { ThemeContext } from '../providers/ThemeProvider';
+import type { ColorKey } from '../theme/types';
 
 import type { UseTheme } from './types/Theming';
+import useThemeContext from './useThemeContext';
 
 const useTheme: UseTheme = () => {
   const {
@@ -18,7 +18,7 @@ const useTheme: UseTheme = () => {
     isDesktop,
     isLandscape,
     isPortrait,
-  } = useContext(ThemeContext);
+  } = useThemeContext();
 
   const availableThemes = useMemo(() => (themes ? Object.keys(themes) : []), [themes]);
 

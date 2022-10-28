@@ -1,5 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
-
 import Avatar, { AvatarProps } from '../../ui/Avatar/Avatar';
 
 type ParticipantAvatarProps = Partial<AvatarProps>;

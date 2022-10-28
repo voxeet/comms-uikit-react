@@ -1,8 +1,8 @@
-import type { ColorKey } from '../../../common';
-import soundWave from '../../../common/assets/lottie/soundWaveLottie.json';
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
 
+import soundWave from '../../../assets/animations/soundWaveLottie.json';
 import useParticipants from '../../../hooks/useParticipants';
+import type { ColorKey } from '../../../theme/types';
 import AnimationIndicator from '../../ui/indicators/AnimationIndicator/AnimationIndicator';
 import IconIndicator from '../../ui/indicators/IconIndicator/IconIndicator';
 

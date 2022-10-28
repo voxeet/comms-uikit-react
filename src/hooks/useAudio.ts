@@ -1,9 +1,6 @@
-import { useContext } from 'react';
-
-import { CommsContext } from '../providers/CommsProvider';
-
 import type { UseAudio } from './types/Audio';
 import { BlockedAudioState } from './types/Audio';
+import useCommsContext from './useCommsContext';
 
 const useAudio: UseAudio = () => {
   const {
@@ -17,7 +14,7 @@ const useAudio: UseAudio = () => {
     setBlockedAudioState,
     isPageMuted,
     toggleMuteParticipants,
-  } = useContext(CommsContext);
+  } = useCommsContext();
 
   const markBlockedAudioActivated = () => {
     setBlockedAudioState(BlockedAudioState.ACTIVATED);

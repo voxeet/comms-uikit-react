@@ -66,4 +66,20 @@ describe('ParticipantsGridItem component', () => {
       expect(getByTestId('ParticipantSpeakingIndicator-muted')).not.toBeNull();
     });
   });
+
+  test('Displays speakerOff icon and indicates participant speak off state', async () => {
+    const { getByTestId } = render(<ParticipantsGridItem localText={localText} participant={remoteParticipant} />, {
+      commsProps: {
+        value: {
+          participantsStatus: {
+            ...remoteParticipantStatusMuted,
+          },
+        },
+      },
+    });
+    await waitFor(() => {
+      const speakerOffIndicator = getByTestId('SpeakerOffIndicator');
+      expect(speakerOffIndicator).not.toBeNull();
+    });
+  });
 });

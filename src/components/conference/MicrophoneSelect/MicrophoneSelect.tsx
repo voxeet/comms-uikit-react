@@ -1,8 +1,8 @@
-import type { ColorKey } from '../../../common';
 import { useEffect, useState } from 'react';
 
 import useConference from '../../../hooks/useConference';
 import useMicrophone from '../../../hooks/useMicrophone';
+import type { ColorKey } from '../../../theme/types';
 import { deviceInfoToOptions } from '../../../utils/deviceInfoToOptions.util';
 import { throwErrorMessage } from '../../../utils/throwError.util';
 import Dropdown from '../../ui/Dropdown/Dropdown';
@@ -56,7 +56,7 @@ const MicrophoneSelect = ({
         throwErrorMessage(error);
       }
     }
-    setLocalMicrophone(e.info);
+    setLocalMicrophone(e.info as MediaDeviceInfo);
   };
 
   if (devices.length === 0) {

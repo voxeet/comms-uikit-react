@@ -13,8 +13,8 @@ export type Video = {
 
   resetVideo: () => void;
 
-  startParticipantVideo: (participant: Participant) => Promise<void>;
-  stopParticipantVideo: (participant: Participant) => Promise<void>;
+  startRemoteParticipantVideo: (participant: Participant) => Promise<void>;
+  stopRemoteParticipantVideo: (participant: Participant) => Promise<void>;
 };
 
 export type UseVideo = () => Video;

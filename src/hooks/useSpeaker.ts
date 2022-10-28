@@ -1,12 +1,10 @@
-import { useContext } from 'react';
-
-import { CommsContext } from '../providers/CommsProvider';
 import MediaDevicesService from '../services/mediaDevices';
 
 import type { UseSpeaker } from './types/Speaker';
+import useCommsContext from './useCommsContext';
 
 const useSpeaker: UseSpeaker = () => {
-  const { localSpeakers, setLocalSpeakers } = useContext(CommsContext);
+  const { localSpeakers, setLocalSpeakers } = useCommsContext();
   const getSpeakers = () => {
     return MediaDevicesService.enumerateAudioOutputDevices() as Promise<MediaDeviceInfo[]>;
   };

@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import { ReactNode, useMemo, useState } from 'react';
 
 import useTheme from '../../../hooks/useTheme';

@@ -1,10 +1,9 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import type { Sizes, ColorKey } from '../../../common';
 import cx from 'classnames';
 import Color from 'color';
 import React, { useMemo } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
+import type { ColorKey, Sizes } from '../../../theme/types';
 import Space from '../Space/Space';
 
 import styles from './Icon.module.scss';
@@ -17,7 +16,7 @@ export type IconProps = React.HTMLAttributes<HTMLDivElement> & {
   name: IconComponentName;
   color?: ColorKey;
   colorTone?: ColorTone;
-  size?: Extract<Sizes, 'xxs' | 'xs' | 's' | 'm' | 'l'>;
+  size?: Extract<Sizes, 'xxs' | 'xs' | 's' | 'm' | 'l' | 'xl'>;
   testID?: string;
 };
 

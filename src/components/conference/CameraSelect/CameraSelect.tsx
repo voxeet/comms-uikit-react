@@ -1,8 +1,8 @@
-import type { ColorKey } from '../../../common';
 import { useEffect, useState } from 'react';
 
 import useCamera from '../../../hooks/useCamera';
 import useConference from '../../../hooks/useConference';
+import type { ColorKey } from '../../../theme/types';
 import { deviceInfoToOptions } from '../../../utils/deviceInfoToOptions.util';
 import { throwErrorMessage } from '../../../utils/throwError.util';
 import Dropdown, { type DropdownOptionType } from '../../ui/Dropdown/Dropdown';
@@ -55,7 +55,7 @@ const CameraSelect = ({
         throwErrorMessage(error);
       }
     }
-    setLocalCamera(e.info);
+    setLocalCamera(e.info as MediaDeviceInfo);
   };
 
   if (devices.length === 0) {

@@ -1,5 +1,5 @@
 export const stringToNumber = (string?: string) => {
-  let value = 0;
+  let value = string?.length || 0;
   if (string) {
     const cleanString = string.replace(/ /g, '').toLowerCase();
 

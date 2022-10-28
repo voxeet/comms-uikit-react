@@ -1,0 +1,29 @@
+.wrapper {
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mobile {
+  justify-content: center;
+}
+.row {
+  display: flex;
+}
+.clickable {
+  cursor: pointer;
+}
+
+.compact {
+  flex-grow: 1;
+  transition: flex-grow 400ms ease-in-out;
+}
+
+.fullWidth {
+  flex-grow: 100;
+  transition: flex-grow 400ms ease-in-out;
+}
+
+.mobileButton {
+  min-width: auto;
+}

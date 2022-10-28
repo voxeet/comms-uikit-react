@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable import/no-extraneous-dependencies */
 import '../../../__mocks__/MediaStream.mock';
 import '../../../__mocks__/documentExec.mock';

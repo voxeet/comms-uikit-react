@@ -1,7 +1,7 @@
-import { defaultTheme as theme } from '../../../common';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { fireEvent } from '@testing-library/react';
 
+import theme from '../../../theme/defaultTheme';
 import { render } from '../../../utils/tests/test-utils';
 
 import MediaButton from './MediaButton';

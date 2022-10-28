@@ -9,7 +9,7 @@ import { terser } from 'rollup-plugin-terser';
 import ts from 'typescript';
 
 export default {
-  external: ['@dolbyio/comms-uikit-common', 'react', 'react-dom'],
+  external: ['react', 'react-dom'],
   input: 'src/index.ts',
   output: [
     {
