@@ -1,7 +1,7 @@
-import { defaultTheme as theme } from '../../../common';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { fireEvent } from '@testing-library/react';
 
+import theme from '../../../theme/defaultTheme';
 import { render } from '../../../utils/tests/test-utils';
 
 import IconButton from './IconButton';
@@ -9,6 +9,7 @@ import IconButton from './IconButton';
 const icon = 'microphone';
 const testID = 'testID';
 const backgroundColor = 'grey.800';
+// eslint-disable-next-line no-console
 const onClick = () => console.log('Hello');
 
 const { colors } = theme;

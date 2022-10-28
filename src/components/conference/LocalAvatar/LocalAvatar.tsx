@@ -1,5 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
-
 import useSession from '../../../hooks/useSession';
 import Avatar, { AvatarProps } from '../../ui/Avatar/Avatar';
 

@@ -1,7 +1,7 @@
-import type { ColorKey } from '../../../common';
 import { useEffect, useState } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
+import type { ColorKey } from '../../../theme/types';
 import Dropdown, { type DropdownOptionType } from '../../ui/Dropdown/Dropdown';
 import DropdownControl from '../../ui/Dropdown/DropdownControl';
 import DropdownLabel from '../../ui/Dropdown/DropdownLabel';

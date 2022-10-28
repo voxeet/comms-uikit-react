@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import type { Participant as ParticipantType } from '@voxeet/voxeet-web-sdk/types/models/Participant';
 
 import useParticipants from '../../../hooks/useParticipants';
@@ -20,15 +19,15 @@ export const ParticipantToggleVideoButton = ({
   ...rest
 }: ParticipantToggleVideoButtonProps) => {
   const { participantsStatus } = useParticipants();
-  const { startParticipantVideo, stopParticipantVideo } = useVideo();
+  const { startRemoteParticipantVideo, stopRemoteParticipantVideo } = useVideo();
 
   const { isVideo } = participantsStatus[participant.id] || {};
 
   const handleToggleVideo = async () => {
     if (isVideo) {
-      await stopParticipantVideo(participant);
+      await stopRemoteParticipantVideo(participant);
     } else {
-      startParticipantVideo(participant);
+      await startRemoteParticipantVideo(participant);
     }
   };
 

@@ -1,8 +1,7 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import type { SpaceValues } from '../../../common/theme/types';
 import { useMemo } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
+import type { SpaceValues } from '../../../theme/types';
 
 type SpaceProps = React.HTMLAttributes<HTMLDivElement> & {
   testID?: string;
@@ -58,20 +57,20 @@ const Space = ({
     let marginTop;
     let marginBottom;
 
-    if (mt) {
-      marginTop = spaces[`${mt}`];
+    if (m) {
+      marginTop = spaces[`${m}`];
     } else if (mv) {
       marginTop = spaces[`${mv}`];
-    } else if (m) {
-      marginTop = spaces[`${m}`];
+    } else if (mt) {
+      marginTop = spaces[`${mt}`];
     }
 
-    if (mb) {
-      marginBottom = spaces[`${mb}`];
+    if (m) {
+      marginBottom = spaces[`${m}`];
     } else if (mv) {
       marginBottom = spaces[`${mv}`];
-    } else if (m) {
-      marginBottom = spaces[`${m}`];
+    } else if (mb) {
+      marginBottom = spaces[`${mb}`];
     }
 
     return { marginTop, marginBottom };
@@ -81,20 +80,20 @@ const Space = ({
     let marginRight;
     let marginLeft;
 
-    if (mr) {
-      marginRight = spaces[`${mr}`];
+    if (m) {
+      marginRight = spaces[`${m}`];
     } else if (mh) {
       marginRight = spaces[`${mh}`];
-    } else if (m) {
-      marginRight = spaces[`${m}`];
+    } else if (mr) {
+      marginRight = spaces[`${mr}`];
     }
 
-    if (ml) {
-      marginLeft = spaces[`${ml}`];
+    if (m) {
+      marginLeft = spaces[`${m}`];
     } else if (mh) {
       marginLeft = spaces[`${mh}`];
-    } else if (m) {
-      marginLeft = spaces[`${m}`];
+    } else if (ml) {
+      marginLeft = spaces[`${ml}`];
     }
 
     return { marginRight, marginLeft };
@@ -104,20 +103,20 @@ const Space = ({
     let paddingTop;
     let paddingBottom;
 
-    if (pt) {
-      paddingTop = spaces[`${pt}`];
+    if (p) {
+      paddingTop = spaces[`${p}`];
     } else if (pv) {
       paddingTop = spaces[`${pv}`];
-    } else if (p) {
-      paddingTop = spaces[`${p}`];
+    } else if (pt) {
+      paddingTop = spaces[`${pt}`];
     }
 
-    if (pb) {
-      paddingBottom = spaces[`${pb}`];
+    if (p) {
+      paddingBottom = spaces[`${p}`];
     } else if (pv) {
       paddingBottom = spaces[`${pv}`];
-    } else if (p) {
-      paddingBottom = spaces[`${p}`];
+    } else if (pb) {
+      paddingBottom = spaces[`${pb}`];
     }
 
     return { paddingTop, paddingBottom };
@@ -127,20 +126,20 @@ const Space = ({
     let paddingRight;
     let paddingLeft;
 
-    if (pr) {
-      paddingRight = spaces[`${pr}`];
+    if (p) {
+      paddingRight = spaces[`${p}`];
     } else if (ph) {
       paddingRight = spaces[`${ph}`];
-    } else if (p) {
-      paddingRight = spaces[`${p}`];
+    } else if (pr) {
+      paddingRight = spaces[`${pr}`];
     }
 
-    if (pl) {
-      paddingLeft = spaces[`${pl}`];
+    if (p) {
+      paddingLeft = spaces[`${p}`];
     } else if (ph) {
       paddingLeft = spaces[`${ph}`];
-    } else if (p) {
-      paddingLeft = spaces[`${p}`];
+    } else if (pl) {
+      paddingLeft = spaces[`${pl}`];
     }
 
     return { paddingRight, paddingLeft };

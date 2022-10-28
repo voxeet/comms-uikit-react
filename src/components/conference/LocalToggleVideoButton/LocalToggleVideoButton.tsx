@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import { useEffect, useState } from 'react';
 
 import useCamera from '../../../hooks/useCamera';

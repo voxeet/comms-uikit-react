@@ -1,11 +1,10 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import type { ColorKey, Sizes } from '../../../../common';
 import cx from 'classnames';
 import { colorify } from 'lottie-colorify';
 import Lottie, { AnimationItem } from 'lottie-web';
 import React, { useEffect, useRef } from 'react';
 
 import useTheme from '../../../../hooks/useTheme';
+import type { ColorKey, Sizes } from '../../../../theme/types';
 import Space from '../../Space/Space';
 
 import styles from './AnimationIndicator.module.scss';

@@ -1,5 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
-
 import VideoTile, { VideoTileProps } from '../../ui/VideoTile/VideoTile';
 
 type ParticipantVideoProps = Partial<Omit<VideoTileProps, 'isMirrored'>>;

@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import type { Participant as ParticipantType } from '@voxeet/voxeet-web-sdk/types/models/Participant';
 
 import useAudio from '../../../hooks/useAudio';

@@ -1,8 +1,7 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import type { ColorKey } from '../../../common';
 import { useRef } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
+import type { ColorKey } from '../../../theme/types';
 import IconButton from '../IconButton/IconButton';
 import Space from '../Space/Space';
 import Text from '../Text/Text';

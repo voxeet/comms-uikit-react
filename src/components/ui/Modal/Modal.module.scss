@@ -1,0 +1,29 @@
+.modalWrapper {
+  position: relative;
+  box-shadow: 0 0 12px rgba(11, 11, 13, 0.48);
+  border-radius: 12px;
+  .closeButton {
+    position: absolute;
+    right: 0;
+    transform: translate(50%, -50%);
+  }
+
+  &.mobile {
+    position: absolute;
+    bottom: 0;
+
+    .closeButton {
+      transform: none;
+      top: 5px;
+      right: 5px;
+    }
+
+    &.tablet {
+      bottom: 32px;
+    }
+
+    &.landscape {
+      max-height: 100vh;
+    }
+  }
+}

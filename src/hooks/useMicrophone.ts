@@ -1,17 +1,24 @@
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 
-import { CommsContext } from '../providers/CommsProvider';
 import MediaDevicesService from '../services/mediaDevices';
 
 import type { UseMicrophone } from './types/Microphone';
+import useCommsContext from './useCommsContext';
 import useTheme from './useTheme';
 
 const defaultMics = ['default'];
 
 const useMicrophone: UseMicrophone = () => {
-  const { localMicrophone, setLocalMicrophone } = useContext(CommsContext);
+  const { localMicrophone, setLocalMicrophone, hasMicrophonePermission, setHasMicrophonePermission } =
+    useCommsContext();
   const { isDesktop } = useTheme();
   const getMicrophones = async () => {
+    /*
+     * Additional refreshing for permissions on Firefox due to assumption of lack of permissions bug
+     */
+    if (navigator.userAgent.indexOf('Firefox') !== -1) {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+    }
     return (await MediaDevicesService.enumerateAudioInputDevices()).filter((d) => d.deviceId) as MediaDeviceInfo[];
   };
 
@@ -20,21 +27,23 @@ const useMicrophone: UseMicrophone = () => {
   };
 
   const getMicrophonePermission = async () => {
-    let permission = false;
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-      });
-
-      if (stream) {
-        permission = true;
-        stream.getTracks().forEach((track) => {
-          track.stop();
+    let permission = hasMicrophonePermission;
+    if (!hasMicrophonePermission) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
         });
+
+        if (stream) {
+          permission = true;
+          stream.getTracks().forEach((track) => {
+            track.stop();
+          });
+        }
+      } catch (error) {
+        permission = false;
       }
-    } catch (error) {
-      permission = false;
+      setHasMicrophonePermission(permission);
     }
     return permission;
   };

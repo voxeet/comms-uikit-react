@@ -1,17 +1,21 @@
-import { useContext } from 'react';
-
-import { CommsContext } from '../providers/CommsProvider';
 import MediaDevicesService from '../services/mediaDevices';
 
 import type { UseCamera } from './types/Camera';
+import useCommsContext from './useCommsContext';
 import useTheme from './useTheme';
 
 const defaultCameras = ['default'];
 
 const useCamera: UseCamera = () => {
-  const { localCamera, setLocalCamera } = useContext(CommsContext);
+  const { localCamera, setLocalCamera, hasCameraPermission, setHasCameraPermission } = useCommsContext();
   const { isDesktop } = useTheme();
   const getCameras = async () => {
+    /*
+     * Additional refreshing for permissions on Firefox due to assumption of lack of permissions bug
+     */
+    if (navigator.userAgent.indexOf('Firefox') !== -1) {
+      await navigator.mediaDevices.getUserMedia({ video: true });
+    }
     return (await MediaDevicesService.enumerateVideoInputDevices()).filter((d) => d.deviceId) as MediaDeviceInfo[];
   };
 
@@ -42,24 +46,26 @@ const useCamera: UseCamera = () => {
   };
 
   const getCameraPermission = async () => {
-    let permission = false;
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { min: 1024, ideal: 1280, max: 1920 },
-          height: { min: 576, ideal: 720, max: 1080 },
-        },
-      });
-
-      if (stream) {
-        permission = true;
-        stream.getTracks().forEach((track) => {
-          track.stop();
+    let permission = hasCameraPermission;
+    if (!hasCameraPermission) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { min: 1024, ideal: 1280, max: 1920 },
+            height: { min: 576, ideal: 720, max: 1080 },
+          },
         });
+
+        if (stream) {
+          permission = true;
+          stream.getTracks().forEach((track) => {
+            track.stop();
+          });
+        }
+      } catch (error) {
+        permission = false;
       }
-    } catch (error) {
-      permission = false;
+      setHasCameraPermission(permission);
     }
     return permission;
   };

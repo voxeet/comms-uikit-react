@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import { defaultTheme as theme } from '../../../../common';
-
+import theme from '../../../../theme/defaultTheme';
 import { render } from '../../../../utils/tests/test-utils';
 
 import QualityIndicator from './QualityIndicator';

@@ -2,12 +2,11 @@
 import type { MediaStreamWithType } from '@voxeet/voxeet-web-sdk/types/models/MediaStream';
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
 import cx from 'classnames';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, CSSProperties } from 'react';
 
 import useParticipants from '../../../hooks/useParticipants';
 import useTheme from '../../../hooks/useTheme';
 import useVideo from '../../../hooks/useVideo';
-import { autoVideoScale } from '../../../utils/autoVideoScale.util';
 import LocalAvatar from '../../conference/LocalAvatar/LocalAvatar';
 import ParticipantAvatar from '../../conference/ParticipantAvatar/ParticipantAvatar';
 import Space from '../Space/Space';
@@ -27,29 +26,30 @@ export type VideoTileProps = React.HTMLAttributes<HTMLDivElement> & {
 const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirrored, ...props }: VideoTileProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { getColor, isDesktop, isMobileSmall, isMobile } = useTheme();
-  const { isVideo } = useVideo();
+  const { getColor, isMobileSmall, isMobile } = useTheme();
+  const { isVideo, toggleVideo } = useVideo();
   const { participantsStatus, participants } = useParticipants();
   const { isLocal } = participantsStatus[participant.id] || {};
   const [isLoading, setIsLoading] = useState(true);
   const [currentStream, setCurrentStream] = useState<MediaStreamWithType | null>(null);
   const [isMirrorStream, setIsMirrorStream] = useState(isMirrored);
-  const [scale, setScale] = useState(1);
   const [isPiPEnabled, setIsPiPEnabled] = useState(false);
 
   const isSmartphone = isMobileSmall || isMobile;
 
   const videoStream = useMemo(() => {
-    return participant.streams[participant.streams.length - 1]?.getVideoTracks().length > 0;
+    const cameraStreams = participant.streams.filter((stream) => stream.type !== 'ScreenShare');
+    return cameraStreams[cameraStreams.length - 1]?.getVideoTracks().length > 0;
   }, [participant]);
 
   useEffect(() => {
     if (participant.streams?.length) {
-      const stream = participant.streams[participant.streams.length - 1];
-      const facingMode = stream.getVideoTracks()[0]?.getSettings()?.facingMode;
+      const cameraStreams = participant.streams.filter((stream) => stream.type !== 'ScreenShare');
+      const stream = cameraStreams[cameraStreams.length - 1];
+      const facingMode = stream?.getVideoTracks()[0]?.getSettings()?.facingMode;
       const facingUserMode = facingMode === 'user';
       setIsMirrorStream(facingMode ? facingUserMode : isMirrored);
-      setCurrentStream(participant.streams[participant.streams.length - 1]);
+      setCurrentStream(cameraStreams[cameraStreams.length - 1]);
     }
   }, [participant]);
 
@@ -57,6 +57,18 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
     if (videoRef?.current) {
       // @ts-expect-error bad navigator type
       navigator.attachMediaStream(videoRef.current, currentStream);
+      /*
+       * Below effect is applied due problem with muted stream track while sending camera stream from iOS device
+       * ( this is connected with trusted events and gesture handlers)
+       * Until problem will be resolved on SDK side , we need to stick to this workaround
+       * SDK 3.6 behaves properly
+       */
+      if (currentStream?.getVideoTracks()?.[0]?.muted && isVideo && /iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        (async () => {
+          await toggleVideo();
+          await toggleVideo();
+        })();
+      }
     } else {
       setIsLoading(true);
     }
@@ -98,30 +110,10 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
     return null;
   };
 
-  const setVideoScale = () => {
-    if (isPiPEnabled) {
-      return setScale(1);
-    }
-    const scale = autoVideoScale(wrapperRef.current, videoRef.current, currentStream) || 1;
-    return setScale(scale);
+  const isPortraitVideo = () => {
+    const { width = 1, height = 1 } = currentStream?.getVideoTracks()[0]?.getSettings?.() || {};
+    return width < height;
   };
-
-  const postponedSetScale = useCallback(() => {
-    setTimeout(() => {
-      setVideoScale();
-    }, 100);
-  }, [currentStream]);
-
-  useEffect(() => {
-    videoRef.current?.addEventListener('resize', postponedSetScale);
-    return () => {
-      videoRef.current?.removeEventListener('resize', postponedSetScale);
-    };
-  }, [currentStream]);
-
-  useEffect(() => {
-    setVideoScale();
-  }, [participants.length, isMobileSmall, isMobile, isDesktop, isPiPEnabled]);
 
   const avatarSize = useMemo(() => {
     if (isSmartphone) {
@@ -133,9 +125,24 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
     return 'm';
   }, [participants]);
 
+  const objectFitStyles = () => {
+    const styles: CSSProperties = {};
+    const isPortrait = isPortraitVideo();
+    if (isPortrait || !isLocal) {
+      styles.width = '100%';
+      styles.height = '100%';
+    }
+    if (isPortrait) {
+      styles.objectFit = 'contain';
+    } else if (!isLocal) {
+      styles.objectFit = 'cover';
+    }
+    return styles;
+  };
+
   return (
     <div
-      className={cx(styles.videoWrapper, { [styles.desktop]: isDesktop })}
+      className={cx(styles.videoWrapper)}
       data-testid={testID}
       style={{ backgroundColor: getColor('grey.700') }}
       ref={wrapperRef}
@@ -154,7 +161,8 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
           className={cx({ [styles.isLoading]: isLoading })}
           onLoadedData={handleLoadedVideo}
           style={{
-            transform: `translate(-50%, -50%) scale(${!isMirrorStream || isPiPEnabled ? '' : '-'}${scale}, ${scale})`,
+            transform: `translate(-50%, -50%) scale(${!isMirrorStream || isPiPEnabled ? '' : '-'}1, 1)`,
+            ...objectFitStyles(),
           }}
         />
       ) : (

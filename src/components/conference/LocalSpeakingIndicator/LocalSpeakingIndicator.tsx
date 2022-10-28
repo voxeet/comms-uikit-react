@@ -1,8 +1,7 @@
-import type { ColorKey } from '../../../common';
-import soundWave from '../../../common/assets/lottie/soundWaveLottie.json';
-
+import soundWave from '../../../assets/animations/soundWaveLottie.json';
 import useParticipants from '../../../hooks/useParticipants';
 import useSession from '../../../hooks/useSession';
+import type { ColorKey } from '../../../theme/types';
 import AnimationIndicator from '../../ui/indicators/AnimationIndicator/AnimationIndicator';
 import IconIndicator from '../../ui/indicators/IconIndicator/IconIndicator';
 

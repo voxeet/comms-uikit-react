@@ -1,0 +1,60 @@
+@import '../../../style/zIndex';
+
+.wrapper {
+  position: absolute;
+  height: auto;
+  width: 320px;
+  z-index: $zI_dialogTooltip;
+  border-radius: 12px;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 24px #0b0b0d;
+  &.top {
+    animation: fadeInUp 500ms ease-in-out;
+    transform: translateY(-110px);
+  }
+  &.bottom {
+    animation: fadeInUDown 500ms ease-in-out;
+    transform: translateY(110px);
+  }
+}
+
+.arrow {
+  position: absolute;
+  align-self: center;
+  left: 50%;
+}
+
+.arrowDown {
+  @extend .arrow;
+  transform: translateX(-50%);
+  bottom: -16px;
+}
+
+.arrowUp {
+  @extend .arrow;
+  transform: translateX(-50%) rotate(180deg);
+  top: -16px;
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(110px);
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-110px);
+  }
+}

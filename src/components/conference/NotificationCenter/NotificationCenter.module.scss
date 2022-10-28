@@ -1,0 +1,142 @@
+@import '../../../style/zIndex';
+
+@mixin centerTransform($property) {
+  align-items: center;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: toast-in-#{$property} 0.7s;
+  padding-top: 12px;
+}
+
+@mixin sideAnimations($horizontal, $vertical) {
+  animation: toast-in-#{$horizontal} 0.7s;
+  #{$horizontal}: 12px;
+  #{$vertical}: 12px;
+  @if $vertical == top {
+    top: 12px;
+  }
+  @if $vertical == bottom {
+    bottom: 0;
+  }
+}
+
+.notificationCenter {
+  box-sizing: border-box;
+  position: fixed;
+  z-index: $zI_overlay;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  &.bottom-center {
+    @include centerTransform(bottom);
+    bottom: 0;
+  }
+  &.top-center {
+    top: 12px;
+    @include centerTransform(top);
+  }
+  &.bottom-left,
+  &.top-left {
+    align-items: unset;
+  }
+}
+
+.top-right {
+  @include sideAnimations(right, top);
+}
+
+.top-left {
+  @include sideAnimations(left, top);
+}
+
+.bottom-right {
+  @include sideAnimations(right, bottom);
+}
+.bottom-left {
+  @include sideAnimations(left, bottom);
+}
+
+.notification {
+  display: flex;
+  padding: 12px;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.3s ease;
+  position: relative;
+  pointer-events: auto;
+  overflow: hidden;
+  margin: 0 0 6px;
+  border-radius: 6px;
+  &.small {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+}
+
+.notification:hover {
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.4);
+  transform: scale(1.03);
+  transition: all 0.2s;
+}
+.fadeOut {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.notificationLeftElement {
+  //For sake of ellipsis container width - left margin + icon size
+  min-width: calc(100% - 32px);
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  flex-grow: 0;
+}
+
+.notificationMessage {
+  text-align: left;
+  max-width: calc(100% - 32px);
+  &.singleLine {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
+.closeElement {
+  cursor: pointer;
+}
+
+@keyframes toast-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes toast-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes toast-in-bottom {
+  from {
+    transform: translate(-50%, 100%);
+  }
+  to {
+    transform: translate(-50%, 0%);
+  }
+}
+
+@keyframes toast-in-top {
+  from {
+    transform: translate(-50%, -100%);
+  }
+  to {
+    transform: translate(-50%, 0%);
+  }
+}

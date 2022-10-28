@@ -1,7 +1,9 @@
-import { customThemes as defaultCustomThemes, defaultTheme, Theme, ThemeMode } from '../common';
-import type { CustomThemes, RecursivePartial } from '../common/theme/types';
 import deepMerge from 'lodash.merge';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
+
+import defaultCustomThemes from '../theme/customThemes';
+import defaultTheme from '../theme/defaultTheme';
+import type { CustomThemes, RecursivePartial, Theme, ThemeMode } from '../theme/types';
 
 import '../style/font.css';
 
@@ -34,22 +36,27 @@ export const ThemeContext = createContext<ThemeContext>({
   theme: defaultTheme,
 } as unknown as ThemeContext);
 
-const breakpoints = {
+export const breakpoints = {
   mobileSmall: 320,
   mobile: 600,
   tablet: 1024,
   desktop: 1440,
 };
 
-const isMobileBrowser = navigator.userAgent.match(/Android|iPhone|mobile/i);
+const isMobileBrowser =
+  (typeof navigator !== 'undefined' && navigator.userAgent.match(/Android|iPhone|mobile/i)) ||
+  /*
+   * Apple tablets are faking userAgent by default to treat them as desktop browsers, additional check for Apple devices
+   */
+  (navigator?.platform === 'MacIntel' && 'maxTouchPoints' in navigator && navigator.maxTouchPoints > 0);
 
 const ThemeProvider = ({ children, theme, customThemes }: ThemeProviderProps) => {
   const [themes, setThemes] = useState<CustomThemes>(defaultCustomThemes);
   const [themeState, setThemeState] = useState<Theme>(defaultTheme);
   const [activeTheme, setActiveTheme] = useState<ThemeMode>('Dark Graphite');
   const [windowDimensions, setWindowDimensions] = useState<ThemeContext['windowDimensions']>({
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: 0,
+    height: 0,
   });
   const [isMobile, setIsMobile] = useState<ThemeContext['isMobile']>(false);
   const [isMobileSmall, setIsMobileSmall] = useState<ThemeContext['isMobileSmall']>(false);
@@ -64,6 +71,13 @@ const ThemeProvider = ({ children, theme, customThemes }: ThemeProviderProps) =>
       height: window.innerHeight,
     });
   };
+
+  useEffect(() => {
+    setWindowDimensions({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+  }, []);
 
   const handleScreenOrientation = () => {
     if (isDesktop) {
@@ -87,7 +101,7 @@ const ThemeProvider = ({ children, theme, customThemes }: ThemeProviderProps) =>
     if (window.innerWidth > window.innerHeight) {
       mainDimension = window.innerHeight;
     }
-    if (window.innerWidth <= breakpoints.tablet) {
+    if (window.innerWidth <= breakpoints.tablet || isMobileBrowser) {
       if (mainDimension <= breakpoints.mobileSmall) {
         setIsMobile(false);
         setIsMobileSmall(true);
@@ -98,7 +112,7 @@ const ThemeProvider = ({ children, theme, customThemes }: ThemeProviderProps) =>
         setIsMobileSmall(false);
         setIsTablet(false);
         setIsDesktop(false);
-      } else if (mainDimension <= breakpoints.tablet) {
+      } else if (mainDimension <= breakpoints.tablet || isMobileBrowser) {
         setIsMobile(false);
         setIsMobileSmall(false);
         setIsTablet(true);

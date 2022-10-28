@@ -1,7 +1,5 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import type { Sizes } from '../../../common';
-
 import useTheme from '../../../hooks/useTheme';
+import type { Sizes } from '../../../theme/types';
 import Space from '../Space/Space';
 import Text from '../Text/Text';
 

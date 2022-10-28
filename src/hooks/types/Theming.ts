@@ -1,5 +1,4 @@
-import type { ColorKey, Theme, ThemeMode } from '../../common';
-import type { CustomThemes } from '../../common/theme/types';
+import type { ColorKey, Theme, ThemeMode, CustomThemes } from '../../theme/types';
 
 export type Theming = {
   /**

@@ -1,8 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import type { ColorKey } from '../../../common';
 import { useMemo, useState } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
+import type { ColorKey } from '../../../theme/types';
 import type { IconComponentName } from '../../ui/Icon/IconComponents';
 import IconButton from '../../ui/IconButton/IconButton';
 import Space from '../../ui/Space/Space';

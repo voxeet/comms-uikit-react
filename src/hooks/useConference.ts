@@ -1,12 +1,9 @@
-import { useContext } from 'react';
-
-import { CommsContext } from '../providers/CommsProvider';
-
 import type { UseConference } from './types/Conferencing';
+import useCommsContext from './useCommsContext';
 
 const useConference: UseConference = () => {
   const { conference, createConference, fetchConference, joinConference, leaveConference, prevConference } =
-    useContext(CommsContext);
+    useCommsContext();
 
   return {
     conference,

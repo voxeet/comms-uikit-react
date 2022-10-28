@@ -1,5 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
-
 import useParticipants from '../../../hooks/useParticipants';
 import useSession from '../../../hooks/useSession';
 import Pill, { PillProps } from '../../ui/Pill/Pill';

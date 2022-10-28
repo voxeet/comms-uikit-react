@@ -1,7 +1,6 @@
 /* eslint-disable react/no-unused-prop-types */
-/* eslint-disable react/jsx-props-no-spreading */
 import cx from 'classnames';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactNode, type HTMLAttributes } from 'react';
 
 import type { IconComponentName } from '../Icon/IconComponents';
 import Space from '../Space/Space';
@@ -11,11 +10,11 @@ import DropdownProvider from './DropdownProvider';
 import { useClickOutside } from './useClickOutside';
 import useDropdown from './useDropdown';
 
-export type DropdownOptionType = React.HTMLAttributes<HTMLDivElement> & {
-  label: string | React.ReactNode;
+export type DropdownOptionType<T = unknown> = HTMLAttributes<HTMLDivElement> & {
+  label: string | ReactNode;
   value: string;
   icon?: IconComponentName;
-  info?: any;
+  info?: T;
 };
 
 export type DropdownProps = {

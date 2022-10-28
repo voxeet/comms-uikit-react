@@ -1,6 +1,7 @@
 import type { SVGProps } from 'react';
 
 import ArrowLeft from './ArrowLeft';
+import BackgroundBlur from './BackgroundBlur';
 import Camera from './Camera';
 import CameraGradient from './CameraGradient';
 import CameraOff from './CameraOff';
@@ -16,6 +17,7 @@ import DotsHorizontal from './DotsHorizontal';
 import DotsHorizontalGradient from './DotsHorizontalGradient';
 import DotsVertical from './DotsVertical';
 import DotsVerticalGradient from './DotsVerticalGradient';
+import Failure from './Failure';
 import Handset from './Handset';
 import HandsetGradient from './HandsetGradient';
 import Headphones from './Headphones';
@@ -46,11 +48,14 @@ import Speaker from './Speaker';
 import SpeakerGradient from './SpeakerGradient';
 import SpeakerOff from './SpeakerOff';
 import SpeakerOffGradient from './SpeakerOffGradient';
+import Success from './Success';
 import SuccessFilled from './SuccessFilled';
+import Warning from './Warning';
 import WarningFilled from './WarningFilled';
 
 const IconComponents = {
   arrowLeft: ArrowLeft,
+  backgroundBlur: BackgroundBlur,
   camera: Camera,
   cameraGradient: CameraGradient,
   cameraOff: CameraOff,
@@ -66,6 +71,7 @@ const IconComponents = {
   dotsHorizontalGradient: DotsHorizontalGradient,
   dotsVertical: DotsVertical,
   dotsVerticalGradient: DotsVerticalGradient,
+  failure: Failure,
   handset: Handset,
   handsetGradient: HandsetGradient,
   headphones: Headphones,
@@ -96,7 +102,9 @@ const IconComponents = {
   speakerGradient: SpeakerGradient,
   speakerOff: SpeakerOff,
   speakerOffGradient: SpeakerOffGradient,
+  success: Success,
   successFilled: SuccessFilled,
+  warning: Warning,
   warningFilled: WarningFilled,
 };
 

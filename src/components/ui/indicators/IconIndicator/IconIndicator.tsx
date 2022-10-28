@@ -1,8 +1,7 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import type { ColorKey, Sizes } from '../../../../common';
 import cx from 'classnames';
 
 import useTheme from '../../../../hooks/useTheme';
+import type { ColorKey, Sizes } from '../../../../theme/types';
 import Icon from '../../Icon/Icon';
 import type { IconComponentName } from '../../Icon/IconComponents';
 import Space from '../../Space/Space';

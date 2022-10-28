@@ -1,0 +1,86 @@
+.infoBar {
+  box-sizing: border-box;
+  min-height: 32px;
+  border-radius: 6px;
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  transform-origin: center;
+  transform: scale(1);
+  transition: 0.3s ease;
+  background-color: rgba(41, 41, 48, 0.8);
+  padding: 8px 16px;
+  width: max-content;
+
+  &.success,
+  &.info,
+  &.warning,
+  &.error {
+    min-height: 48px;
+    min-width: 260px;
+    padding: 12px 16px 12px 12px;
+  }
+
+  &.success {
+    background-color: #179934;
+  }
+
+  &.info {
+    background-color: #2288e6;
+  }
+
+  &.warning {
+    background-color: #fcb91a;
+  }
+
+  &.error {
+    background-color: #e52222;
+  }
+
+  &.invisible {
+    transform: scale(0);
+    opacity: 0;
+    visibility: hidden;
+    z-index: -1;
+    transition: 0.3s ease;
+    height: 0;
+    margin: 0;
+    display: none;
+  }
+
+  .defaultLeftIcon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+  }
+
+  .variantsLeftIcon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+  }
+
+  .defaultText {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .variantsText {
+    min-width: 235px;
+    font-size: 13px;
+    line-height: 16.9px;
+  }
+
+  .action {
+    background-color: transparent;
+    border: none;
+    margin-left: auto;
+    padding: 0;
+
+    .actionIcon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}

@@ -1,10 +1,9 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import type { ColorKey } from '../../../common';
 import cx from 'classnames';
 import Color from 'color';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
+import type { ColorKey } from '../../../theme/types';
 import Space from '../Space/Space';
 import Text from '../Text/Text';
 
@@ -39,7 +38,7 @@ const Tooltip = ({ text, position, children, backgroundColor, textColor, testID,
     return () => {
       window.removeEventListener('resize', setRects);
     };
-  }, [wrapperRef.current, tooltipRef.current, text]);
+  }, [text]);
 
   const tooltipPosition = useMemo(
     () => countTooltipPosition({ position, wrapperRect, tooltipRect }),

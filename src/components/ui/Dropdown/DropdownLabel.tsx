@@ -1,5 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
-
 import Space from '../Space/Space';
 import Text, { TextProps } from '../Text/Text';
 

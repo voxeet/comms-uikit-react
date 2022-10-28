@@ -1,10 +1,9 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import type { ColorKey, Sizes } from '../../../common';
 import cx from 'classnames';
 import Color from 'color';
 import { useState, useMemo, ButtonHTMLAttributes } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
+import type { ColorKey, Sizes } from '../../../theme/types';
 import Badge from '../Badge/Badge';
 import Icon, { ColorTone } from '../Icon/Icon';
 import type { IconComponentName } from '../Icon/IconComponents';
@@ -132,6 +131,7 @@ const IconButton = ({
       style={{
         background: handleBackgroundColor,
         border: `1px solid ${strokeColor ? getColor(strokeColor) : 'transparent'}`,
+        borderRadius: variant === 'circle' ? '100%' : `${theme.borderRadius}px`,
         ...style,
       }}
       onMouseEnter={() => setIsHovered(true)}
@@ -161,7 +161,14 @@ const IconButton = ({
         </Space>
       )}
       {icon && (
-        <Icon testID="IconButtonIcon" name={icon} color={iconColor} colorTone={handleIconColorTone} size={size} />
+        <Icon
+          style={{ pointerEvents: 'none' }}
+          testID="IconButtonIcon"
+          name={icon}
+          color={iconColor}
+          colorTone={handleIconColorTone}
+          size={size}
+        />
       )}
     </button>
   );

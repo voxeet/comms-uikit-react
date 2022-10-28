@@ -1,9 +1,8 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import type { ColorKey, Sizes } from '../../../common';
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
 import { useMemo } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
+import type { ColorKey, Sizes } from '../../../theme/types';
 import { stringToNumber } from '../../../utils/stringToNumber.util';
 import Space from '../Space/Space';
 import Text, { TextType } from '../Text/Text';
@@ -13,7 +12,7 @@ import styles from './Avatar.module.scss';
 type Size = Extract<Sizes, 'xs' | 's' | 'm' | 'l'>;
 
 export type AvatarProps = React.HTMLAttributes<HTMLDivElement> & {
-  participant: Participant | string | undefined;
+  participant?: Participant | string | null;
   size?: Size;
   borderColor?: ColorKey;
   testID?: string;
@@ -43,7 +42,7 @@ const sizeMap: Record<Size, { width: string; height: string; text: TextType }> =
 };
 
 const Avatar = ({ participant, size = 'l', borderColor, testID, ...props }: AvatarProps) => {
-  if (participant === undefined) {
+  if (!participant) {
     return null;
   }
   const { avatars, getColor } = useTheme();
@@ -58,7 +57,15 @@ const Avatar = ({ participant, size = 'l', borderColor, testID, ...props }: Avat
     }
     return [firstValue, lastValue];
   }, [name]);
-  const backgroundColor = useMemo(() => avatars[stringToNumber(name) % avatars.length], [name]);
+
+  const backgroundColor = useMemo(
+    () =>
+      avatars[
+        stringToNumber(name + (typeof participant === 'object' ? (participant as Participant).id.slice(0, 2) : '')) %
+          avatars.length
+      ],
+    [name],
+  );
   const { width, height, text } = sizeMap[size];
   return (
     <Space

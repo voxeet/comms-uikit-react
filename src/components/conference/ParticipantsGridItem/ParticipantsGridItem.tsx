@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 
 import useParticipants from '../../../hooks/useParticipants';
 import useTheme from '../../../hooks/useTheme';
+import IconIndicator from '../../ui/indicators/IconIndicator/IconIndicator';
 import Space from '../../ui/Space/Space';
 import LocalName from '../LocalName/LocalName';
 import LocalSpeakingIndicator from '../LocalSpeakingIndicator/LocalSpeakingIndicator';
@@ -35,8 +36,13 @@ const ParticipantsGridItem = React.memo(({ participant, localText }: Participant
     <Space
       testID="ParticipantsGridItem"
       className={cx(styles.item, { [styles.mobile]: isSmartphone })}
-      style={{
-        borderColor: isSpeaking && isRemoteAudio && isLocalAudio ? getColor('purple.400') : getColor('transparent'),
+      fw
+      fh
+      css={{
+        '&:after': {
+          display: isSpeaking ? 'block' : 'none',
+          borderColor: isSpeaking && isRemoteAudio && isLocalAudio ? getColor('purple.400') : getColor('transparent'),
+        },
       }}
     >
       {isLocal ? (
@@ -51,6 +57,18 @@ const ParticipantsGridItem = React.memo(({ participant, localText }: Participant
           <ParticipantName testID="ParticipantName" participant={participant} />
         )}
       </Space>
+      {!isLocal && !isLocalAudio && (
+        <Space
+          className={cx(styles.indicatorsContainer, isMobile && styles.mobile, isMobileSmall && styles.mobileSmall)}
+        >
+          <IconIndicator
+            testID="SpeakerOffIndicator"
+            icon="speakerOff"
+            backgroundColor="white"
+            iconColor="primary.400"
+          />
+        </Space>
+      )}
       <Space className={styles.talking}>
         {isLocal ? (
           <LocalSpeakingIndicator testID="LocalSpeakingIndicator" />

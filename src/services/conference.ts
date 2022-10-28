@@ -1,101 +1,161 @@
-import WebSDK from '@voxeet/voxeet-web-sdk';
+import VoxeetSDK from '@voxeet/voxeet-web-sdk';
 import type { ConferencePermission, ConferenceStatus } from '@voxeet/voxeet-web-sdk/types/models/Conference';
 import type Conference from '@voxeet/voxeet-web-sdk/types/models/Conference';
 import type ConferenceOptions from '@voxeet/voxeet-web-sdk/types/models/ConferenceOptions';
+import type { MediaStreamWithType } from '@voxeet/voxeet-web-sdk/types/models/MediaStream';
 import type { JoinOptions } from '@voxeet/voxeet-web-sdk/types/models/Options';
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
 
 export default class ConferenceService {
   public static create(options: ConferenceOptions) {
-    return WebSDK.conference.create({
+    return VoxeetSDK.conference.create({
       params: {
         dolbyVoice: true,
+        liveRecording: true,
         ...options.params,
       },
       ...options,
     });
   }
 
+  public static setPackageUrlPrefix(prefix?: string) {
+    if (prefix) {
+      VoxeetSDK.packageUrlPrefix = prefix;
+    }
+  }
+
   public static current() {
-    return WebSDK.conference.current;
+    return VoxeetSDK.conference.current;
   }
 
   public static participants() {
-    return WebSDK.conference.participants;
+    return VoxeetSDK.conference.participants;
   }
 
   public static fetch(conferenceId: string) {
-    return WebSDK.conference.fetch(conferenceId);
+    return VoxeetSDK.conference.fetch(conferenceId);
   }
 
   public static join(conference: Conference, options: JoinOptions) {
-    return WebSDK.conference.join(conference, options);
+    return VoxeetSDK.conference.join(conference, options);
   }
 
-  public static stopVideo(participant: Participant) {
-    return WebSDK.conference.stopVideo(participant);
+  public static stopRemoteVideo(participant: Participant) {
+    return VoxeetSDK.video.remote.stop(participant);
   }
 
-  public static startVideo(participant: Participant) {
-    return WebSDK.conference.startVideo(participant, false);
+  public static startRemoteVideo(participant: Participant) {
+    return VoxeetSDK.video.remote.start(participant);
   }
 
-  public static startAudio(participant: Participant) {
-    return WebSDK.conference.startAudio(participant);
+  public static startRemoteAudio(participant: Participant) {
+    return VoxeetSDK.audio.remote.start(participant);
   }
 
-  public static stopAudio(participant: Participant) {
-    return WebSDK.conference.stopAudio(participant);
+  public static stopRemoteAudio(participant: Participant) {
+    return VoxeetSDK.audio.remote.stop(participant);
+  }
+
+  public static startLocalAudio() {
+    return VoxeetSDK.audio.local.start();
+  }
+
+  public static stopLocalAudio() {
+    return VoxeetSDK.audio.local.stop();
+  }
+
+  public static startLocalVideo(isBlurred?: boolean) {
+    // @ts-expect-error problem with enum import from SDK
+    return VoxeetSDK.video.local.start({}, isBlurred ? { type: 'bokeh' } : undefined);
+  }
+
+  public static stopLocalVideo() {
+    return VoxeetSDK.video.local.stop();
   }
 
   public static isSpeaking(participant: Participant, callback: (value: boolean) => void) {
-    return WebSDK.conference.isSpeaking(participant, callback);
+    return VoxeetSDK.conference.isSpeaking(participant, callback);
+  }
+
+  public static startScreenShare() {
+    return VoxeetSDK.conference.startScreenShare();
+  }
+
+  public static stopScreenShare() {
+    return VoxeetSDK.conference.stopScreenShare();
   }
 
   public static onParticipantsChange(handler: (data: Participant) => void) {
-    WebSDK.conference.on('participantAdded', handler);
-    WebSDK.conference.on('participantUpdated', handler);
-    WebSDK.conference.on('', handler);
+    VoxeetSDK.conference.on('participantAdded', handler);
+    VoxeetSDK.conference.on('participantUpdated', handler);
     return () => {
-      WebSDK.conference.removeListener('participantAdded', handler);
-      WebSDK.conference.removeListener('participantUpdated', handler);
+      VoxeetSDK.conference.removeListener('participantAdded', handler);
+      VoxeetSDK.conference.removeListener('participantUpdated', handler);
     };
   }
 
   public static onStreamsChange(handler: (data: Participant) => void) {
-    WebSDK.conference.on('streamAdded', handler);
-    WebSDK.conference.on('streamRemoved', handler);
-    WebSDK.conference.on('streamUpdated', handler);
+    VoxeetSDK.conference.on('streamAdded', handler);
+    VoxeetSDK.conference.on('streamRemoved', handler);
+    VoxeetSDK.conference.on('streamUpdated', handler);
     return () => {
-      WebSDK.conference.removeListener('streamAdded', handler);
-      WebSDK.conference.removeListener('streamRemoved', handler);
-      WebSDK.conference.removeListener('streamUpdated', handler);
+      VoxeetSDK.conference.removeListener('streamAdded', handler);
+      VoxeetSDK.conference.removeListener('streamRemoved', handler);
+      VoxeetSDK.conference.removeListener('streamUpdated', handler);
+    };
+  }
+
+  public static onScreenShareChange(
+    onStartHandler: (participant: Participant, stream: MediaStreamWithType) => void,
+    onStopHandler: (participant: Participant, stream: MediaStreamWithType) => void,
+  ) {
+    VoxeetSDK.conference.on('streamAdded', onStartHandler);
+    VoxeetSDK.conference.on('streamRemoved', onStopHandler);
+    return () => {
+      VoxeetSDK.conference.on('streamAdded', onStartHandler);
+      VoxeetSDK.conference.on('streamRemoved', onStopHandler);
     };
   }
 
   public static onConferenceStatusChange(handler: (data: ConferenceStatus) => void) {
-    WebSDK.conference.on('ended', handler);
-    WebSDK.conference.on('joined', handler);
-    WebSDK.conference.on('left', handler);
+    VoxeetSDK.conference.on('ended', handler);
+    VoxeetSDK.conference.on('joined', handler);
+    VoxeetSDK.conference.on('left', handler);
     return () => {
-      WebSDK.conference.removeListener('ended', handler);
-      WebSDK.conference.removeListener('joined', handler);
-      WebSDK.conference.removeListener('left', handler);
+      VoxeetSDK.conference.removeListener('ended', handler);
+      VoxeetSDK.conference.removeListener('joined', handler);
+      VoxeetSDK.conference.removeListener('left', handler);
     };
   }
 
   public static onPermissionsChange(handler: (data: ConferencePermission[]) => void) {
-    WebSDK.conference.on('permissionsUpdated', handler);
+    VoxeetSDK.conference.on('permissionsUpdated', handler);
     return () => {
-      WebSDK.conference.removeListener('permissionsUpdated', handler);
+      VoxeetSDK.conference.removeListener('permissionsUpdated', handler);
+    };
+  }
+
+  public static onConferenceError(handler: (error: Error) => void) {
+    VoxeetSDK.conference.on('error', handler);
+    return () => {
+      VoxeetSDK.conference.removeListener('error', handler);
     };
   }
 
   public static leave() {
-    return WebSDK.conference.leave();
+    return VoxeetSDK.conference.leave();
   }
 
   public static playBlockedAudio() {
-    return WebSDK.conference.playBlockedAudio();
+    return VoxeetSDK.conference.playBlockedAudio();
+  }
+
+  public static startBackgroundBlur() {
+    // @ts-expect-error problem with enum import from SDK
+    return VoxeetSDK.video.local.setProcessor({ type: 'bokeh' });
+  }
+
+  public static stopVideoProcessing() {
+    return VoxeetSDK.video.local.disableProcessing();
   }
 }

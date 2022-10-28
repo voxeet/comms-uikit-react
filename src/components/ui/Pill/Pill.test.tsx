@@ -1,5 +1,4 @@
-import { defaultTheme as theme } from '../../../common';
-
+import theme from '../../../theme/defaultTheme';
 import { render } from '../../../utils/tests/test-utils';
 
 import Pill from './Pill';

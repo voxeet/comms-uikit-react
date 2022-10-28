@@ -71,7 +71,7 @@ describe('ParticipantToggleVideoButton component', () => {
   });
 
   test('Can click ParticipantToggleVideoButton and runs stopParticipantVideo', async () => {
-    const stopParticipantVideo = jest.fn();
+    const stopRemoteParticipantVideo = jest.fn();
 
     const { getByTestId } = render(
       <ParticipantToggleVideoButton
@@ -86,7 +86,7 @@ describe('ParticipantToggleVideoButton component', () => {
             participantsStatus: {
               ...remoteParticipantStatusWithVideo,
             },
-            stopParticipantVideo,
+            stopRemoteParticipantVideo,
           },
         },
       },
@@ -95,11 +95,11 @@ describe('ParticipantToggleVideoButton component', () => {
     await waitFor(() => {
       const element = getByTestId(testID);
       fireEvent.click(element);
-      expect(stopParticipantVideo).toHaveBeenCalled();
+      expect(stopRemoteParticipantVideo).toHaveBeenCalled();
     });
   });
   test('Can click ParticipantToggleVideoButton and runs startParticipantVideo', async () => {
-    const startParticipantVideo = jest.fn();
+    const startRemoteParticipantVideo = jest.fn();
 
     const { getByTestId } = render(
       <ParticipantToggleVideoButton
@@ -114,7 +114,7 @@ describe('ParticipantToggleVideoButton component', () => {
             participantsStatus: {
               ...remoteParticipantStatusWithoutVideo,
             },
-            startParticipantVideo,
+            startRemoteParticipantVideo,
           },
         },
       },
@@ -123,7 +123,7 @@ describe('ParticipantToggleVideoButton component', () => {
     await waitFor(() => {
       const element = getByTestId(testID);
       fireEvent.click(element);
-      expect(startParticipantVideo).toHaveBeenCalled();
+      expect(startRemoteParticipantVideo).toHaveBeenCalled();
     });
   });
 });
