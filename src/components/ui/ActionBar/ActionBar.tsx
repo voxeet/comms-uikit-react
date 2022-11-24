@@ -1,4 +1,5 @@
 import cx from 'classnames';
+import { useEffect } from 'react';
 import type { ComponentProps, ReactNode } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
@@ -18,13 +19,15 @@ type ActionBarProps = ComponentProps<typeof Space> & {
   closeCallback?: () => void;
   unified?: boolean;
   compact?: boolean;
+  onMount?: () => void;
 };
 
 export type AbstractionBarPropsBase<T, K> = {
+  onMount?: () => void;
   onActionSuccess?: () => void;
   statusLabels: Record<keyof K, string | ReactNode>;
   buttonLabels: T;
-  guestLabel?: string;
+  guestLabel?: string | ReactNode;
   compact?: boolean;
   testID?: string;
 } & ComponentProps<typeof Space>;
@@ -35,9 +38,14 @@ const ActionBar = ({
   closeCallback,
   unified = false,
   compact = false,
+  onMount,
   ...props
 }: ActionBarProps) => {
   const { getColor, isDesktop } = useTheme();
+
+  useEffect(() => {
+    onMount?.();
+  }, []);
 
   return (
     <Space
@@ -45,6 +53,7 @@ const ActionBar = ({
       className={cx(styles.wrapper, compact ? styles.compact : styles.fullWidth, {
         [styles.mobile]: !isDesktop && !unified,
         [styles.clickable]: !!props.onClick,
+        [styles.compactAlignment]: !isDesktop,
       })}
       style={{ backgroundColor: getColor('grey.800') }}
       pv="xs"

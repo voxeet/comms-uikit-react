@@ -54,7 +54,7 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
   }, [participant]);
 
   useEffect(() => {
-    if (videoRef?.current) {
+    if (videoRef?.current && currentStream) {
       // @ts-expect-error bad navigator type
       navigator.attachMediaStream(videoRef.current, currentStream);
       /*
@@ -72,7 +72,7 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
     } else {
       setIsLoading(true);
     }
-  }, [currentStream]);
+  }, [currentStream, participant]);
 
   useEffect(() => {
     if (!document.pictureInPictureEnabled || !videoRef.current) return;

@@ -77,6 +77,7 @@ const Text = ({
   uppercase = false,
   align = 'left',
   style,
+  className,
   ...props
 }: TextProps) => {
   const {
@@ -86,7 +87,13 @@ const Text = ({
   return (
     <span
       data-testid={testID}
-      className={cx(styles.text, styles[`type-${type}`], styles[`align-${align}`], uppercase && styles.uppercase)}
+      className={cx(
+        className,
+        styles.text,
+        styles[`type-${type}`],
+        styles[`align-${align}`],
+        uppercase && styles.uppercase,
+      )}
       style={{
         color: getColor(color, 'white'),
         fontFamily: font || fontFamily,

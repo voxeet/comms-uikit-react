@@ -1,8 +1,9 @@
-import { useRef } from 'react';
+import cx from 'classnames';
+import { useRef, useState } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
 import type { ColorKey } from '../../../theme/types';
-import IconButton from '../IconButton/IconButton';
+import Icon from '../Icon/Icon';
 import Space from '../Space/Space';
 import Text from '../Text/Text';
 
@@ -11,6 +12,8 @@ import styles from './Input.module.scss';
 export type ValidationType = { valid: boolean; message?: string };
 
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+  backgroundColor?: ColorKey;
+  borderColor?: ColorKey;
   value: string;
   label?: string;
   labelColor?: ColorKey;
@@ -18,6 +21,7 @@ export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   textColor?: ColorKey;
   validation?: ValidationType;
   testID?: string;
+  secure?: boolean;
 };
 
 const Input = ({
@@ -28,10 +32,13 @@ const Input = ({
   textColor,
   labelBackground,
   validation,
+  secure,
+  borderColor,
   testID,
   ...props
 }: InputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isValueHidden, setIsValueHidden] = useState(secure);
   const { getColor, theme } = useTheme();
 
   const clear = () => {
@@ -44,7 +51,7 @@ const Input = ({
   };
 
   return (
-    <div>
+    <div style={{ backgroundColor: 'inherit' }}>
       <Space className={styles.wrapper} testID={testID}>
         {label && (
           <Space
@@ -52,36 +59,44 @@ const Input = ({
             pv="xxxs"
             ph="xxs"
             className={styles.label}
-            style={{ backgroundColor: getColor(labelBackground, 'white') }}
+            style={{
+              backgroundColor: getColor(labelBackground, 'background'),
+            }}
           >
-            <Text type="captionRegular" color={getColor(labelColor, 'grey.500')}>
+            <Text className={styles.labelText} type="captionRegular" color={getColor(labelColor, 'grey.500')}>
               {label}
             </Text>
           </Space>
         )}
-        {value.length > 0 && (
-          <Space className={styles.clear}>
-            <IconButton
-              icon="close"
-              backgroundColor="transparent"
-              color={textColor}
-              onClick={clear}
-              iconColor={getColor(textColor, 'black')}
-              size="xxs"
-              style={{ padding: '0px' }}
-            />
+        {(value.length > 0 || secure) && (
+          <Space className={styles.actions}>
+            {value.length > 0 && (
+              <Space mr={secure && 'xs'}>
+                <Icon testID="CloseIcon" name="close" onClick={clear} color={getColor(textColor, 'black')} size="xxs" />
+              </Space>
+            )}
+            {secure && (
+              <Icon
+                testID="SecureIcon"
+                name={!isValueHidden ? 'eyeOpen' : 'eyeClosed'}
+                onClick={() => setIsValueHidden((prev) => !prev)}
+                color={getColor(textColor, 'black')}
+                size="m"
+              />
+            )}
           </Space>
         )}
         <input
           ref={inputRef}
-          className={styles.input}
-          type="text"
+          className={cx(styles.input, { [styles.securePadding]: secure })}
+          type={!isValueHidden ? 'text' : 'password'}
+          autoComplete="false"
           value={value}
           onChange={onChange}
           css={{
             border: '2px solid',
-            borderColor: validation?.valid === false ? getColor('infoError') : getColor('grey.100'),
-            color: getColor('black'),
+            borderColor: validation?.valid === false ? getColor('infoError') : getColor(borderColor || 'grey.100'),
+            color: getColor(textColor, 'black'),
             '&:focus': {
               borderColor: validation?.valid === false ? getColor('infoError') : getColor('primary.400'),
             },

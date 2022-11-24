@@ -15,7 +15,7 @@ export type PresentationBoxProps = {
   stream?: MediaStreamWithType | null;
   fallbackContent: React.ReactNode;
   isError?: boolean;
-  isLocalUserPresentationOwner: boolean;
+  isLocalUserPresentationOwner?: boolean;
   backgroundColor?: ColorKey;
   style?: React.CSSProperties;
   testID?: string;

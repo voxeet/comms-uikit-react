@@ -2,7 +2,7 @@ type ErrorWithMessage = {
   message: string;
 };
 
-const isErrorWithMessage = (error: unknown): error is ErrorWithMessage => {
+export const isErrorWithMessage = (error: unknown): error is ErrorWithMessage => {
   return (
     typeof error === 'object' &&
     error !== null &&
@@ -11,11 +11,11 @@ const isErrorWithMessage = (error: unknown): error is ErrorWithMessage => {
   );
 };
 
-function toErrorWithMessage(maybeError: unknown): ErrorWithMessage {
+export function toErrorWithMessage(maybeError: unknown): ErrorWithMessage {
   if (isErrorWithMessage(maybeError)) return maybeError;
 
   try {
-    return new Error(JSON.stringify(maybeError));
+    return new Error(typeof maybeError === 'string' ? maybeError : JSON.stringify(maybeError));
   } catch {
     return new Error(String(maybeError));
   }

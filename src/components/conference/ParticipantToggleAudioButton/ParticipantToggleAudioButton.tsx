@@ -12,8 +12,8 @@ export const ParticipantToggleAudioButton = ({
   participant,
   size = 'm',
   tooltipPosition = 'top',
-  activeIcon = 'speaker',
-  inactiveIcon = 'speakerOff',
+  defaultIcon = 'speaker',
+  activeIcon = 'speakerOff',
   disabledIcon = 'speakerOff',
   testID = 'ParticipantToggleAudioButton',
   ...rest
@@ -21,7 +21,7 @@ export const ParticipantToggleAudioButton = ({
   const { participantsStatus } = useParticipants();
   const { startParticipantAudio, stopParticipantAudio } = useAudio();
 
-  const { isLocalAudio, isRemoteAudio } = participantsStatus[participant.id] || {};
+  const { isLocalAudio } = participantsStatus[participant.id] || {};
 
   const handleToggleAudio = async () => {
     if (isLocalAudio) {
@@ -34,11 +34,10 @@ export const ParticipantToggleAudioButton = ({
   return (
     <MediaButton
       tooltipPosition={tooltipPosition}
+      defaultIcon={defaultIcon}
       activeIcon={activeIcon}
-      inactiveIcon={inactiveIcon}
       disabledIcon={disabledIcon}
-      isActive={isLocalAudio}
-      isDisabled={!isRemoteAudio || !participant}
+      isActive={!isLocalAudio}
       onClick={handleToggleAudio}
       size={size}
       testID={testID}

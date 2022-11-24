@@ -1,29 +1,45 @@
 import { Status } from '../../../hooks/types/misc';
+import { ScreenShareTakeoverMessages } from '../../../hooks/types/ScreenShare';
 import { fireEvent, render, waitFor } from '../../../utils/tests/test-utils';
 
 import ScreenShareButton from './ScreenShareButton';
 
+const defaultText = 'Present';
 const activeText = 'Stop present';
-const inactiveText = 'Present';
 const testID = 'testID';
 const testPropID = 'testProp';
 
 const actionMock = jest.fn();
-const setSharingErrorsMock = jest.fn();
+const setSharingErrors = jest.fn();
+const startScreenShare = jest.fn(() => true);
+const setPendingTakeoverRequest = jest.fn(() => true);
 
 let status = Status.Active;
 let isLocalUserPresentationOwner = false;
 let sharingInProgressError = false;
+let isLackOfBrowserPermissions = false;
+let isPendingTakeoverRequest = false;
+let message: Record<string, unknown> | null = null;
 
 jest.mock('../../../hooks/useScreenSharing', () => {
   return jest.fn(() => ({
     ...jest.requireActual('../../../hooks/useScreenSharing'),
     status,
     stopScreenShare: jest.fn(() => true),
-    startScreenShare: jest.fn(() => true),
+    startScreenShare,
     isLocalUserPresentationOwner,
     sharingInProgressError,
-    setSharingErrors: setSharingErrorsMock,
+    setSharingErrors,
+    isLackOfBrowserPermissions,
+    isPendingTakeoverRequest,
+    setPendingTakeoverRequest,
+  }));
+});
+
+jest.mock('../../../hooks/useMessage', () => {
+  return jest.fn(() => ({
+    ...jest.requireActual('../../../hooks/useMessage'),
+    message,
   }));
 });
 
@@ -41,19 +57,21 @@ beforeEach(() => {
   jest.clearAllMocks();
   status = Status.Active;
   isLocalUserPresentationOwner = false;
+  isLackOfBrowserPermissions = false;
+  isPendingTakeoverRequest = false;
 });
 
-const props = { testID, activeTooltipText: activeText, inactiveTooltipText: inactiveText };
+const props = { testID, defaultTooltipText: defaultText, activeTooltipText: activeText };
 
 describe('ScreenShareButton component', () => {
   test('Passes TestID', () => {
     const { getByTestId } = render(<ScreenShareButton {...props} />);
     expect(getByTestId(testID)).not.toBeNull();
   });
-  test('Displays stop present text props', () => {
+  test('Displays start present text props', () => {
     const { getByText } = render(<ScreenShareButton {...props} />);
 
-    expect(getByText(activeText)).not.toBeNull();
+    expect(getByText(defaultText)).not.toBeNull();
   });
   test('it invokes stop callback action', async () => {
     isLocalUserPresentationOwner = true;
@@ -83,6 +101,37 @@ describe('ScreenShareButton component', () => {
     expect(renderPropComponent).toBeInTheDocument();
     const button = renderPropComponent.getElementsByTagName('button')[0];
     fireEvent.click(button);
-    await waitFor(() => expect(setSharingErrorsMock).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(setSharingErrors).toHaveBeenCalledTimes(1));
+  });
+  test('Should properly handle lack of permissions', async () => {
+    isLackOfBrowserPermissions = true;
+    render(
+      <ScreenShareButton
+        {...props}
+        onLackOfBrowserPermissions={actionMock}
+        renderTakeOver={(flag, callback) => <RenderProp flag={flag} callback={callback} />}
+      />,
+    );
+    await waitFor(() => {
+      expect(actionMock).toHaveBeenCalledTimes(1);
+    });
+  });
+  test('Should properly handle presentation takeover response', async () => {
+    isPendingTakeoverRequest = true;
+    message = {
+      text: ScreenShareTakeoverMessages.ACCEPT,
+    };
+    status = Status.Other;
+    render(
+      <ScreenShareButton
+        {...props}
+        onStartSharingAction={actionMock}
+        renderTakeOver={(flag, callback) => <RenderProp flag={flag} callback={callback} />}
+      />,
+    );
+    await waitFor(() => {
+      expect(startScreenShare).toHaveBeenCalledTimes(1);
+      expect(actionMock).toHaveBeenCalledTimes(1);
+    });
   });
 });

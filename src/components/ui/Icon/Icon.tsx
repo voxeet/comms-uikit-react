@@ -36,7 +36,11 @@ const Icon = ({ name, color, colorTone = 'default', size = 'm', testID, ...props
   }, [color, colorTone, theme]);
 
   return (
-    <Space testID={testID} className={cx(styles.icon, styles[`size-${size}`])} {...props}>
+    <Space
+      testID={testID}
+      className={cx(styles.icon, styles[`size-${size}`], { [styles.clickable]: !!props.onClick })}
+      {...props}
+    >
       <IconSVG testID="icon" fill={handleFillColor} />
     </Space>
   );

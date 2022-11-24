@@ -696,6 +696,7 @@ If you would like to connect to the Dolby.io Communications APIs using your own 
 | [useCamera](documentation/hooks/useCamera.md)               | Lists and selects available cameras, in addition to requesting camera permissions from the user.         |
 | [useConference](documentation/hooks/useConference.md)       | Enables creating, joining or leaving conferences.                                                        |
 | [useErrors](documentation/hooks/useErrors.md)               | Expose errors and methods to remove handled ones.                                                        |
+| [useLiveStreaming](documentation/hooks/useLiveStreaming.md) | Gathers functions responsible for managing live streaming.                                               |
 | [useLogger](documentation/hooks/useLogger.md)               | Exposes function to create logs with specific log type.                                                  |
 | [useMessage](documentation/hooks/useMessage.md)             | Gathers functions responsible for managing messages.                                                     |
 | [useMicrophone](documentation/hooks/useMicrophone.md)       | Lists and selects available microphones, in addition to requesting microphone permissions from the user. |

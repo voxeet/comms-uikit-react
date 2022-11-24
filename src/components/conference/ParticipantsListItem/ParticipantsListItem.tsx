@@ -65,13 +65,13 @@ const ParticipantsListItem = ({
         <Space className={styles.actionsSection}>
           <Space className={styles.actionButton}>
             {isLocal ? (
-              <LocalToggleAudioButton size="s" activeTooltipText={muteText} inactiveTooltipText={unmuteText} />
+              <LocalToggleAudioButton size="s" defaultTooltipText={muteText} activeTooltipText={unmuteText} />
             ) : (
               <ParticipantToggleAudioButton
                 size="s"
                 participant={participant}
-                activeTooltipText={soundOffText}
-                inactiveTooltipText={soundOnText}
+                defaultTooltipText={soundOffText}
+                activeTooltipText={soundOnText}
               />
             )}
           </Space>
@@ -82,8 +82,8 @@ const ParticipantsListItem = ({
               <ParticipantToggleVideoButton
                 size="s"
                 participant={participant}
-                activeTooltipText={intl.formatMessage({ id: 'videoOff' })}
-                inactiveTooltipText={intl.formatMessage({ id: 'videoOn' })}
+                defaultTooltipText={intl.formatMessage({ id: 'videoOff' })}
+                activeTooltipText={intl.formatMessage({ id: 'videoOn' })}
               />
             )}
           </Space> */}

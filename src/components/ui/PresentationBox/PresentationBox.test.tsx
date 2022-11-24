@@ -75,7 +75,6 @@ describe('PresentationBox component', () => {
           testID={testID}
           stream={undefined}
           fallbackContent={testFallbackContent}
-          isLocalUserPresentationOwner={false}
           isError
           backgroundColor={backgroundColor}
         />

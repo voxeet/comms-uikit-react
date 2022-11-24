@@ -3,8 +3,8 @@ import { fireEvent, render, waitFor } from '../../../utils/tests/test-utils';
 
 import ParticipantToggleVideoButton from './ParticipantToggleVideoButton';
 
-const activeText = 'Camera off';
-const inactiveText = 'Camera on';
+const defaultText = 'Camera off';
+const activeText = 'Camera on';
 const testID = 'testID';
 
 const remoteParticipant = createParticipant({ name: 'Remote', id: 'Remote' });
@@ -17,8 +17,8 @@ describe('ParticipantToggleVideoButton component', () => {
       <ParticipantToggleVideoButton
         testID={testID}
         participant={remoteParticipant}
+        defaultTooltipText={defaultText}
         activeTooltipText={activeText}
-        inactiveTooltipText={inactiveText}
       />,
     );
     await waitFor(() => {
@@ -30,8 +30,8 @@ describe('ParticipantToggleVideoButton component', () => {
       <ParticipantToggleVideoButton
         testID={testID}
         participant={remoteParticipant}
+        defaultTooltipText={defaultText}
         activeTooltipText={activeText}
-        inactiveTooltipText={inactiveText}
       />,
       {
         commsProps: {
@@ -44,7 +44,7 @@ describe('ParticipantToggleVideoButton component', () => {
       },
     );
     await waitFor(() => {
-      expect(getByText(activeText)).not.toBeNull();
+      expect(getByText(defaultText)).not.toBeNull();
     });
   });
   test('Displays Camera on text props', async () => {
@@ -52,8 +52,8 @@ describe('ParticipantToggleVideoButton component', () => {
       <ParticipantToggleVideoButton
         testID={testID}
         participant={remoteParticipant}
+        defaultTooltipText={defaultText}
         activeTooltipText={activeText}
-        inactiveTooltipText={inactiveText}
       />,
       {
         commsProps: {
@@ -66,7 +66,7 @@ describe('ParticipantToggleVideoButton component', () => {
       },
     );
     await waitFor(() => {
-      expect(getByText(inactiveText)).not.toBeNull();
+      expect(getByText(activeText)).not.toBeNull();
     });
   });
 
@@ -77,8 +77,8 @@ describe('ParticipantToggleVideoButton component', () => {
       <ParticipantToggleVideoButton
         testID={testID}
         participant={remoteParticipant}
+        defaultTooltipText={defaultText}
         activeTooltipText={activeText}
-        inactiveTooltipText={inactiveText}
       />,
       {
         commsProps: {
@@ -105,8 +105,8 @@ describe('ParticipantToggleVideoButton component', () => {
       <ParticipantToggleVideoButton
         testID={testID}
         participant={remoteParticipant}
+        defaultTooltipText={defaultText}
         activeTooltipText={activeText}
-        inactiveTooltipText={inactiveText}
       />,
       {
         commsProps: {

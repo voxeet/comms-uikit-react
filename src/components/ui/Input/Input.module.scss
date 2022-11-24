@@ -8,14 +8,17 @@
   position: absolute;
   left: 16px;
   transform: translateY(-50%);
+  & .labelText {
+    user-select: none;
+  }
 }
 
 .input {
   display: block;
   border-radius: 10px;
   border: 2px solid;
-  padding: 12px;
-  padding-right: 36px;
+  padding: 12px 36px 12px 12px;
+  background-color: inherit;
   box-sizing: border-box;
   width: 100%;
   font-size: 16px;
@@ -23,6 +26,9 @@
   &:focus-visible {
     border-color: #aa33ff;
     outline: inherit;
+  }
+  &.securePadding{
+    padding: 12px 64px 12px 12px;
   }
 }
 
@@ -36,4 +42,14 @@
   right: 14px;
   top: 50%;
   transform: translateY(-50%);
+}
+
+.actions {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }

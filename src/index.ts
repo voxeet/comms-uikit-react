@@ -20,6 +20,7 @@ export { default as useErrors } from './hooks/useErrors';
 export { default as useLogger } from './hooks/useLogger';
 export { default as useBlur } from './hooks/useBlur';
 export { default as useRecording } from './hooks/useRecording';
+export { default as useLiveStreaming } from './hooks/useLiveStreaming';
 
 // Components - UI
 export { default as Avatar } from './components/ui/Avatar/Avatar';
@@ -86,11 +87,13 @@ export { default as ParticipantsListItem } from './components/conference/Partici
 export { default as ConferenceName } from './components/conference/ConferenceName/ConferenceName';
 export { default as ScreenSharingActionBar } from './components/conference/ScreenSharingActionBar/ScreenSharingActionBar';
 export { default as RecordingActionBar } from './components/conference/RecordingActionBar/RecordingActionBar';
+export { default as LiveStreamingActionBar } from './components/conference/LiveStreamingActionBar/LiveStreamingActionBar';
 export { default as ScreenShareButton } from './components/conference/ScreenShareButton/ScreenShareButton';
 export { default as ScreenSharingPresentationBox } from './components/conference/ScreenSharingPresentationBox/ScreenSharingPresentationBox';
 export { default as Modal } from './components/ui/Modal/Modal';
 export { default as RecordButton } from './components/conference/RecordButton/RecordButton';
 export { default as BlurButton } from './components/conference/BlurButton/BlurButton';
+export { default as LiveStreamButton } from './components/conference/LiveStreamButton/LiveStreamButton';
 
 // Themes
 
@@ -110,6 +113,7 @@ export { Status as GenericStatus } from './hooks/types/misc';
 export { Status as ShareStatus } from './hooks/types/misc';
 export { Status as RecordingStatus } from './hooks/types/misc';
 export { ScreenShareTakeoverMessages } from './hooks/types/ScreenShare';
+export type { LiveStreamProvider } from './hooks/types/LiveStreaming';
 export { ErrorCodes } from './providers/CommsProvider';
 export type { IconComponentName } from './components/ui/Icon/IconComponents';
 export type { VideoViewProps } from './components/conference/VideoLocalView/VideoLocalView';

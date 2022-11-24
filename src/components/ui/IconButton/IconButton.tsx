@@ -24,7 +24,7 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
   size?: Extract<Sizes, 'xxs' | 'xs' | 's' | 'm' | 'l'>;
   disabled?: boolean;
   icon: IconComponentName;
-  onClick: () => void;
+  onClick?: () => void;
   testID?: string;
   style?: React.CSSProperties;
 }
@@ -71,7 +71,7 @@ const IconButton = ({
       if (backgroundColor) color = getColor(backgroundColor as string);
       if ((isHovered && !disabled && isDesktop) || (isTouched && !disabled && !isDesktop))
         color = Color(color).lighten(0.2).hex();
-      else color = getColor(backgroundColor as string, 'grey.800');
+      else color = getColor(backgroundColor as string, 'grey.600');
     }
 
     if (
@@ -130,7 +130,7 @@ const IconButton = ({
       )}
       style={{
         background: handleBackgroundColor,
-        border: `1px solid ${strokeColor ? getColor(strokeColor) : 'transparent'}`,
+        border: `2px solid ${strokeColor ? getColor(strokeColor) : 'transparent'}`,
         borderRadius: variant === 'circle' ? '100%' : `${theme.borderRadius}px`,
         ...style,
       }}

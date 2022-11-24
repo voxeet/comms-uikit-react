@@ -24,7 +24,7 @@ const ParticipantsGridItem = React.memo(({ participant, localText }: Participant
   const { getColor, isMobileSmall, isMobile } = useTheme();
   const { addIsSpeakingListener, participantsStatus } = useParticipants();
 
-  const { isSpeaking, isRemoteAudio, isLocalAudio, isLocal } = participantsStatus[participant.id] || {};
+  const { isSpeaking, isRemoteAudio, isLocal, isLocalAudio } = participantsStatus[participant.id] || {};
 
   const isSmartphone = isMobileSmall || isMobile;
 
@@ -41,7 +41,7 @@ const ParticipantsGridItem = React.memo(({ participant, localText }: Participant
       css={{
         '&:after': {
           display: isSpeaking ? 'block' : 'none',
-          borderColor: isSpeaking && isRemoteAudio && isLocalAudio ? getColor('purple.400') : getColor('transparent'),
+          borderColor: isSpeaking && isRemoteAudio ? getColor('purple.400') : getColor('transparent'),
         },
       }}
     >
@@ -69,6 +69,7 @@ const ParticipantsGridItem = React.memo(({ participant, localText }: Participant
           />
         </Space>
       )}
+
       <Space className={styles.talking}>
         {isLocal ? (
           <LocalSpeakingIndicator testID="LocalSpeakingIndicator" />

@@ -31,9 +31,9 @@ const ParticipantSpeakingIndicator = ({
 
   if (!participant) return null;
 
-  const { isSpeaking, isLocalAudio, isRemoteAudio } = participantsStatus[participant.id] || {};
+  const { isSpeaking, isRemoteAudio } = participantsStatus[participant.id] || {};
 
-  if (!isLocalAudio || !isRemoteAudio) {
+  if (!isRemoteAudio) {
     return (
       <IconIndicator
         testID={`${testID}-muted`}

@@ -18,8 +18,8 @@ const RecordButton = ({
   onStartRecordingAction,
   onError,
   tooltipPosition = 'top',
+  defaultIcon = 'record',
   activeIcon = 'record',
-  inactiveIcon = 'record',
   disabledIcon = 'record',
   renderStartConfirmation,
   renderStopConfirmation,
@@ -90,9 +90,9 @@ const RecordButton = ({
     let isActive;
 
     if (status === RecordingStatus.Active || isRecordingModeActive) {
-      isActive = !isLocalUserRecordingOwner;
+      isActive = isLocalUserRecordingOwner;
     } else {
-      isActive = true;
+      isActive = false;
     }
 
     return isActive;
@@ -102,8 +102,8 @@ const RecordButton = ({
     <>
       <MediaButton
         tooltipPosition={tooltipPosition}
+        defaultIcon={defaultIcon}
         activeIcon={activeIcon}
-        inactiveIcon={inactiveIcon}
         disabledIcon={disabledIcon}
         isActive={isButtonActive}
         isDisabled={status === RecordingStatus.Active && !isLocalUserRecordingOwner}

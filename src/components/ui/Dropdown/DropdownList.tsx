@@ -10,12 +10,22 @@ import useDropdown from './useDropdown';
 export type DropdownListProps = {
   backgroundColor?: ColorKey;
   color?: ColorKey;
+  iconColor?: ColorKey;
+  hoverColor?: ColorKey;
   options: DropdownOptionType[];
   onChange: (value: DropdownOptionType) => void;
   testID?: string;
 };
 
-const DropdownList = ({ backgroundColor, color, options, onChange, testID }: DropdownListProps) => {
+const DropdownList = ({
+  backgroundColor,
+  color,
+  options,
+  onChange,
+  iconColor = 'grey.300',
+  hoverColor = 'grey.50',
+  testID,
+}: DropdownListProps) => {
   const { isOpen, setIsOpen, selected } = useDropdown();
   const { getColor } = useTheme();
   const handleOnChange = (item: DropdownOptionType) => {
@@ -49,8 +59,10 @@ const DropdownList = ({ backgroundColor, color, options, onChange, testID }: Dro
               isActive={selected?.value === option.value}
               option={option}
               key={option.value}
+              hoverColor={hoverColor}
               onChange={handleOnChange}
               color={color}
+              iconColor={iconColor}
             />
           ))}
         </Space>

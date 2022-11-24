@@ -14,6 +14,7 @@ type DropdownOptionProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, '
   isActive: boolean;
   color?: ColorKey;
   iconColor?: ColorKey;
+  hoverColor?: ColorKey;
   onChange: DropdownListProps['onChange'];
   testID?: string;
   option: DropdownOptionType;
@@ -24,6 +25,7 @@ export const DropdownOption = ({
   isActive,
   color,
   iconColor,
+  hoverColor = 'grey.50',
   onChange,
   testID,
   ...props
@@ -39,7 +41,7 @@ export const DropdownOption = ({
         border: 'none',
         height: 48,
         '&:hover': {
-          backgroundColor: getColor('grey.50'),
+          backgroundColor: getColor(hoverColor),
         },
       }}
       onClick={() => onChange(option)}

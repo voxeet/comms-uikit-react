@@ -20,7 +20,7 @@ const Conference = ({ alias, id, audio = false, video = false, liveRecording = f
     leaveConference,
   } = useConference();
 
-  const timeout: { current: NodeJS.Timeout | null } = useRef(null);
+  const timeout: { current: ReturnType<typeof setTimeout> | null } = useRef(null);
 
   useEffect(() => {
     timeout.current = setTimeout(async () => {

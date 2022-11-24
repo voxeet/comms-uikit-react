@@ -9,8 +9,8 @@ type BlurButtonProps = Partial<Omit<MediaButtonProps, 'onClick' | 'isActive' | '
 const BlurButton = ({
   size = 'm',
   tooltipPosition = 'top',
+  defaultIcon = 'backgroundBlur',
   activeIcon = 'backgroundBlur',
-  inactiveIcon = 'backgroundBlur',
   disabledIcon = 'backgroundBlur',
   testID = 'BlurButton',
   ...rest
@@ -46,10 +46,10 @@ const BlurButton = ({
     return (
       <MediaButton
         tooltipPosition={tooltipPosition}
+        defaultIcon={defaultIcon}
         activeIcon={activeIcon}
-        inactiveIcon={inactiveIcon}
         disabledIcon={disabledIcon}
-        isActive={!isBlurred}
+        isActive={isBlurred}
         isDisabled={!isVideo}
         onClick={handleBlur}
         size={size}

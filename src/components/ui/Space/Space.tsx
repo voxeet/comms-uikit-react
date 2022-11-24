@@ -3,27 +3,30 @@ import { useMemo } from 'react';
 import useTheme from '../../../hooks/useTheme';
 import type { SpaceValues } from '../../../theme/types';
 
+type Falsy = null | false;
+type BoolCastableSpaceValues = Falsy | SpaceValues;
+
 type SpaceProps = React.HTMLAttributes<HTMLDivElement> & {
   testID?: string;
-  fw?: boolean;
-  fh?: boolean;
+  fw?: boolean | null;
+  fh?: boolean | null;
   style?: React.CSSProperties;
   tag?: 'div' | 'span' | 'p';
   children?: React.ReactNode;
-  m?: SpaceValues;
-  mv?: SpaceValues;
-  mh?: SpaceValues;
-  mt?: SpaceValues;
-  mr?: SpaceValues;
-  mb?: SpaceValues;
-  ml?: SpaceValues;
-  p?: SpaceValues;
-  pv?: SpaceValues;
-  ph?: SpaceValues;
-  pt?: SpaceValues;
-  pr?: SpaceValues;
-  pb?: SpaceValues;
-  pl?: SpaceValues;
+  m?: BoolCastableSpaceValues;
+  mv?: BoolCastableSpaceValues;
+  mh?: BoolCastableSpaceValues;
+  mt?: BoolCastableSpaceValues;
+  mr?: BoolCastableSpaceValues;
+  mb?: BoolCastableSpaceValues;
+  ml?: BoolCastableSpaceValues;
+  p?: BoolCastableSpaceValues;
+  pv?: BoolCastableSpaceValues;
+  ph?: BoolCastableSpaceValues;
+  pt?: BoolCastableSpaceValues;
+  pr?: BoolCastableSpaceValues;
+  pb?: BoolCastableSpaceValues;
+  pl?: BoolCastableSpaceValues;
 };
 
 const Space = ({
@@ -60,7 +63,7 @@ const Space = ({
     if (m) {
       marginTop = spaces[`${m}`];
     } else if (mv) {
-      marginTop = spaces[`${mv}`];
+      marginTop = spaces[`${mv as SpaceValues}`];
     } else if (mt) {
       marginTop = spaces[`${mt}`];
     }

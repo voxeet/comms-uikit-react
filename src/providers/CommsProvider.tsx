@@ -6,14 +6,15 @@ import type { MediaStreamWithType } from '@voxeet/voxeet-web-sdk/types/models/Me
 import type { JoinOptions, ParticipantInfo } from '@voxeet/voxeet-web-sdk/types/models/Options';
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
 import type Recording from '@voxeet/voxeet-web-sdk/types/models/Recording';
-import React, { createContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
+import React, { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { BlockedAudioState } from '../hooks/types/Audio';
+import type { LiveStreamProvider } from '../hooks/types/LiveStreaming';
+import { LiveStreamingMessages } from '../hooks/types/LiveStreaming';
 import { LogLevel } from '../hooks/types/Logger';
 import { Status } from '../hooks/types/misc';
 import type { Notification, NotificationBase } from '../hooks/types/Notifications';
 import type { ParticipantStatus } from '../hooks/types/Participants';
-import type { ScreenShare } from '../hooks/types/ScreenShare';
 import useLogger from '../hooks/useLogger';
 import commandService from '../services/command';
 import conferenceService from '../services/conference';
@@ -33,17 +34,12 @@ dioWindow.dolbyio = {
   isInitialized: false,
 };
 
-type ScreenShareStatusType = {
+type ScreenSharingDataType = {
   owner: Participant | null;
   stream: MediaStreamWithType | null;
-  status: ScreenShare['status'];
+  status: Status;
   isPendingTakeoverRequest: boolean;
   isPresentationModeActive: boolean;
-};
-
-type MessageData = {
-  sender: Participant | null;
-  message: string | null;
 };
 
 type RecordingDataType = {
@@ -51,6 +47,43 @@ type RecordingDataType = {
   timestamp: number | null;
   status: Status;
   isRecordingModeActive: boolean;
+};
+
+type LiveStreamingDataType = {
+  owner: Participant | null;
+  timestamp: number | null;
+  status: Status;
+  isLiveStreamingModeActive: boolean;
+  provider: LiveStreamProvider;
+  rtmp?: string;
+};
+
+type MessageData = {
+  sender: Participant | null;
+  message: Record<string, unknown> | null;
+};
+
+const initialScreenSharingData: ScreenSharingDataType = {
+  owner: null,
+  stream: null,
+  status: Status.Other,
+  isPendingTakeoverRequest: false,
+  isPresentationModeActive: false,
+};
+
+const initialRecordingData: RecordingDataType = {
+  ownerId: null,
+  timestamp: null,
+  status: Status.Other,
+  isRecordingModeActive: false,
+};
+
+const initialLiveStreamingData: LiveStreamingDataType = {
+  owner: null,
+  timestamp: null,
+  status: Status.Other,
+  isLiveStreamingModeActive: false,
+  provider: null,
 };
 
 export type CommsContextType = {
@@ -95,20 +128,22 @@ export type CommsContextType = {
   toggleMuteParticipants: () => void;
   startScreenShare: () => Promise<boolean>;
   stopScreenShare: () => Promise<void>;
-  screenShareStatus: ScreenShareStatusType;
+  screenSharingData: ScreenSharingDataType;
   recordingData: RecordingDataType;
   setSharingErrors: (error?: ErrorCodes) => void;
   setRecordingErrors: (error?: ErrorCodes) => void;
+  setLiveStreamingErrors: (error?: ErrorCodes) => void;
   showNotification: (notification: NotificationBase) => void;
   notifications: Notification[];
   removeNotification: (notificationId: number) => void;
   screenShareErrorMessages: ErrorCodes[];
   recordingErrorMessages: ErrorCodes[];
-  sendMessage: (message: string) => Promise<void>;
+  liveStreamingErrorMessages: ErrorCodes[];
+  sendMessage: (message: Record<string, unknown>) => Promise<void>;
   messageData: MessageData;
   clearMessage: () => void;
   setPendingTakeoverRequest: (pendingTakeoverRequest: boolean) => void;
-  resetScreenShareStatus: () => void;
+  resetScreenSharingData: () => void;
   resetRecordingData: () => void;
   errors: Errors;
   stopRecording: () => Promise<boolean>;
@@ -122,6 +157,11 @@ export type CommsContextType = {
   stopVideoProcessing: () => void;
   isBlurred: boolean;
   setIsBlurred: React.Dispatch<React.SetStateAction<boolean>>;
+  liveStreamingData: LiveStreamingDataType;
+  setLiveStreamingData: React.Dispatch<React.SetStateAction<LiveStreamingDataType>>;
+  startLiveStreaming: (start: () => Promise<void>, rtmp: string, provider: LiveStreamProvider) => Promise<boolean>;
+  stopLiveStreaming: (stop: () => Promise<void>) => Promise<boolean>;
+  resetLiveStreamingData: () => void;
 };
 
 export type CommsProviderProps = {
@@ -151,6 +191,7 @@ export const CommsContext = createContext<CommsContextType>({} as CommsContextTy
 // We should add some SDK error codes here
 export type Errors = {
   recordingErrors: ErrorCodes[];
+  liveStreamingErrors: ErrorCodes[];
   screenShareErrors: ErrorCodes[];
   sdkErrors: Partial<Record<ErrorCodes, boolean>>;
 };
@@ -175,6 +216,7 @@ export enum ErrorCodes {
  */
 
 const singleParticipantMutedSet = new Set();
+const liveStreamAwareParticipants = new Set();
 
 export const errorMapper = (error: unknown) => {
   const { message } = (error as Error) || { message: '' };
@@ -215,23 +257,14 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
 
   const [blockedAudioState, setBlockedAudioState] = useState<BlockedAudioState>(BlockedAudioState.INACTIVATED);
   const [isPageMuted, setIsPageMuted] = useState(false);
-  const [screenShareStatus, setScreenShareStatus] = useState<ScreenShareStatusType>({
-    owner: null,
-    stream: null,
-    status: Status.Other,
-    isPendingTakeoverRequest: false,
-    isPresentationModeActive: false,
-  });
-  const [recordingData, setRecordingData] = useState<RecordingDataType>({
-    ownerId: null,
-    timestamp: null,
-    status: Status.Other,
-    isRecordingModeActive: false,
-  });
+  const [screenSharingData, setScreenSharingData] = useState<ScreenSharingDataType>(initialScreenSharingData);
+  const [recordingData, setRecordingData] = useState<RecordingDataType>(initialRecordingData);
+  const [liveStreamingData, setLiveStreamingData] = useState<LiveStreamingDataType>(initialLiveStreamingData);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   // We should expand this with specific context errors
   const [errors, setErrors] = useState<Errors>({
     recordingErrors: [],
+    liveStreamingErrors: [],
     screenShareErrors: [],
     sdkErrors: {},
   });
@@ -505,7 +538,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   };
 
   const startScreenShare = async () => {
-    setScreenShareStatus((prev) => ({
+    setScreenSharingData((prev) => ({
       ...prev,
       status: Status.Loading,
     }));
@@ -513,7 +546,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     try {
       await conferenceService.startScreenShare();
 
-      setScreenShareStatus((prev) => ({
+      setScreenSharingData((prev) => ({
         ...prev,
         owner: participant,
         isPresentationModeActive: true,
@@ -525,14 +558,14 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
         setErrors((prev) => ({ ...prev, screenShareErrors: [message, ...prev.screenShareErrors] }));
       }
       if (message === ErrorCodes.LackOfBrowserPermissions || message === ErrorCodes.ScreenShareAutoTakeoverError) {
-        setScreenShareStatus((prev) => ({
+        setScreenSharingData((prev) => ({
           ...prev,
           owner: null,
           status: Status.Other,
           isPresentationModeActive: false,
         }));
       } else {
-        setScreenShareStatus((prev) => ({
+        setScreenSharingData((prev) => ({
           ...prev,
           owner: participant,
           status: Status.Error,
@@ -546,7 +579,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   const stopScreenShare = async () => {
     try {
       await conferenceService.stopScreenShare();
-      setScreenShareStatus((prev) => ({
+      setScreenSharingData((prev) => ({
         ...prev,
         owner: null,
         status: Status.Other,
@@ -614,29 +647,134 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     }
   };
 
-  const resetScreenShareStatus = () => {
-    setScreenShareStatus((prev) => ({
+  // extend start with error types
+  const startLiveStreaming: CommsContextType['startLiveStreaming'] = async (start, rtmp, provider) => {
+    setLiveStreamingData((prev) => ({
       ...prev,
-      stream: null,
-      owner: null,
-      status: Status.Other,
-      isPresentationModeActive: false,
+      status: Status.Loading,
     }));
+    setErrors((prev) => ({ ...prev, liveStreamingErrors: [] }));
+    try {
+      await start();
+      const timestamp = Date.now();
+      if (participant) {
+        setLiveStreamingData((prev) => ({
+          ...prev,
+          owner: participant,
+          isLiveStreamingModeActive: true,
+          status: Status.Active,
+          timestamp,
+          provider,
+          rtmp,
+        }));
+        const startMessage = {
+          text: LiveStreamingMessages.STARTED,
+          timestamp,
+          owner: participant,
+          provider,
+        };
+
+        await sendMessage(startMessage);
+      }
+      return true;
+    } catch (error: any) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      }
+      const { message } = error.data;
+      if (message) {
+        setLiveStreamingErrors(message);
+      }
+
+      setLiveStreamingData((prev) => ({
+        ...prev,
+        owner: participant,
+        status: Status.Error,
+        isLiveStreamingModeActive: true,
+      }));
+      return false;
+    }
+  };
+
+  const stopLiveStreaming: CommsContextType['stopLiveStreaming'] = async (stop) => {
+    setErrors((prev) => ({ ...prev, liveStreamingErrors: [] }));
+    try {
+      await stop();
+      if (participant) {
+        setLiveStreamingData((prev) => ({
+          ...prev,
+          rtmp: undefined,
+          timestamp: null,
+          provider: null,
+          owner: null,
+          isLiveStreamingModeActive: false,
+          status: Status.Other,
+        }));
+      }
+      const stopMessage = {
+        text: LiveStreamingMessages.STOPPED,
+      };
+
+      await sendMessage(stopMessage);
+      liveStreamAwareParticipants.clear();
+      return true;
+    } catch (error: any) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      }
+      const { message: errorMessage } = error.data;
+      const message = errorMapper(errorMessage);
+      if (message) {
+        setLiveStreamingErrors(errorMapper(message));
+      }
+
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    if (messageData.message) {
+      const { text, timestamp, owner, provider, id } = messageData.message;
+      if ((id && id === participant?.id) || !id) {
+        if (text === LiveStreamingMessages.STARTED && timestamp && owner) {
+          setLiveStreamingData(
+            (prev) =>
+              ({
+                ...prev,
+                owner,
+                timestamp,
+                provider,
+                status: Status.Active,
+              } as LiveStreamingDataType),
+          );
+        } else if (text === LiveStreamingMessages.STOPPED) {
+          setLiveStreamingData((prev) => ({
+            ...prev,
+            owner: null,
+            timestamp: null,
+            provider: null,
+            status: Status.Other,
+          }));
+        }
+      }
+    }
+  }, [messageData]);
+
+  const resetScreenSharingData = () => {
+    setScreenSharingData(initialScreenSharingData);
   };
 
   const resetRecordingData = () => {
-    setRecordingData((prev) => ({
-      ...prev,
-      ownerId: null,
-      timestamp: null,
-      status: Status.Other,
-      isRecordingModeActive: false,
-    }));
+    setRecordingData(initialRecordingData);
   };
 
-  const sendMessage = async (message: string) => {
+  const resetLiveStreamingData = () => {
+    setLiveStreamingData(initialLiveStreamingData);
+  };
+
+  const sendMessage = async (message: Record<string, unknown>) => {
     try {
-      await commandService.send(message);
+      await commandService.send(JSON.stringify(message));
     } catch (error) {
       if (error instanceof Error) {
         alert('Send message error!');
@@ -675,19 +813,42 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     setConferenceStatus(status);
   };
 
-  const onParticipantsChange = async (participant: Participant) => {
-    const p = participants.get(participant.id);
+  const onParticipantsChange = async (updatedParticipant: Participant) => {
+    if (['Left', 'Kicked'].includes(updatedParticipant.status)) {
+      liveStreamAwareParticipants.delete(updatedParticipant.id);
+      if (updatedParticipant.id === liveStreamingData.owner?.id && liveStreamingData.status === Status.Active) {
+        resetLiveStreamingData();
+      }
+    }
+    if (
+      liveStreamingData.status === Status.Active &&
+      liveStreamingData.isLiveStreamingModeActive &&
+      !liveStreamAwareParticipants.has(updatedParticipant.id)
+    ) {
+      const { timestamp, provider } = liveStreamingData;
+      const startMessage = {
+        text: LiveStreamingMessages.STARTED,
+        timestamp,
+        owner: participant,
+        provider,
+        id: updatedParticipant.id,
+      };
+
+      sendMessage(startMessage);
+      liveStreamAwareParticipants.add(updatedParticipant.id);
+    }
+    const p = participants.get(updatedParticipant.id);
     setParticipants((participants) => {
       return new Map(
-        participants.set(participant.id, {
+        participants.set(updatedParticipant.id, {
           ...p,
-          ...participant,
-          audioReceivingFrom: participant.audioReceivingFrom,
+          ...updatedParticipant,
+          audioReceivingFrom: updatedParticipant.audioReceivingFrom,
         } as Participant),
       );
     });
     if (!p && isPageMuted) {
-      await stopParticipantAudio(participant, true);
+      await stopParticipantAudio(updatedParticipant, true);
     }
   };
 
@@ -711,7 +872,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     if (stream.type === 'ScreenShare') {
       try {
         setErrors((prev) => ({ ...prev, screenShareErrors: [] }));
-        setScreenShareStatus((prev) => ({
+        setScreenSharingData((prev) => ({
           ...prev,
           owner: participant,
           stream,
@@ -721,7 +882,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       } catch (error) {
         const message = errorMapper(error);
         if (message) setSharingErrors(errorMapper(message));
-        setScreenShareStatus((prev) => ({
+        setScreenSharingData((prev) => ({
           ...prev,
           owner: participant,
           stream,
@@ -735,7 +896,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     if (stream.type === 'ScreenShare') {
       try {
         setErrors((prev) => ({ ...prev, screenShareErrors: [] }));
-        setScreenShareStatus((prev) => ({
+        setScreenSharingData((prev) => ({
           ...prev,
           owner: null,
           stream: null,
@@ -744,7 +905,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       } catch (error) {
         const message = errorMapper(error);
         if (message) setSharingErrors(errorMapper(message));
-        setScreenShareStatus((prev) => ({
+        setScreenSharingData((prev) => ({
           ...prev,
           owner: participant,
           stream,
@@ -772,7 +933,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   };
 
   const setPendingTakeoverRequest = (isPendingTakeoverRequest: boolean) => {
-    setScreenShareStatus((prev) => ({
+    setScreenSharingData((prev) => ({
       ...prev,
       isPendingTakeoverRequest,
     }));
@@ -784,6 +945,10 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
 
   const setRecordingErrors = (errorCode?: ErrorCodes) => {
     setErrors((prev) => ({ ...prev, recordingErrors: errorCode ? [errorCode, ...prev.recordingErrors] : [] }));
+  };
+
+  const setLiveStreamingErrors = (errorCode?: ErrorCodes) => {
+    setErrors((prev) => ({ ...prev, liveStreamingErrors: errorCode ? [errorCode, ...prev.liveStreamingErrors] : [] }));
   };
 
   const removeSdkErrors = (error?: ErrorCodes) => {
@@ -800,7 +965,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   const onMessageReceived = (participant: Participant, message: string) => {
     setMessageData({
       sender: participant,
-      message,
+      message: JSON.parse(message),
     });
   };
 
@@ -830,7 +995,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
 
   useEffect(() => {
     return conferenceService.onParticipantsChange(onParticipantsChange);
-  }, [isPageMuted]);
+  }, [isPageMuted, liveStreamingData]);
 
   const showNotification = (notification: NotificationBase) => {
     const id = Date.now() * Math.random();
@@ -919,9 +1084,10 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       toggleMuteParticipants,
       startScreenShare,
       stopScreenShare,
-      screenShareStatus,
+      screenSharingData,
       setSharingErrors,
       setRecordingErrors,
+      setLiveStreamingErrors,
       showNotification,
       notifications,
       removeNotification,
@@ -931,9 +1097,10 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       setPendingTakeoverRequest,
       screenShareErrorMessages: errors.screenShareErrors,
       recordingErrorMessages: errors.recordingErrors,
+      liveStreamingErrorMessages: errors.liveStreamingErrors,
       errors,
       // For additional errors provide proper pointers
-      resetScreenShareStatus,
+      resetScreenSharingData,
       resetRecordingData,
       removeSdkErrors,
       hasCameraPermission,
@@ -947,6 +1114,11 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       startRecording,
       isBlurred,
       setIsBlurred,
+      liveStreamingData,
+      setLiveStreamingData,
+      stopLiveStreaming,
+      startLiveStreaming,
+      resetLiveStreamingData,
       // For additional errors provide proper pointers
       ...value,
     };
@@ -968,16 +1140,15 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     blockedAudioState,
     isPageMuted,
     toggleMuteParticipants,
-    screenShareStatus,
+    screenSharingData,
     notifications,
     messageData,
     errors,
     hasCameraPermission,
     hasMicrophonePermission,
-    startBackgroundBlur,
-    stopVideoProcessing,
     recordingData,
     isBlurred,
+    liveStreamingData,
   ]);
 
   return (

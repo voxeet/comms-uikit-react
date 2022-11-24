@@ -7,15 +7,23 @@ export type DeviceInfoToOptionsArguments = {
   local: string | null | undefined;
   renderLabel?(label: string): React.ReactNode;
   icon?: IconComponentName;
+  defaultDeviceLabel?: string;
 };
 
-export const deviceInfoToOptions = ({ data, local, renderLabel, icon }: DeviceInfoToOptionsArguments) => {
+export const deviceInfoToOptions = ({
+  data,
+  local,
+  renderLabel,
+  icon,
+  defaultDeviceLabel = '',
+}: DeviceInfoToOptionsArguments) => {
   let defaultDevice: DropdownOptionType | null = null;
   const options: Array<DropdownOptionType & { info: MediaDeviceInfo }> = [];
   data.forEach((item) => {
+    const label = item.label.length ? item.label : defaultDeviceLabel;
     const option = {
       value: item.deviceId,
-      label: renderLabel ? renderLabel(item.label) : item.label,
+      label: renderLabel ? renderLabel(label) : label,
       info: item,
       icon,
     };

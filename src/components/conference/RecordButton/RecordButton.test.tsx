@@ -3,8 +3,8 @@ import { fireEvent, render, waitFor } from '../../../utils/tests/test-utils';
 
 import RecordButton from './RecordButton';
 
-const activeText = 'Record';
-const inactiveText = 'Stop recording';
+const defaultText = 'Record';
+const activeText = 'Stop recording';
 const testID = 'testID';
 const testPropID = 'testProp';
 
@@ -41,7 +41,7 @@ beforeEach(() => {
   isLocalUserRecordingOwner = true;
 });
 
-const props = { testID, activeTooltipText: activeText, inactiveTooltipText: inactiveText };
+const props = { testID, defaultTooltipText: defaultText, activeTooltipText: activeText };
 
 describe('RecordButton component', () => {
   test('Passes TestID', () => {
@@ -50,7 +50,7 @@ describe('RecordButton component', () => {
   });
   test('Displays stop recording text props', () => {
     const { getByText } = render(<RecordButton {...props} />);
-    expect(getByText(inactiveText)).not.toBeNull();
+    expect(getByText(activeText)).not.toBeNull();
   });
   test('It invokes stop callback action', async () => {
     const { getByRole } = render(<RecordButton {...props} onStopRecordingAction={actionMock} />);
