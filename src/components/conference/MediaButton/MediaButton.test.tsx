@@ -7,12 +7,12 @@ import { render } from '../../../utils/tests/test-utils';
 import MediaButton from './MediaButton';
 
 const testID = 'testID';
-const activeTestIcon = 'microphone';
-const inactiveTestIcon = 'microphoneOff';
+const defaultTestIcon = 'microphone';
+const activeTestIcon = 'microphoneOff';
 const disabledTestIcon = 'microphoneOff';
-const customInactiveBackgroundColor = 'primary.500';
-const customInactiveIconColor = 'secondary.500';
-const customInactiveStrokeColor = 'secondary.500';
+const customActiveBackgroundColor = 'primary.500';
+const customActiveIconColor = 'secondary.500';
+const customActiveStrokeColor = 'secondary.500';
 
 const mockOnClick = jest.fn();
 
@@ -23,8 +23,8 @@ describe('MediaButton component', () => {
     const { getByTestId } = render(
       <MediaButton
         testID={testID}
+        defaultIcon={defaultTestIcon}
         activeIcon={activeTestIcon}
-        inactiveIcon={inactiveTestIcon}
         disabledIcon={disabledTestIcon}
         onClick={mockOnClick}
         isActive
@@ -33,15 +33,15 @@ describe('MediaButton component', () => {
     );
     expect(getByTestId(testID)).not.toBeNull();
   });
-  test('Should render with default styles in active state', () => {
+  test('Should render with default styles in default state', () => {
     const { getByTestId } = render(
       <MediaButton
         testID={testID}
+        defaultIcon={defaultTestIcon}
         activeIcon={activeTestIcon}
-        inactiveIcon={inactiveTestIcon}
         disabledIcon={disabledTestIcon}
         onClick={mockOnClick}
-        isActive
+        isActive={false}
         isDisabled={false}
       />,
     );
@@ -51,18 +51,18 @@ describe('MediaButton component', () => {
     expect(element).toHaveStyle(`border-color: ${colors.transparent}`);
     expect(iconElement).toHaveAttribute('fill', colors.white);
   });
-  test('Should render with custom styles in inactive state', () => {
+  test('Should render with custom styles in active state', () => {
     const { getByTestId } = render(
       <MediaButton
         testID={testID}
+        defaultIcon={defaultTestIcon}
         activeIcon={activeTestIcon}
-        inactiveIcon={inactiveTestIcon}
         disabledIcon={disabledTestIcon}
-        inactiveBackgroundColor={customInactiveBackgroundColor}
-        inactiveIconColor={customInactiveIconColor}
-        inactiveStrokeColor={customInactiveStrokeColor}
+        activeBackgroundColor={customActiveBackgroundColor}
+        activeIconColor={customActiveIconColor}
+        activeStrokeColor={customActiveStrokeColor}
         onClick={mockOnClick}
-        isActive={false}
+        isActive
         isDisabled={false}
       />,
     );
@@ -76,8 +76,8 @@ describe('MediaButton component', () => {
     const { getByTestId } = render(
       <MediaButton
         testID={testID}
+        defaultIcon={defaultTestIcon}
         activeIcon={activeTestIcon}
-        inactiveIcon={inactiveTestIcon}
         disabledIcon={disabledTestIcon}
         onClick={mockOnClick}
         isActive={false}
@@ -92,8 +92,8 @@ describe('MediaButton component', () => {
     const { getByTestId } = render(
       <MediaButton
         testID={testID}
+        defaultIcon={defaultTestIcon}
         activeIcon={activeTestIcon}
-        inactiveIcon={inactiveTestIcon}
         disabledIcon={disabledTestIcon}
         onClick={mockOnClick}
         isActive

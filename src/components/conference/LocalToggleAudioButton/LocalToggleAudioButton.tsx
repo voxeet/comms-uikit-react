@@ -10,8 +10,8 @@ type LocalToggleAudioButtonProps = Partial<Omit<MediaButtonProps, 'onClick' | 'i
 const LocalToggleAudioButton = ({
   size = 'm',
   tooltipPosition = 'top',
-  activeIcon = 'microphone',
-  inactiveIcon = 'microphoneOff',
+  defaultIcon = 'microphone',
+  activeIcon = 'microphoneOff',
   disabledIcon = 'microphoneOff',
   testID = 'LocalToggleAudioButton',
   ...rest
@@ -36,10 +36,10 @@ const LocalToggleAudioButton = ({
   return (
     <MediaButton
       tooltipPosition={tooltipPosition}
+      defaultIcon={defaultIcon}
       activeIcon={activeIcon}
-      inactiveIcon={inactiveIcon}
       disabledIcon={disabledIcon}
-      isActive={isAudio}
+      isActive={!isAudio}
       isDisabled={!isMicrophonePermission || !participant}
       onClick={toggleAudio}
       size={size}

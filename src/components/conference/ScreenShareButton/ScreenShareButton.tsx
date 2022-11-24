@@ -23,8 +23,8 @@ const ScreenShareButton = ({
   onTakeOverDeclineAction,
   onLackOfBrowserPermissions,
   tooltipPosition = 'top',
+  defaultIcon = 'present',
   activeIcon = 'present',
-  inactiveIcon = 'present',
   disabledIcon = 'present',
   renderTakeOver,
   renderHandOver,
@@ -55,7 +55,7 @@ const ScreenShareButton = ({
     if (
       status === ShareStatus.Active &&
       isLocalUserPresentationOwner &&
-      message === ScreenShareTakeoverMessages.REQUEST
+      message?.text === ScreenShareTakeoverMessages.REQUEST
     ) {
       setIsTakeoverRequestVisible(true);
     }
@@ -86,21 +86,25 @@ const ScreenShareButton = ({
 
   const acceptHandOverRequest = async () => {
     await stopScreenShare();
-    await sendMessage(ScreenShareTakeoverMessages.ACCEPT);
+    await sendMessage({
+      text: ScreenShareTakeoverMessages.ACCEPT,
+    });
     onStopSharingAction?.();
     clearMessage();
     setIsTakeoverRequestVisible(false);
   };
 
   const declineHandOverRequest = async () => {
-    await sendMessage(ScreenShareTakeoverMessages.DECLINE);
+    await sendMessage({
+      text: ScreenShareTakeoverMessages.DECLINE,
+    });
     clearMessage();
     setIsTakeoverRequestVisible(false);
   };
 
   const handleTakeoverPresentationResponse = async () => {
     if (isPendingTakeoverRequest) {
-      if (message === ScreenShareTakeoverMessages.ACCEPT) {
+      if (message?.text === ScreenShareTakeoverMessages.ACCEPT) {
         if (status === ShareStatus.Other) {
           setPendingTakeoverRequest(false);
           if (isLackOfBrowserPermissions) {
@@ -112,7 +116,7 @@ const ScreenShareButton = ({
             }
           }
         }
-      } else if (message === ScreenShareTakeoverMessages.DECLINE) {
+      } else if (message?.text === ScreenShareTakeoverMessages.DECLINE) {
         onTakeOverDeclineAction?.();
         setPendingTakeoverRequest(false);
         clearMessage();
@@ -136,9 +140,9 @@ const ScreenShareButton = ({
     let isActive;
 
     if (status === ShareStatus.Active) {
-      isActive = !isLocalUserPresentationOwner;
+      isActive = isLocalUserPresentationOwner;
     } else {
-      isActive = true;
+      isActive = false;
     }
 
     return isActive;
@@ -165,8 +169,8 @@ const ScreenShareButton = ({
     <>
       <MediaButton
         tooltipPosition={tooltipPosition}
+        defaultIcon={defaultIcon}
         activeIcon={activeIcon}
-        inactiveIcon={inactiveIcon}
         disabledIcon={disabledIcon}
         isActive={isButtonActive}
         isDisabled={isPendingTakeoverRequest}

@@ -17,6 +17,9 @@
 .compact {
   flex-grow: 1;
   transition: flex-grow 400ms ease-in-out;
+  &.compactAlignment {
+    justify-content: center;
+  }
 }
 
 .fullWidth {

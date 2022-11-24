@@ -14,4 +14,9 @@ module.exports = {
   },
   verbose: true,
   setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
+  coveragePathIgnorePatterns: [
+    '<rootDir>/src/components/ui/Icon/IconComponents',
+    '<rootDir>/src/services',
+    '<rootDir>/src/providers',
+  ],
 };

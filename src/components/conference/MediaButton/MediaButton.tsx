@@ -12,49 +12,57 @@ import type { TooltipProps } from '../../ui/Tooltip/Tooltip';
 import styles from './MediaButton.module.scss';
 
 export type MediaButtonProps = {
+  transparent?: boolean;
+  defaultBackgroundColor?: ColorKey | [ColorKey, ColorKey];
   activeBackgroundColor?: ColorKey | [ColorKey, ColorKey];
-  inactiveBackgroundColor?: ColorKey | [ColorKey, ColorKey];
   disabledBackgroundColor?: ColorKey | [ColorKey, ColorKey];
+  defaultIconColor?: ColorKey;
   activeIconColor?: ColorKey;
-  inactiveIconColor?: ColorKey;
   disabledIconColor?: ColorKey;
+  defaultStrokeColor?: ColorKey;
   activeStrokeColor?: ColorKey;
-  inactiveStrokeColor?: ColorKey;
   disabledStrokeColor?: ColorKey;
+  defaultIcon: IconComponentName;
   activeIcon: IconComponentName;
-  inactiveIcon: IconComponentName;
   disabledIcon: IconComponentName;
+  defaultTooltipText?: string;
   activeTooltipText?: string;
-  inactiveTooltipText?: string;
   tooltipPosition?: TooltipProps['position'];
+  badge?: string | number | boolean;
+  badgeColor?: ColorKey;
   isActive: boolean;
-  isDisabled: boolean;
+  isDisabled?: boolean;
   size?: 's' | 'm' | 'l';
   onClick: () => void;
   testID?: string;
+  style?: React.CSSProperties;
 };
 
 const MediaButton = ({
-  activeBackgroundColor = 'grey.600',
-  inactiveBackgroundColor = 'white',
+  transparent = false,
+  defaultBackgroundColor = 'grey.600',
+  activeBackgroundColor = 'white',
   disabledBackgroundColor = 'grey.800',
-  activeIconColor = 'white',
-  inactiveIconColor = 'primary.500',
+  defaultIconColor = 'white',
+  activeIconColor = 'primary.500',
   disabledIconColor = 'grey.300',
+  defaultStrokeColor = 'transparent',
   activeStrokeColor = 'transparent',
-  inactiveStrokeColor = 'transparent',
   disabledStrokeColor = 'transparent',
+  defaultIcon,
   activeIcon,
-  inactiveIcon,
   disabledIcon,
+  defaultTooltipText = '',
   activeTooltipText = '',
-  inactiveTooltipText = '',
   tooltipPosition = 'top',
+  badge = false,
+  badgeColor = 'primary.500',
   isActive,
-  isDisabled,
+  isDisabled = false,
   size = 'm',
   onClick,
   testID,
+  style,
 }: MediaButtonProps) => {
   const [timedDisable, setTimedDisable] = useState(false);
 
@@ -69,82 +77,55 @@ const MediaButton = ({
   };
 
   const tooltipText = useMemo(() => {
-    let text;
-
     if (isDisabled) {
       return '';
     }
     if (isActive) {
-      text = activeTooltipText;
-    } else {
-      text = inactiveTooltipText;
+      return activeTooltipText;
     }
-
-    return text;
+    return defaultTooltipText;
   }, [isActive, isDisabled]);
 
-  const iconName = useMemo(() => {
-    let icon: IconComponentName;
-
+  const iconName: IconComponentName = useMemo(() => {
     if (isDisabled) {
       return disabledIcon;
     }
-
     if (isActive) {
-      icon = activeIcon;
-    } else {
-      icon = inactiveIcon;
+      return activeIcon;
     }
-
-    return icon;
+    return defaultIcon;
   }, [isActive, isDisabled]);
 
-  const backgroundColor = useMemo(() => {
-    let color: ColorKey | [ColorKey, ColorKey];
-
+  const backgroundColor: ColorKey | [ColorKey, ColorKey] = useMemo(() => {
     if (isDisabled) {
       return disabledBackgroundColor;
     }
-
     if (isActive) {
-      color = activeBackgroundColor;
-    } else {
-      color = inactiveBackgroundColor;
+      return activeBackgroundColor;
     }
-
-    return color;
+    return defaultBackgroundColor;
   }, [isActive, isDisabled, theme]);
 
-  const iconColor = useMemo(() => {
-    let color: ColorKey;
-
+  const iconColor: ColorKey = useMemo(() => {
     if (isDisabled) {
       return disabledIconColor;
     }
 
     if (isActive) {
-      color = activeIconColor;
-    } else {
-      color = inactiveIconColor;
+      return activeIconColor;
     }
-
-    return color;
+    return defaultIconColor;
   }, [isActive, isDisabled, theme]);
 
   const strokeColor: ColorKey = useMemo(() => {
-    let color: ColorKey;
-
     if (isDisabled) {
       return disabledStrokeColor;
     }
 
     if (isActive) {
-      color = activeStrokeColor;
-    } else {
-      color = inactiveStrokeColor;
+      return activeStrokeColor;
     }
-
-    return color;
+    return defaultStrokeColor;
   }, [isActive, isDisabled, theme]);
 
   return (
@@ -152,14 +133,16 @@ const MediaButton = ({
       <Tooltip position={tooltipPosition} text={isDesktop ? tooltipText : ''}>
         <IconButton
           testID={testID}
-          backgroundColor={backgroundColor}
+          backgroundColor={transparent ? 'transparent' : backgroundColor}
           iconColor={iconColor}
           strokeColor={strokeColor}
           icon={iconName}
           size={size}
           onClick={handleOnClick}
           disabled={isDisabled}
-          style={{ opacity: isDisabled ? 0.8 : 1 }}
+          badge={badge}
+          badgeColor={badgeColor}
+          style={{ opacity: isDisabled ? 0.8 : 1, ...style }}
         />
       </Tooltip>
       {timedDisable && <Space fw fh className={styles.backdrop} />}

@@ -51,4 +51,19 @@ describe('InfoBar component', () => {
       { timeout: duration },
     );
   });
+  test('Still present while alwaysVisible prop is provided', async () => {
+    const text = 'TEST';
+    render(
+      <InfoBar testID={testID} iconName="camera" text={text} duration={4000} alwaysVisible>
+        {testContent}
+      </InfoBar>,
+    );
+    expect(screen.getByTestId(testID)).not.toHaveClass(`invisible`);
+    act(() => {
+      jest.advanceTimersByTime(6000);
+    });
+    await waitFor(() => {
+      expect(screen.getByText(text)).toBeVisible();
+    });
+  });
 });

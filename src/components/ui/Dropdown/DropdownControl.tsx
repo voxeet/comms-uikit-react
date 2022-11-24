@@ -10,12 +10,23 @@ import useDropdownControl from './useDropdown';
 type DropdownControlProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   placeholder: string;
   color?: ColorKey;
-  borderColor?: ColorKey;
+  primaryBorderColor?: ColorKey;
+  secondaryBorderColor?: ColorKey;
+  iconColor?: ColorKey;
   backgroundColor?: ColorKey;
   testID?: string;
 };
 
-const DropdownControl = ({ placeholder, color, backgroundColor, testID, ...props }: DropdownControlProps) => {
+const DropdownControl = ({
+  placeholder,
+  color,
+  backgroundColor,
+  iconColor,
+  primaryBorderColor = 'grey.100',
+  secondaryBorderColor = 'grey.200',
+  testID,
+  ...props
+}: DropdownControlProps) => {
   const { isOpen, selected, toggle } = useDropdownControl();
   const { getColor } = useTheme();
 
@@ -43,7 +54,7 @@ const DropdownControl = ({ placeholder, color, backgroundColor, testID, ...props
       type="button"
       className={styles.control}
       css={{
-        borderColor: isOpen ? getColor('grey.200') : getColor('grey.100'),
+        borderColor: isOpen ? getColor(secondaryBorderColor) : getColor(primaryBorderColor),
         borderRadius: 8,
         borderStyle: 'solid',
         borderWidth: 2,
@@ -52,18 +63,18 @@ const DropdownControl = ({ placeholder, color, backgroundColor, testID, ...props
         paddingRight: 50,
         position: 'relative',
         zIndex: 2,
-        backgroundColor: backgroundColor || 'transparent',
+        backgroundColor: getColor(backgroundColor) || getColor('transparent'),
       }}
       onClick={toggle}
       {...props}
     >
       {selected && selected.icon && (
         <Space pr="xs">
-          <Icon name={selected.icon} color="grey.300" />
+          <Icon name={selected.icon} color={iconColor || 'grey.300'} />
         </Space>
       )}
       {content()}
-      <div css={{ borderColor: color || getColor('grey.500') }} className={styles.dropdownArrow} />
+      <div css={{ borderColor: getColor(color) || getColor('grey.500') }} className={styles.dropdownArrow} />
     </button>
   );
 };

@@ -3,8 +3,8 @@ import { fireEvent, render, waitFor } from '../../../utils/tests/test-utils';
 
 import LocalToggleAudioButton from './LocalToggleAudioButton';
 
-const activeText = 'Mute';
-const inactiveText = 'Unmute';
+const defaultText = 'Mute';
+const activeText = 'Unmute';
 const testID = 'testID';
 
 const localParticipant = createParticipant({ name: 'Local', id: 'Local' });
@@ -21,7 +21,7 @@ jest.mock('../../../hooks/useMicrophone', () => {
 describe('LocalToggleAudioButton component', () => {
   test('Passes TestID', async () => {
     const { getByTestId } = render(
-      <LocalToggleAudioButton testID={testID} activeTooltipText={activeText} inactiveTooltipText={inactiveText} />,
+      <LocalToggleAudioButton testID={testID} defaultTooltipText={defaultText} activeTooltipText={activeText} />,
     );
     await waitFor(() => {
       expect(getByTestId(testID)).not.toBeNull();
@@ -29,7 +29,7 @@ describe('LocalToggleAudioButton component', () => {
   });
   test('Displays mute text props', async () => {
     const { getByText } = render(
-      <LocalToggleAudioButton testID={testID} activeTooltipText={activeText} inactiveTooltipText={inactiveText} />,
+      <LocalToggleAudioButton testID={testID} defaultTooltipText={defaultText} activeTooltipText={activeText} />,
       {
         commsProps: {
           value: {
@@ -42,12 +42,12 @@ describe('LocalToggleAudioButton component', () => {
       },
     );
     await waitFor(() => {
-      expect(getByText(activeText)).not.toBeNull();
+      expect(getByText(defaultText)).not.toBeNull();
     });
   });
   test('Displays unmute text props', async () => {
     const { getByText } = render(
-      <LocalToggleAudioButton testID={testID} activeTooltipText={activeText} inactiveTooltipText={inactiveText} />,
+      <LocalToggleAudioButton testID={testID} defaultTooltipText={defaultText} activeTooltipText={activeText} />,
       {
         commsProps: {
           value: {
@@ -61,14 +61,14 @@ describe('LocalToggleAudioButton component', () => {
       },
     );
     await waitFor(() => {
-      expect(getByText(inactiveText)).not.toBeNull();
+      expect(getByText(activeText)).not.toBeNull();
     });
   });
   test('Can click LocalToggleAudioButton and runs toggleAudio function', async () => {
     const toggleAudio = jest.fn();
 
     const { getByTestId } = render(
-      <LocalToggleAudioButton testID={testID} activeTooltipText={activeText} inactiveTooltipText={inactiveText} />,
+      <LocalToggleAudioButton testID={testID} defaultTooltipText={defaultText} activeTooltipText={activeText} />,
       {
         commsProps: {
           value: {

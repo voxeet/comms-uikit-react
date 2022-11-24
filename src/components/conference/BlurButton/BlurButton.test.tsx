@@ -15,8 +15,8 @@ const SafariAgent =
 
 const FirefoxAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:104.0) Gecko/20100101 Firefox/104.0';
 
-const activeText = 'Blur';
-const inactiveText = 'Blur Off';
+const defaultText = 'Blur';
+const activeText = 'Blur Off';
 const testID = 'testID';
 // const testPropID = 'testProp';
 
@@ -39,7 +39,7 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-const props = { testID, activeTooltipText: activeText, inactiveTooltipText: inactiveText };
+const props = { testID, defaultTooltipText: defaultText, activeTooltipText: activeText };
 
 describe('BlurButton component', () => {
   test('Passes TestID', () => {
@@ -65,17 +65,18 @@ describe('BlurButton component', () => {
   test('It invokes start/stop action and proper tooltip message', () => {
     const { getByRole, getByText, rerender } = render(<BlurButton {...props} />);
     const button = getByRole('button');
-    expect(getByText(activeText)).not.toBeNull();
+    expect(getByText(defaultText)).not.toBeNull();
     fireEvent.click(button);
     expect(startBackgroundBlurMock).toHaveBeenCalledTimes(1);
     mockUseBlur.mockReturnValue({
       isBlurred: true,
       startBackgroundBlur: startBackgroundBlurMock,
       stopVideoProcessing: stopVideoProcessingMock,
+      isSupported: true,
     });
     waitFor(() => {
       rerender(<BlurButton {...props} />);
-      expect(getByText(inactiveText)).not.toBeNull();
+      expect(getByText(activeText)).not.toBeNull();
       fireEvent.click(button);
       expect(stopVideoProcessingMock).toHaveBeenCalledTimes(1);
     });

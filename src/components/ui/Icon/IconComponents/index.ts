@@ -17,6 +17,8 @@ import DotsHorizontal from './DotsHorizontal';
 import DotsHorizontalGradient from './DotsHorizontalGradient';
 import DotsVertical from './DotsVertical';
 import DotsVerticalGradient from './DotsVerticalGradient';
+import EyeClosed from './EyeClosed';
+import EyeOpen from './EyeOpen';
 import Failure from './Failure';
 import Handset from './Handset';
 import HandsetGradient from './HandsetGradient';
@@ -48,6 +50,7 @@ import Speaker from './Speaker';
 import SpeakerGradient from './SpeakerGradient';
 import SpeakerOff from './SpeakerOff';
 import SpeakerOffGradient from './SpeakerOffGradient';
+import Stream from './Stream';
 import Success from './Success';
 import SuccessFilled from './SuccessFilled';
 import Warning from './Warning';
@@ -71,6 +74,8 @@ const IconComponents = {
   dotsHorizontalGradient: DotsHorizontalGradient,
   dotsVertical: DotsVertical,
   dotsVerticalGradient: DotsVerticalGradient,
+  eyeClosed: EyeClosed,
+  eyeOpen: EyeOpen,
   failure: Failure,
   handset: Handset,
   handsetGradient: HandsetGradient,
@@ -106,6 +111,7 @@ const IconComponents = {
   successFilled: SuccessFilled,
   warning: Warning,
   warningFilled: WarningFilled,
+  stream: Stream,
 };
 
 export default IconComponents;

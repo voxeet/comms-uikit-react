@@ -51,6 +51,7 @@ const VideoLocalView = ({
   cameraReverseButton = true,
   disabled = false,
   isMicrophonePermission,
+  className,
   ...props
 }: VideoViewProps) => {
   const [videoSrcObject, setVideoSrcObject] = useState<MediaStream | null>(null);
@@ -305,19 +306,20 @@ const VideoLocalView = ({
   return (
     <Space
       onDoubleClick={handleDoubleClick}
-      className={cx(styles.videoWrapper, !isDesktop && styles.mobile)}
+      className={cx(styles.videoWrapper, !isDesktop && styles.mobile, className)}
       testID={testID}
       style={{ backgroundColor: getColor('grey.700'), width, height }}
       {...props}
     >
       {videoSrcObject && isVideo && !disabled ? (
         <video
+          data-testid="videoTag"
           ref={videoRef}
           autoPlay
           playsInline
           width={width}
           height={height}
-          className={cx({ [styles.rearCamera]: isUsingRearCamera })}
+          className={cx({ [styles.rearCamera]: isUsingRearCamera }, className)}
         />
       ) : (
         <Space fw fh className={styles.fallbackWrapper} testID="FallbackWrapper">
@@ -331,7 +333,7 @@ const VideoLocalView = ({
       {indicator && !disabled && <Space className={styles.indicator}>{indicatorContent}</Space>}
       {cameraReverseButton && !isDesktop && isVideo && !disabled && (
         <Space onClick={reverseCamera} className={styles.cameraReverse}>
-          <IconIndicator icon="cameraReverse" />
+          <IconIndicator icon="cameraReverse" testID="ReverseCameraIcon" />
         </Space>
       )}
     </Space>

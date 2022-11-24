@@ -14,15 +14,23 @@ type CameraSelectProps = {
   labelColor?: ColorKey;
   textColor?: ColorKey;
   backgroundColor?: ColorKey;
+  iconColor?: ColorKey;
+  hoverColor?: ColorKey;
+  primaryBorderColor?: ColorKey;
+  secondaryBorderColor?: ColorKey;
   label: string;
   placeholder: string;
   testID?: string;
 };
 
 const CameraSelect = ({
-  labelColor = 'black',
+  labelColor = 'grey.500',
   textColor = 'grey.500',
   backgroundColor = 'white',
+  iconColor = 'grey.300',
+  hoverColor = 'grey.50',
+  primaryBorderColor = 'grey.100',
+  secondaryBorderColor = 'grey.200',
   label,
   placeholder,
   testID,
@@ -64,8 +72,22 @@ const CameraSelect = ({
   return (
     <Dropdown testID={testID} selected={selectedDevice}>
       <DropdownLabel label={label} color={labelColor} />
-      <DropdownControl placeholder={placeholder} color={textColor} backgroundColor={backgroundColor} />
-      <DropdownList onChange={onChange} options={devices} color={textColor} backgroundColor={backgroundColor} />
+      <DropdownControl
+        placeholder={placeholder}
+        color={textColor}
+        backgroundColor={backgroundColor}
+        iconColor={iconColor}
+        primaryBorderColor={primaryBorderColor}
+        secondaryBorderColor={secondaryBorderColor}
+      />
+      <DropdownList
+        onChange={onChange}
+        options={devices}
+        color={textColor}
+        iconColor={iconColor}
+        backgroundColor={backgroundColor}
+        hoverColor={hoverColor}
+      />
     </Dropdown>
   );
 };

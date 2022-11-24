@@ -10,13 +10,13 @@ const useScreenSharing: UseScreenSharing = () => {
   const {
     startScreenShare,
     stopScreenShare,
-    screenShareStatus,
+    screenSharingData,
     setSharingErrors,
     screenShareErrorMessages: errorMessages,
     setPendingTakeoverRequest,
-    resetScreenShareStatus,
+    resetScreenSharingData,
   } = useCommsContext();
-  const { owner, status, stream, isPendingTakeoverRequest, isPresentationModeActive } = screenShareStatus;
+  const { owner, status, stream, isPendingTakeoverRequest, isPresentationModeActive } = screenSharingData;
   const { participant } = useSession();
 
   const isLocalUserPresentationOwner = useMemo(() => {
@@ -43,7 +43,7 @@ const useScreenSharing: UseScreenSharing = () => {
     setSharingErrors,
     isPendingTakeoverRequest,
     setPendingTakeoverRequest,
-    resetScreenShareStatus,
+    resetScreenSharingData,
     isPresentationModeActive,
     isAutoStartShareError: errorMessages.some((error) => error === ErrorCodes.ScreenShareAutoTakeoverError),
     isLackOfBrowserPermissions: errorMessages.some((error) => error === ErrorCodes.LackOfBrowserPermissions),

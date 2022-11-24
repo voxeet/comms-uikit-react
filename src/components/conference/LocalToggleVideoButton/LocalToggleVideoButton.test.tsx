@@ -3,8 +3,8 @@ import { fireEvent, render, waitFor } from '../../../utils/tests/test-utils';
 
 import LocalToggleVideoButton from './LocalToggleVideoButton';
 
-const activeText = 'Camera off';
-const inactiveText = 'Camera on';
+const defaultText = 'Camera off';
+const activeText = 'Camera on';
 const testID = 'testID';
 
 const localParticipant = createParticipant({ name: 'Local', id: 'Local' });
@@ -21,7 +21,7 @@ jest.mock('../../../hooks/useCamera', () => {
 describe('LocalToggleVideoButton component', () => {
   test('Passes TestID', async () => {
     const { getByTestId } = render(
-      <LocalToggleVideoButton testID={testID} activeTooltipText={activeText} inactiveTooltipText={inactiveText} />,
+      <LocalToggleVideoButton testID={testID} defaultTooltipText={activeText} activeTooltipText={activeText} />,
     );
     await waitFor(() => {
       expect(getByTestId(testID)).not.toBeNull();
@@ -29,7 +29,7 @@ describe('LocalToggleVideoButton component', () => {
   });
   test('Displays camera off text props', async () => {
     const { getByText } = render(
-      <LocalToggleVideoButton testID={testID} activeTooltipText={activeText} inactiveTooltipText={inactiveText} />,
+      <LocalToggleVideoButton testID={testID} defaultTooltipText={defaultText} activeTooltipText={activeText} />,
       {
         commsProps: {
           value: {
@@ -42,12 +42,12 @@ describe('LocalToggleVideoButton component', () => {
       },
     );
     await waitFor(() => {
-      expect(getByText(activeText)).not.toBeNull();
+      expect(getByText(defaultText)).not.toBeNull();
     });
   });
   test('Displays camera on text props', async () => {
     const { getByText } = render(
-      <LocalToggleVideoButton testID={testID} activeTooltipText={activeText} inactiveTooltipText={inactiveText} />,
+      <LocalToggleVideoButton testID={testID} defaultTooltipText={activeText} activeTooltipText={activeText} />,
       {
         commsProps: {
           value: {
@@ -61,14 +61,14 @@ describe('LocalToggleVideoButton component', () => {
       },
     );
     await waitFor(() => {
-      expect(getByText(inactiveText)).not.toBeNull();
+      expect(getByText(activeText)).not.toBeNull();
     });
   });
   test('Can click LocalToggleVideoButton and runs toggleVideo function', async () => {
     const toggleVideo = jest.fn();
 
     const { getByTestId } = render(
-      <LocalToggleVideoButton testID={testID} activeTooltipText={activeText} inactiveTooltipText={inactiveText} />,
+      <LocalToggleVideoButton testID={testID} defaultTooltipText={activeText} activeTooltipText={activeText} />,
       {
         commsProps: {
           value: {

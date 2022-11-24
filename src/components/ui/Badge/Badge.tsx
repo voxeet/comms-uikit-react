@@ -18,7 +18,7 @@ const Badge = ({ content, backgroundColor = 'grey.700', contentColor = 'white', 
   const { getColor } = useTheme();
   return (
     <Space
-      ph={content ? 'xs' : undefined}
+      ph={!!content && 'xs'}
       testID={testID}
       className={cx(styles.badge, !content && styles.noContent)}
       style={{ backgroundColor: getColor(backgroundColor) }}

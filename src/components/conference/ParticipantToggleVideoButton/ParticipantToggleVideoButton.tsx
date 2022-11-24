@@ -12,8 +12,8 @@ export const ParticipantToggleVideoButton = ({
   participant,
   size = 'm',
   tooltipPosition = 'top',
-  activeIcon = 'camera',
-  inactiveIcon = 'cameraOff',
+  defaultIcon = 'camera',
+  activeIcon = 'cameraOff',
   disabledIcon = 'cameraOff',
   testID = 'ParticipantToggleVideoButton',
   ...rest
@@ -34,10 +34,10 @@ export const ParticipantToggleVideoButton = ({
   return (
     <MediaButton
       tooltipPosition={tooltipPosition}
+      defaultIcon={defaultIcon}
       activeIcon={activeIcon}
-      inactiveIcon={inactiveIcon}
       disabledIcon={disabledIcon}
-      isActive={isVideo}
+      isActive={!isVideo}
       isDisabled={!participant}
       onClick={handleToggleVideo}
       size={size}

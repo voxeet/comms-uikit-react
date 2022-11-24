@@ -11,6 +11,10 @@ export type Blur = {
    * Removes video processor.
    */
   stopVideoProcessing: () => void;
+  /**
+   * Informs if blur is supported by environment.
+   */
+  isSupported: boolean | null;
 };
 
 export type UseBlur = () => Blur;

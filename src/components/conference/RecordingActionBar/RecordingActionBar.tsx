@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { Status as RecordingStatus } from '../../../hooks/types/misc';
 import useRecording from '../../../hooks/useRecording';
+import useTheme from '../../../hooks/useTheme';
 import ActionBar, { type AbstractionBarPropsBase, type ActionButtonLabels } from '../../ui/ActionBar/ActionBar';
 import Status from '../../ui/Status/Status';
 
@@ -23,6 +24,7 @@ const RecordingActionBar = ({
   testID,
   ...props
 }: RecordingActionBarProps) => {
+  const { isDesktop } = useTheme();
   const { stopRecording, isLocalUserRecordingOwner, status, startRecording, resetRecordingData, setRecordingErrors } =
     useRecording();
 
@@ -72,7 +74,12 @@ const RecordingActionBar = ({
       closeCallback={status === RecordingStatus.Error ? onErrorClose : undefined}
       {...props}
     >
-      <Status statusDotColor={statusColors[status]} icon="record" label={statusLabels[status]} />
+      <Status
+        statusDotColor={statusColors[status]}
+        icon="record"
+        label={statusLabels[status]}
+        compact={!isDesktop && compact}
+      />
     </ActionBar>
   );
 };

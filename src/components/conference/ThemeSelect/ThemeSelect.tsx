@@ -13,6 +13,10 @@ type ThemeSelectProps = {
   labelColor?: ColorKey;
   textColor?: ColorKey;
   backgroundColor?: ColorKey;
+  iconColor?: ColorKey;
+  hoverColor?: ColorKey;
+  primaryBorderColor?: ColorKey;
+  secondaryBorderColor?: ColorKey;
   label: string;
   placeholder: string;
   testID?: string;
@@ -22,6 +26,10 @@ const ThemeSelect = ({
   labelColor = 'grey.500',
   textColor = 'grey.500',
   backgroundColor = 'white',
+  iconColor = 'grey.300',
+  hoverColor = 'grey.50',
+  primaryBorderColor = 'grey.100',
+  secondaryBorderColor = 'grey.200',
   label,
   placeholder,
   testID,
@@ -34,7 +42,7 @@ const ThemeSelect = ({
     setOptions(() => {
       return availableThemes.map((value) => ({
         value,
-        label: <ThemeOption value={value} />,
+        label: <ThemeOption color={textColor} value={value} />,
       }));
     });
   }, []);
@@ -42,7 +50,7 @@ const ThemeSelect = ({
   useEffect(() => {
     setActiveOption(() => ({
       value: activeTheme,
-      label: <ThemeOption value={activeTheme} />,
+      label: <ThemeOption color={textColor} value={activeTheme} />,
     }));
   }, [activeTheme]);
 
@@ -53,8 +61,22 @@ const ThemeSelect = ({
   return (
     <Dropdown testID={testID} selected={activeOption}>
       <DropdownLabel label={label} color={labelColor} />
-      <DropdownControl placeholder={placeholder} color={textColor} backgroundColor={backgroundColor} />
-      <DropdownList onChange={onChange} options={options} color={textColor} backgroundColor={backgroundColor} />
+      <DropdownControl
+        placeholder={placeholder}
+        color={textColor}
+        backgroundColor={backgroundColor}
+        iconColor={iconColor}
+        primaryBorderColor={primaryBorderColor}
+        secondaryBorderColor={secondaryBorderColor}
+      />
+      <DropdownList
+        onChange={onChange}
+        options={options}
+        color={textColor}
+        iconColor={iconColor}
+        backgroundColor={backgroundColor}
+        hoverColor={hoverColor}
+      />
     </Dropdown>
   );
 };

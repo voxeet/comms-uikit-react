@@ -64,7 +64,7 @@ const Modal = ({
               <IconButton
                 testID="ModalCloseIcon"
                 icon="close"
-                size={isDesktop ? 'm' : 's'}
+                size="s"
                 backgroundColor={isDesktop ? getColor(closeButtonColor) : getColor('transparent')}
                 iconColor={getColor(closeIconColor)}
                 variant="circle"

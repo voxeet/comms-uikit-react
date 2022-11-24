@@ -85,7 +85,7 @@ const Button: FunctionComponent<ButtonProps> = ({
   fw,
   ...props
 }) => {
-  const { getColor, borderRadius } = useTheme();
+  const { getColor, borderRadius, theme } = useTheme();
   const variantStyle = useMemo(() => {
     const { base, disabled, active, danger } = colorsMap[variant];
     return {
@@ -120,7 +120,7 @@ const Button: FunctionComponent<ButtonProps> = ({
         color: getColor(danger.hoverText),
       },
     };
-  }, [variant]);
+  }, [variant, theme]);
   return (
     <button
       className={cx(styles.button, danger && 'danger', styles[`size-${size}`], fw && styles.fullWidth, className)}

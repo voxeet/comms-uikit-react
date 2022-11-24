@@ -68,7 +68,7 @@ export const calculateGrid = ({ container, elements, gap }: CalculateGridOptions
     }
   } else if (elements === 9) {
     width = 33.3333;
-    height = 33.333;
+    height = 33.3333;
   } else if (elements === 10 || elements === 11 || elements === 12) {
     if (isLandscape) {
       width = 25;

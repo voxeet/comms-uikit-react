@@ -4,7 +4,7 @@ export type Message = {
   /**
    * Received message.
    */
-  message: string | null;
+  message: Record<string, unknown> | null;
 
   /**
    * The object of participant which sent the message.
@@ -15,7 +15,7 @@ export type Message = {
    * Sends message to all participants.
    * @param message - The message.
    */
-  sendMessage: (message: string) => Promise<void>;
+  sendMessage: (message: Record<string, unknown>) => Promise<void>;
 
   /**
    * Clear received message data.

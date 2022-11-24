@@ -30,6 +30,7 @@ export type ThemeProviderProps = {
   children: React.ReactNode;
   theme?: RecursivePartial<Theme>;
   customThemes?: CustomThemes;
+  values?: Partial<ThemeContext>;
 };
 
 export const ThemeContext = createContext<ThemeContext>({
@@ -50,7 +51,7 @@ const isMobileBrowser =
    */
   (navigator?.platform === 'MacIntel' && 'maxTouchPoints' in navigator && navigator.maxTouchPoints > 0);
 
-const ThemeProvider = ({ children, theme, customThemes }: ThemeProviderProps) => {
+const ThemeProvider = ({ children, theme, customThemes, values }: ThemeProviderProps) => {
   const [themes, setThemes] = useState<CustomThemes>(defaultCustomThemes);
   const [themeState, setThemeState] = useState<Theme>(defaultTheme);
   const [activeTheme, setActiveTheme] = useState<ThemeMode>('Dark Graphite');
@@ -180,6 +181,7 @@ const ThemeProvider = ({ children, theme, customThemes }: ThemeProviderProps) =>
       isDesktop,
       isLandscape,
       isPortrait,
+      ...values,
     }),
     [themeState, activeTheme, windowDimensions, isMobile, isMobileSmall, isTablet, isDesktop, isLandscape, isPortrait],
   );

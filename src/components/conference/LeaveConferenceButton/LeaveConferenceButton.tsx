@@ -8,6 +8,7 @@ type LeaveConferenceButtonProps = Partial<Omit<IconButtonProps, 'onClick'>> & {
   tooltipText: string;
   tooltipPosition?: TooltipProps['position'];
   onSuccess?: () => void;
+  preAction?: () => Promise<boolean> | boolean;
   testID?: string;
 };
 
@@ -15,6 +16,7 @@ const LeaveConferenceButton = ({
   tooltipText,
   tooltipPosition = 'top',
   onSuccess,
+  preAction,
   testID,
   ...rest
 }: LeaveConferenceButtonProps) => {
@@ -26,6 +28,8 @@ const LeaveConferenceButton = ({
     if (isLocalUserRecordingOwner && status === RecordingStatus.Active) {
       await stopRecording();
     }
+
+    await preAction?.();
 
     await leaveConference();
     if (onSuccess) {

@@ -11,22 +11,27 @@ import styles from './DefaultFallback.module.scss';
 type DefaultFallbackContentProps = {
   messageText?: string;
   buttonText?: string;
+  testID?: string;
 };
 
-const DefaultFallbackContent = ({ messageText, buttonText }: DefaultFallbackContentProps) => {
-  const { startScreenShare, stopScreenShare, stream, resetScreenShareStatus } = useScreenSharing();
+const DefaultFallbackContent = ({
+  messageText,
+  buttonText,
+  testID = 'DefaultFallback',
+}: DefaultFallbackContentProps) => {
+  const { startScreenShare, stopScreenShare, stream, resetScreenSharingData } = useScreenSharing();
   const { getColor } = useTheme();
 
   const closePresentation = () => {
     if (stream) {
       stopScreenShare();
     } else {
-      resetScreenShareStatus();
+      resetScreenSharingData();
     }
   };
 
   return (
-    <Space testID="DefaultFallback" fw fh className={styles.fallback} style={{ backgroundColor: getColor('grey.800') }}>
+    <Space testID={testID} fw fh className={styles.fallback} style={{ backgroundColor: getColor('grey.800') }}>
       <Space className={styles.closeIcon}>
         <IconButton size="xs" icon="close" backgroundColor="transparent" onClick={closePresentation} />
       </Space>

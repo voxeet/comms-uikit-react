@@ -3,8 +3,8 @@ import { fireEvent, render, waitFor } from '../../../utils/tests/test-utils';
 
 import ParticipantToggleAudioButton from './ParticipantToggleAudioButton';
 
-const activeText = 'Volume off';
-const inactiveText = 'Volume on';
+const defaultText = 'Volume off';
+const activeText = 'Volume on';
 const testID = 'testID';
 
 const remoteParticipant = createParticipant({ name: 'Remote', id: 'Remote' });
@@ -22,8 +22,8 @@ describe('ParticipantToggleAudioButton component', () => {
       <ParticipantToggleAudioButton
         testID={testID}
         participant={remoteParticipant}
+        defaultTooltipText={defaultText}
         activeTooltipText={activeText}
-        inactiveTooltipText={inactiveText}
       />,
     );
     await waitFor(() => {
@@ -35,8 +35,8 @@ describe('ParticipantToggleAudioButton component', () => {
       <ParticipantToggleAudioButton
         testID={testID}
         participant={remoteParticipant}
+        defaultTooltipText={defaultText}
         activeTooltipText={activeText}
-        inactiveTooltipText={inactiveText}
       />,
       {
         commsProps: {
@@ -49,7 +49,7 @@ describe('ParticipantToggleAudioButton component', () => {
       },
     );
     await waitFor(() => {
-      expect(getByText(activeText)).not.toBeNull();
+      expect(getByText(defaultText)).not.toBeNull();
     });
   });
   test('Displays Volume on text props', async () => {
@@ -57,8 +57,8 @@ describe('ParticipantToggleAudioButton component', () => {
       <ParticipantToggleAudioButton
         testID={testID}
         participant={remoteParticipant}
+        defaultTooltipText={defaultText}
         activeTooltipText={activeText}
-        inactiveTooltipText={inactiveText}
       />,
       {
         commsProps: {
@@ -71,16 +71,16 @@ describe('ParticipantToggleAudioButton component', () => {
       },
     );
     await waitFor(() => {
-      expect(getByText(inactiveText)).not.toBeNull();
+      expect(getByText(activeText)).not.toBeNull();
     });
   });
-  test('Should button be disabled if participant is remotely muted', async () => {
+  test("Button shouldn't be disabled if participant is remotely muted", async () => {
     const { getByTestId } = render(
       <ParticipantToggleAudioButton
         testID={testID}
         participant={remoteParticipant}
+        defaultTooltipText={defaultText}
         activeTooltipText={activeText}
-        inactiveTooltipText={inactiveText}
       />,
       {
         commsProps: {
@@ -93,7 +93,7 @@ describe('ParticipantToggleAudioButton component', () => {
       },
     );
     await waitFor(() => {
-      expect(getByTestId(testID)).toBeDisabled();
+      expect(getByTestId(testID)).not.toBeDisabled();
     });
   });
   test('Can click ParticipantToggleAudioButton and runs stopParticipantAudio', async () => {
@@ -103,8 +103,8 @@ describe('ParticipantToggleAudioButton component', () => {
       <ParticipantToggleAudioButton
         testID={testID}
         participant={remoteParticipant}
+        defaultTooltipText={defaultText}
         activeTooltipText={activeText}
-        inactiveTooltipText={inactiveText}
       />,
       {
         commsProps: {
@@ -131,8 +131,8 @@ describe('ParticipantToggleAudioButton component', () => {
       <ParticipantToggleAudioButton
         testID={testID}
         participant={remoteParticipant}
+        defaultTooltipText={defaultText}
         activeTooltipText={activeText}
-        inactiveTooltipText={inactiveText}
       />,
       {
         commsProps: {

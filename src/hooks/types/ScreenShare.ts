@@ -62,9 +62,9 @@ export type ScreenShare = {
   setPendingTakeoverRequest: (isPendingTakeoverRequest: boolean) => void;
 
   /**
-   * Resets status of screen sharing for local user.
+   * Resets data of screen sharing for local user.
    */
-  resetScreenShareStatus: () => void;
+  resetScreenSharingData: () => void;
 
   /**
    * Informs if local user has active presentation mode.

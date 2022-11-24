@@ -12,8 +12,8 @@ const ParticipantName = ({ participant, ...rest }: ParticipantNameProps) => {
 
   if (!participant) return null;
 
-  const { isSpeaking, isRemoteAudio, isLocalAudio } = participantsStatus[participant.id] || {};
-  return <Pill text={participant.info.name} active={isSpeaking && isRemoteAudio && isLocalAudio} {...rest} />;
+  const { isSpeaking, isRemoteAudio } = participantsStatus[participant.id] || {};
+  return <Pill text={participant.info.name} active={isSpeaking && isRemoteAudio} {...rest} />;
 };
 
 export default ParticipantName;
