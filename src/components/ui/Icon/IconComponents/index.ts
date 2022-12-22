@@ -17,6 +17,7 @@ import DotsHorizontal from './DotsHorizontal';
 import DotsHorizontalGradient from './DotsHorizontalGradient';
 import DotsVertical from './DotsVertical';
 import DotsVerticalGradient from './DotsVerticalGradient';
+import Echo from './Echo';
 import EyeClosed from './EyeClosed';
 import EyeOpen from './EyeOpen';
 import Failure from './Failure';
@@ -53,6 +54,8 @@ import SpeakerOffGradient from './SpeakerOffGradient';
 import Stream from './Stream';
 import Success from './Success';
 import SuccessFilled from './SuccessFilled';
+import Tiles from './Tiles';
+import Tune from './Tune';
 import Warning from './Warning';
 import WarningFilled from './WarningFilled';
 
@@ -112,6 +115,9 @@ const IconComponents = {
   warning: Warning,
   warningFilled: WarningFilled,
   stream: Stream,
+  tune: Tune,
+  tiles: Tiles,
+  echo: Echo,
 };
 
 export default IconComponents;

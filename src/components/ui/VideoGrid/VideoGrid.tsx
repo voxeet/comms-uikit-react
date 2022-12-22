@@ -149,6 +149,9 @@ const VideoGrid = ({
     if (presenter) {
       withoutLocal.unshift(presenter);
     }
+    /*
+     There shouldn't be situation when we are setting actualMaxTiles to 1 since therefore we won't be able to see rest size
+     */
     let tiles: Participant[] = withoutLocal.slice(0, actualMaxTiles - 2);
     let restTiles: Participant[] = withoutLocal.slice(actualMaxTiles - 2);
     if (restTiles.length === 1) {
@@ -158,7 +161,6 @@ const VideoGrid = ({
     if (localParticipant && local) {
       if (tiles.length === 0) {
         tiles = [local];
-        restTiles = [];
       } else {
         tiles.push(local);
       }
@@ -170,13 +172,12 @@ const VideoGrid = ({
     if (wrapperSize) {
       const size = calculateGrid({
         container: wrapperSize,
-        elements: tiles.length,
+        elements: tiles.length + (restTiles.length ? 1 : 0),
         gap: participants.length === 1 ? 0 : gap,
       });
-
       setTileSize(size);
     }
-  }, [wrapperSize, participants, tiles]);
+  }, [wrapperSize, participants, tiles, restTiles]);
 
   if (participants.length === 0) {
     return null;

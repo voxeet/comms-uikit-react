@@ -19,6 +19,7 @@ jest.mock('../../services/mediaDevices', () => {
   return {
     enumerateAudioOutputDevices: jest.fn(() => speakers),
     selectSpeaker: jest.fn(),
+    onDeviceListChanged: jest.fn(),
   };
 });
 

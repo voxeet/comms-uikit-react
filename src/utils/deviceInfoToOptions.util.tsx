@@ -1,5 +1,4 @@
-import type { DropdownOptionType } from 'src/components/ui/Dropdown/Dropdown';
-
+import type { DropdownOptionType } from '../components/ui/Dropdown/Dropdown';
 import type { IconComponentName } from '../components/ui/Icon/IconComponents';
 
 export type DeviceInfoToOptionsArguments = {

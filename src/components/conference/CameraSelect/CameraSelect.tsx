@@ -1,27 +1,14 @@
 import { useEffect, useState } from 'react';
 
 import useCamera from '../../../hooks/useCamera';
-import useConference from '../../../hooks/useConference';
-import type { ColorKey } from '../../../theme/types';
 import { deviceInfoToOptions } from '../../../utils/deviceInfoToOptions.util';
 import { throwErrorMessage } from '../../../utils/throwError.util';
-import Dropdown, { type DropdownOptionType } from '../../ui/Dropdown/Dropdown';
+import Dropdown, { type DropdownOptionType, type SelectPropsBase } from '../../ui/Dropdown/Dropdown';
 import DropdownControl from '../../ui/Dropdown/DropdownControl';
 import DropdownLabel from '../../ui/Dropdown/DropdownLabel';
 import DropdownList from '../../ui/Dropdown/DropdownList';
 
-type CameraSelectProps = {
-  labelColor?: ColorKey;
-  textColor?: ColorKey;
-  backgroundColor?: ColorKey;
-  iconColor?: ColorKey;
-  hoverColor?: ColorKey;
-  primaryBorderColor?: ColorKey;
-  secondaryBorderColor?: ColorKey;
-  label: string;
-  placeholder: string;
-  testID?: string;
-};
+type CameraSelectProps = SelectPropsBase;
 
 const CameraSelect = ({
   labelColor = 'grey.500',
@@ -34,11 +21,11 @@ const CameraSelect = ({
   label,
   placeholder,
   testID,
+  ...props
 }: CameraSelectProps) => {
   const [selectedDevice, setSelectedDevice] = useState<DropdownOptionType | null>(null);
   const [devices, setDevices] = useState<DropdownOptionType[]>([]);
   const { getCameras, selectCamera, localCamera, setLocalCamera } = useCamera();
-  const { conference } = useConference();
 
   useEffect(() => {
     (async () => {
@@ -55,13 +42,12 @@ const CameraSelect = ({
   }, []);
 
   const onChange = async (e: DropdownOptionType) => {
+    if (e.value === selectedDevice?.value) return;
     setSelectedDevice(e);
-    if (conference) {
-      try {
-        await selectCamera(e.value);
-      } catch (error) {
-        throwErrorMessage(error);
-      }
+    try {
+      await selectCamera(e.value);
+    } catch (error) {
+      throwErrorMessage(error);
     }
     setLocalCamera(e.info as MediaDeviceInfo);
   };
@@ -70,7 +56,7 @@ const CameraSelect = ({
     return null;
   }
   return (
-    <Dropdown testID={testID} selected={selectedDevice}>
+    <Dropdown testID={testID} selected={selectedDevice} {...props}>
       <DropdownLabel label={label} color={labelColor} />
       <DropdownControl
         placeholder={placeholder}

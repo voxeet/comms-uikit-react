@@ -25,12 +25,18 @@ const ScreenSharingPresentationBox = ({
   style,
   ...rest
 }: ScreenSharingPresentationBoxProps) => {
-  const { stream, status, isLocalUserPresentationOwner } = useScreenSharing();
+  const { stream, status, isLocalUserPresentationOwner, isPendingTakeoverRequest, sharingInProgressError } =
+    useScreenSharing();
 
   return (
     <PresentationBox
       stream={stream}
-      isError={status === ShareStatus.Error}
+      isError={
+        status === ShareStatus.Error &&
+        isLocalUserPresentationOwner &&
+        !isPendingTakeoverRequest &&
+        !sharingInProgressError
+      }
       isLocalUserPresentationOwner={isLocalUserPresentationOwner}
       backgroundColor={backgroundColor}
       fallbackContent={

@@ -10,7 +10,7 @@ type DropdownLabelProps = {
 
 const DropdownLabel = ({ label, testID, ...props }: DropdownLabelProps) => {
   return (
-    <Space testID={testID} mt="xxs" mb="xs" ml="s" className={styles.label}>
+    <Space testID={testID} mb="xs" ml="s" className={styles.label}>
       <Text type="captionSemiBold" {...props}>
         {label}
       </Text>

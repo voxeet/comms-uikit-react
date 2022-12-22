@@ -21,6 +21,7 @@ const RecordingActionBar = ({
   statusLabels,
   onActionSuccess,
   compact = false,
+  guestLabel,
   testID,
   ...props
 }: RecordingActionBarProps) => {
@@ -77,7 +78,7 @@ const RecordingActionBar = ({
       <Status
         statusDotColor={statusColors[status]}
         icon="record"
-        label={statusLabels[status]}
+        label={isLocalUserRecordingOwner || !guestLabel ? statusLabels[status] : guestLabel}
         compact={!isDesktop && compact}
       />
     </ActionBar>

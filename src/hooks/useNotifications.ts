@@ -17,6 +17,9 @@ const useNotifications: UseNotifications = () => {
   const showErrorNotification = (message: string, instanceConfig?: NotificationBase[`instanceConfig`]) => {
     showNotification({ message, variant: NotificationVariants.Error, instanceConfig });
   };
+  const showNeutralNotification = (message: string, instanceConfig?: NotificationBase[`instanceConfig`]) => {
+    showNotification({ message, variant: NotificationVariants.Neutral, instanceConfig });
+  };
 
   return {
     showNotification,
@@ -24,6 +27,7 @@ const useNotifications: UseNotifications = () => {
     showInfoNotification,
     showWarningNotification,
     showErrorNotification,
+    showNeutralNotification,
     removeNotification,
     notifications,
     shouldShowNotificationCenter: !!notifications.length,

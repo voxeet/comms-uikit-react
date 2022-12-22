@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import Color from 'color';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
 import type { ColorKey } from '../../../theme/types';
@@ -17,9 +17,19 @@ export type TooltipProps = React.HTMLAttributes<HTMLDivElement> & {
   backgroundColor?: ColorKey;
   textColor?: ColorKey;
   testID?: string;
+  tooltipStyle?: CSSProperties;
 };
 
-const Tooltip = ({ text, position, children, backgroundColor, textColor, testID, ...props }: TooltipProps) => {
+const Tooltip = ({
+  text,
+  position,
+  children,
+  backgroundColor,
+  textColor,
+  testID,
+  tooltipStyle,
+  ...props
+}: TooltipProps) => {
   const { getColor } = useTheme();
   const [isActive, setIsActive] = useState<boolean>(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -73,7 +83,7 @@ const Tooltip = ({ text, position, children, backgroundColor, textColor, testID,
       {text && (
         <div
           className={cx(styles.tooltip, { [styles.hidden]: !isActive })}
-          style={{ ...tooltipPosition }}
+          style={{ ...tooltipPosition, ...tooltipStyle }}
           data-testid={testID}
           ref={tooltipRef}
         >

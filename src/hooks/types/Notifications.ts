@@ -28,6 +28,11 @@ export type Notifications = {
   showErrorNotification: (message: string, instanceConfig?: InstanceNotificationConfig) => void;
 
   /**
+   * Show neutral notification in NotificationCenter
+   */
+  showNeutralNotification: (message: string, instanceConfig?: InstanceNotificationConfig) => void;
+
+  /**
    * Selects a camera.
    * @param notificationId -Identifier of notification to remove from notification center..
    */
@@ -52,6 +57,7 @@ export enum NotificationVariants {
   Warning = 'warning',
   Error = 'error',
   Info = 'info',
+  Neutral = 'neutral',
 }
 
 export type NotificationBase = {
@@ -61,9 +67,9 @@ export type NotificationBase = {
   instanceConfig?: InstanceNotificationConfig;
 };
 
-export type NotificationConfigBase = { bgColor: ColorKey; icon: IconComponentName; color?: ColorKey };
+export type NotificationConfigBase = { bgColor: ColorKey; icon?: IconComponentName; color?: ColorKey };
 export type InstanceNotificationConfig = Partial<
-  NotificationConfigBase & { width: number; duration: number; size: 's' | 'm'; singleLine: boolean }
+  NotificationConfigBase & { width: number; duration: number; size: 's' | 'm'; singleLine: boolean; close?: boolean }
 >;
 
 export interface Notification extends NotificationBase {

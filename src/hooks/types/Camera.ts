@@ -1,3 +1,9 @@
+export type LocalVideoParams = {
+  deviceId?: string;
+  isBlurred?: boolean;
+  constraints?: MediaTrackConstraints;
+};
+
 export type Camera = {
   /**
    * Gets the list of the available cameras.
@@ -38,6 +44,22 @@ export type Camera = {
    * Switch between front and rear camera.
    */
   swapCamera: () => Promise<void>;
+  /**
+   * Starting local video.
+   */
+  startLocalVideo: (params: LocalVideoParams) => Promise<MediaStreamTrack>;
+  /**
+   * Stops local video.
+   */
+  stopLocalVideo: () => Promise<void>;
+  /**
+   * Errors related to video devices.
+   */
+  videoError: boolean;
+  /**
+   * Resets error message
+   */
+  removeError: () => void;
 };
 
 export type UseCamera = () => Camera;

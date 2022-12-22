@@ -1,3 +1,5 @@
+import { cleanup } from '@testing-library/react';
+
 import MediaDevicesService from '../../services/mediaDevices';
 import { waitFor, act, navigatorReturnMock, setupHook } from '../../utils/tests/test-utils';
 import useCamera from '../useCamera';
@@ -17,11 +19,14 @@ jest.mock('../../services/mediaDevices', () => {
   return {
     enumerateVideoInputDevices: jest.fn(() => [localCamera, { label: 'this one is without deviceId' }, faceTimeCamera]),
     selectCamera: jest.fn(),
+    getSelectedCamera: jest.fn(() => localCamera as MediaDeviceInfo),
+    onDeviceListChanged: jest.fn(),
   };
 });
 
 beforeEach(() => {
   jest.clearAllMocks();
+  cleanup();
 });
 
 describe('useCamera', () => {
@@ -32,13 +37,13 @@ describe('useCamera', () => {
   });
   test('Should invoke selectCamera ', () => {
     const selectCamera = jest.fn();
-    jest.spyOn(MediaDevicesService, 'selectCamera').mockImplementationOnce(selectCamera);
-
+    jest.spyOn(MediaDevicesService, 'selectCamera').mockImplementation(selectCamera);
     const hookValues = setup();
-    hookValues.selectCamera(localCamera.deviceId);
-    expect(selectCamera).toBeCalledWith(localCamera.deviceId);
+    hookValues.selectCamera(faceTimeCamera.deviceId);
+    waitFor(() => {
+      expect(selectCamera).toBeCalledWith(faceTimeCamera.deviceId);
+    });
   });
-
   test('Should invoke getDefaultLocalCamera ', async () => {
     const defaultCamera = { deviceId: 'default', label: 'default' };
     const getCameras = jest.fn(() => {

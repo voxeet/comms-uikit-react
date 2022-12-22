@@ -1,5 +1,4 @@
 import cx from 'classnames';
-import type { DropdownOptionType } from 'src/components/ui/Dropdown/Dropdown';
 
 import useTheme from '../../../hooks/useTheme';
 import type { ColorKey } from '../../../theme/types';
@@ -7,6 +6,7 @@ import Icon from '../Icon/Icon';
 import Space from '../Space/Space';
 import Text from '../Text/Text';
 
+import type { DropdownOptionType } from './Dropdown';
 import styles from './Dropdown.module.scss';
 import type { DropdownListProps } from './DropdownList';
 

@@ -1,3 +1,4 @@
+import { ErrorCodes } from '../providers/CommsProvider';
 import MediaDevicesService from '../services/mediaDevices';
 
 import type { UseCamera } from './types/Camera';
@@ -7,7 +8,16 @@ import useTheme from './useTheme';
 const defaultCameras = ['default'];
 
 const useCamera: UseCamera = () => {
-  const { localCamera, setLocalCamera, hasCameraPermission, setHasCameraPermission } = useCommsContext();
+  const {
+    localCamera,
+    setLocalCamera,
+    hasCameraPermission,
+    setHasCameraPermission,
+    startLocalVideo,
+    stopLocalVideo,
+    errors,
+    removeError,
+  } = useCommsContext();
   const { isDesktop } = useTheme();
   const getCameras = async () => {
     /*
@@ -19,8 +29,12 @@ const useCamera: UseCamera = () => {
     return (await MediaDevicesService.enumerateVideoInputDevices()).filter((d) => d.deviceId) as MediaDeviceInfo[];
   };
 
-  const selectCamera = (device: string) => {
-    return MediaDevicesService.selectCamera(device);
+  const selectCamera = async (device: string) => {
+    const selectedDevice = await MediaDevicesService.getSelectedCamera();
+    if (device !== selectedDevice?.deviceId) {
+      return MediaDevicesService.selectCamera(device);
+    }
+    return Promise.resolve(device);
   };
 
   const getDefaultLocalCamera = async () => {
@@ -88,6 +102,10 @@ const useCamera: UseCamera = () => {
     localCamera,
     setLocalCamera,
     swapCamera,
+    startLocalVideo,
+    stopLocalVideo,
+    videoError: !!errors.mediaDevicesErrors.CorruptedVideoTrack,
+    removeError: () => removeError({ error: ErrorCodes.CorruptedVideoTrack }),
   };
 };
 

@@ -23,6 +23,10 @@ export type Session = {
    * @returns the version of the SDK.
    */
   getSDKVersion: () => string;
+  /**
+   * Informs if session is already opened
+   */
+  isSessionOpened: () => boolean;
 };
 
 export type UseSession = () => Session;

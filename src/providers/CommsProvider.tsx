@@ -1,23 +1,29 @@
 /* eslint-disable no-alert */
-import type { ConferenceStatus } from '@voxeet/voxeet-web-sdk/types/models/Conference';
+import type { AudioCaptureModeOptions } from '@voxeet/voxeet-web-sdk/types/models/Audio';
 import type Conference from '@voxeet/voxeet-web-sdk/types/models/Conference';
+import type { ConferenceStatus } from '@voxeet/voxeet-web-sdk/types/models/Conference';
 import type ConferenceOptions from '@voxeet/voxeet-web-sdk/types/models/ConferenceOptions';
 import type { MediaStreamWithType } from '@voxeet/voxeet-web-sdk/types/models/MediaStream';
 import type { JoinOptions, ParticipantInfo } from '@voxeet/voxeet-web-sdk/types/models/Options';
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
 import type Recording from '@voxeet/voxeet-web-sdk/types/models/Recording';
+import type { VideoForwardingOptions } from '@voxeet/voxeet-web-sdk/types/models/VideoForwarding';
 import React, { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { BlockedAudioState } from '../hooks/types/Audio';
+import type { LocalVideoParams } from '../hooks/types/Camera';
+import { VideoForwardingStrategy } from '../hooks/types/Conferencing';
 import type { LiveStreamProvider } from '../hooks/types/LiveStreaming';
 import { LiveStreamingMessages } from '../hooks/types/LiveStreaming';
 import { LogLevel } from '../hooks/types/Logger';
 import { Status } from '../hooks/types/misc';
 import type { Notification, NotificationBase } from '../hooks/types/Notifications';
 import type { ParticipantStatus } from '../hooks/types/Participants';
+import { AudioCaptureMode, AudioProcessingMessages } from '../hooks/types/UseAudioProcessing';
 import useLogger from '../hooks/useLogger';
 import commandService from '../services/command';
 import conferenceService from '../services/conference';
+import MediaDevicesService from '../services/mediaDevices';
 import recordingService from '../services/recording';
 import sdkService from '../services/sdk';
 import sessionService from '../services/session';
@@ -136,9 +142,6 @@ export type CommsContextType = {
   showNotification: (notification: NotificationBase) => void;
   notifications: Notification[];
   removeNotification: (notificationId: number) => void;
-  screenShareErrorMessages: ErrorCodes[];
-  recordingErrorMessages: ErrorCodes[];
-  liveStreamingErrorMessages: ErrorCodes[];
   sendMessage: (message: Record<string, unknown>) => Promise<void>;
   messageData: MessageData;
   clearMessage: () => void;
@@ -146,6 +149,7 @@ export type CommsContextType = {
   resetScreenSharingData: () => void;
   resetRecordingData: () => void;
   errors: Errors;
+  removeError: (params: { error?: ErrorCodes; level?: keyof Errors }) => void;
   stopRecording: () => Promise<boolean>;
   startRecording: () => Promise<boolean>;
   removeSdkErrors: (error?: ErrorCodes) => void;
@@ -162,6 +166,16 @@ export type CommsContextType = {
   startLiveStreaming: (start: () => Promise<void>, rtmp: string, provider: LiveStreamProvider) => Promise<boolean>;
   stopLiveStreaming: (stop: () => Promise<void>) => Promise<boolean>;
   resetLiveStreamingData: () => void;
+  getAudioCaptureMode: () => Promise<AudioCaptureModeOptions | undefined>;
+  setAudioCaptureMode: (option: Partial<AudioCaptureModeOptions>) => Promise<void>;
+  audioMode?: AudioCaptureModeOptions;
+  startLocalVideo: (params: LocalVideoParams) => Promise<MediaStreamTrack>;
+  stopLocalVideo: () => Promise<void>;
+  localStream: MediaStream | null;
+  setLocalStream: (stream?: MediaStream) => void;
+  isSessionOpened: () => boolean;
+  setVideoForwarding: (maxVideoForwarding: number, option?: Partial<VideoForwardingOptions>) => Promise<void>;
+  maxVideoForwarding: number;
 };
 
 export type CommsProviderProps = {
@@ -189,11 +203,14 @@ export type CommsProviderProps = {
 export const CommsContext = createContext<CommsContextType>({} as CommsContextType);
 
 // We should add some SDK error codes here
+type ErrorsPartial = Partial<Record<ErrorCodes, boolean>>;
 export type Errors = {
-  recordingErrors: ErrorCodes[];
-  liveStreamingErrors: ErrorCodes[];
-  screenShareErrors: ErrorCodes[];
-  sdkErrors: Partial<Record<ErrorCodes, boolean>>;
+  recordingErrors: ErrorsPartial;
+  liveStreamingErrors: ErrorsPartial;
+  screenShareErrors: ErrorsPartial;
+  audioCapture: ErrorsPartial;
+  sdkErrors: ErrorsPartial;
+  mediaDevicesErrors: ErrorsPartial;
 };
 
 export enum ErrorCodes {
@@ -208,7 +225,12 @@ export enum ErrorCodes {
   'ScreenShareAutoTakeoverError' = 'Screen share auto takeover error',
   'ScreenShareAlreadyInProgress' = 'ScreenShare already in progress',
   'IncorrectSession' = 'Incorrect participant session',
+  'CouldNotStartVideoSource' = 'Could not start video source',
   'PeerConnectionDisconnectedError' = 'PeerConnectionDisconnectedError',
+  'AudioCaptureParameterError' = 'Unable to change audio capture mode. Please provide a valid audio capture mode.',
+  'ConferenceIsNotInitialized' = 'Conference is not initialized.',
+  'CorruptedVideoTrack' = 'CorruptedVideoTrack',
+  'ExpiredOrInvalidToken' = 'Expired or invalid token',
 }
 
 /*
@@ -217,6 +239,7 @@ export enum ErrorCodes {
 
 const singleParticipantMutedSet = new Set();
 const liveStreamAwareParticipants = new Set();
+let retries = 0;
 
 export const errorMapper = (error: unknown) => {
   const { message } = (error as Error) || { message: '' };
@@ -233,9 +256,20 @@ export const errorMapper = (error: unknown) => {
     case ErrorCodes.ScreenShareAutoTakeoverErrorSafari:
     case ErrorCodes.ScreenShareAutoTakeoverErrorMozilla:
       return ErrorCodes.ScreenShareAutoTakeoverError;
+    case ErrorCodes.AudioCaptureParameterError:
+      return ErrorCodes.AudioCaptureParameterError;
     default:
       return undefined;
   }
+};
+
+const initialErrors = {
+  recordingErrors: {},
+  liveStreamingErrors: {},
+  screenShareErrors: {},
+  audioCapture: {},
+  sdkErrors: {},
+  mediaDevicesErrors: {},
 };
 
 const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix }: CommsProviderProps) => {
@@ -250,6 +284,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
 
   const [isAudio, setIsAudio] = useState<boolean>(true);
   const [isVideo, setIsVideo] = useState<boolean>(true);
+  const [maxVideoForwarding, setMaxVideoForwarding] = useState<number>(24);
 
   const [localCamera, setLocalCamera] = useState<CommsContextType['localCamera']>(null);
   const [localMicrophone, setLocalMicrophone] = useState<CommsContextType['localMicrophone']>(null);
@@ -262,18 +297,26 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   const [liveStreamingData, setLiveStreamingData] = useState<LiveStreamingDataType>(initialLiveStreamingData);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   // We should expand this with specific context errors
-  const [errors, setErrors] = useState<Errors>({
-    recordingErrors: [],
-    liveStreamingErrors: [],
-    screenShareErrors: [],
-    sdkErrors: {},
-  });
+  const [errors, setErrors] = useState<Errors>(initialErrors);
   const [messageData, setMessageData] = useState<MessageData>({ sender: null, message: null });
   const [hasCameraPermission, setHasCameraPermission] = useState(false);
   const [hasMicrophonePermission, setHasMicrophonePermission] = useState(false);
   const [isBlurred, setIsBlurred] = useState(false);
+  const [audioMode, setAudioMode] = useState<AudioCaptureModeOptions | undefined>();
   const { log } = useLogger();
+  const [localStream, dispatchSetLocalStream] = useState<MediaStream | null>(null);
+  const [participantsWithMusic, setParticipantsWithMusic] = useState<string[]>([]);
 
+  useEffect(() => {
+    if (conference) {
+      const userStreamFromConference = participant?.streams[0];
+      setLocalStream(userStreamFromConference);
+    }
+  }, [conference]);
+
+  const setLocalStream = (stream?: MediaStream) => {
+    dispatchSetLocalStream(stream || null);
+  };
   // INITIALIZATION
   useEffect(() => {
     if (!dioWindow.dolbyio.isInitialized) {
@@ -314,14 +357,74 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
         map[p.id] = {
           isSpeaking: !!participantsStatus[p.id]?.isSpeaking,
           isLocal,
-          isRemoteAudio: isLocal ? p.audioTransmitting : p.audioReceivingFrom,
+          isRemoteAudio: p.audioTransmitting,
           isLocalAudio: isLocal ? isAudio : remoteLocalAudioStatus(),
           isVideo: isLocal ? isVideoFromStreamEnabled && isVideo : isVideoFromStreamEnabled,
+          isRemoteMusicMode: prev[p.id]?.isRemoteMusicMode,
         };
       });
       return map;
     });
   }, [participantsArray, participant, isVideo]);
+
+  // MUSIC MODE MESSAGING
+
+  useEffect(() => {
+    Object.keys(participantsStatus).forEach((id) => {
+      if (participantsStatus[id].isRemoteMusicMode) {
+        setParticipantsWithMusic((prev) => [...prev, id]);
+      } else {
+        const indexOfId = participantsWithMusic.indexOf(id);
+        setParticipantsWithMusic((prev) => {
+          return prev.splice(indexOfId, 1);
+        });
+      }
+    });
+    if (participant) {
+      if (audioMode?.mode === AudioCaptureMode.Music) {
+        setParticipantsWithMusic((prev) => [...prev, participant.id]);
+      } else {
+        const indexOfId = participantsWithMusic.indexOf(participant.id);
+        setParticipantsWithMusic((prev) => {
+          return prev.splice(indexOfId, 1);
+        });
+      }
+    }
+  }, [participantsStatus, audioMode]);
+
+  useEffect(() => {
+    const participantsWithMusicMessage = {
+      text: AudioProcessingMessages.PARTICIPANTS_STATUS,
+      data: participantsWithMusic,
+    };
+
+    const sendStatusMessage = async () => {
+      await sendMessage(participantsWithMusicMessage);
+    };
+
+    if (conference && participants && audioMode?.mode === AudioCaptureMode.Music) {
+      sendStatusMessage();
+    }
+  }, [participants.size]);
+
+  useEffect(() => {
+    if (
+      messageData.message?.text === AudioProcessingMessages.PARTICIPANTS_STATUS &&
+      Array.isArray(messageData.message.data)
+    ) {
+      messageData.message.data.forEach((id) => {
+        setParticipantsStatus((participantsStatus) => {
+          return {
+            ...participantsStatus,
+            [id]: {
+              ...participantsStatus[id],
+              isRemoteMusicMode: true,
+            },
+          };
+        });
+      });
+    }
+  }, [messageData]);
 
   useEffect(() => {
     if (participant && participant.info.name && conference) {
@@ -423,21 +526,26 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   };
 
   const toggleAudio = async (): Promise<void> => {
-    if (participant) {
+    if (conference && participant) {
       const localUser = conferenceService.participants().get(participant.id);
       if (localUser) {
         if (localUser.audioTransmitting) {
           log(LogLevel.info, 'Muting local user');
-          setIsAudio(false);
           await stopParticipantAudio(localUser);
+          setIsAudio(false);
         } else {
           log(LogLevel.info, 'Unmuting local user');
-          setIsAudio(true);
           await startParticipantAudio(localUser);
+          setIsAudio(true);
         }
       }
+    } else if (isAudio) {
+      // Currently SDK implementation is not exposing audio functionalities before conference
+      // await conferenceService.stopLocalAudio();
+      setIsAudio(false);
     } else {
-      setIsAudio((audio) => !audio);
+      // await conferenceService.startLocalAudio();
+      setIsAudio(true);
     }
   };
 
@@ -474,7 +582,11 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   };
 
   const toggleVideo = async (): Promise<void> => {
-    if (participant) {
+    /*
+     * Resetting retries counter while toggling video is necessary , to allow desired retry
+     */
+    retries = 0;
+    if (conference && participant) {
       const localUser = conferenceService.participants().get(participant.id);
       if (localUser) {
         /*
@@ -488,16 +600,37 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
           log(LogLevel.info, "Turning off local user's video");
           setIsVideo(false);
         } else {
-          await conferenceService.startLocalVideo(isBlurred);
+          await conferenceService.startLocalVideo({ isBlurred });
           log(LogLevel.info, "Turning on local user's video");
           setIsVideo(true);
         }
       }
+    } else if (isVideo) {
+      await conferenceService.stopLocalVideo();
+      setIsVideo(false);
     } else {
-      log(LogLevel.info, 'Turning off video for remote participant');
-      setIsVideo((video) => !video);
+      const track = await conferenceService.startLocalVideo({ isBlurred });
+      const stream = new MediaStream([track]);
+      setIsVideo(true);
+      setLocalStream(stream);
     }
   };
+
+  useEffect(() => {
+    if (isVideo && participant && !conference) {
+      (async () => {
+        if (localStream && localCamera && /android/i.test(navigator.userAgent || navigator.vendor)) {
+          return MediaDevicesService.selectCamera(localCamera?.deviceId || '');
+        }
+        const track = await conferenceService.startLocalVideo({
+          deviceId: localCamera ? localCamera.deviceId : undefined,
+          isBlurred,
+        });
+        const stream = new MediaStream([track]);
+        return setLocalStream(stream);
+      })();
+    }
+  }, [localCamera]);
 
   const playBlockedAudio = async (): Promise<void> => {
     await conferenceService.playBlockedAudio();
@@ -521,11 +654,14 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
 
   const leaveConference = useCallback(async (): Promise<void> => {
     await conferenceService.leave();
-    await closeSession();
+    setRecordingData(initialRecordingData);
     setConference(null);
+    setMaxVideoForwarding(24);
     setParticipantsStatus({});
     setConferenceStatus(null);
     setParticipants(new Map());
+    setLocalStream(undefined);
+    // TODO remove when video blur preview will be available in setup
     setIsBlurred(false);
   }, []);
 
@@ -535,6 +671,8 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
 
   const resetAudio = () => {
     setIsAudio(true);
+    setIsPageMuted(false);
+    singleParticipantMutedSet.clear();
   };
 
   const startScreenShare = async () => {
@@ -542,10 +680,10 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       ...prev,
       status: Status.Loading,
     }));
-    setErrors((prev) => ({ ...prev, screenShareErrors: [] }));
+    setSharingErrors();
+
     try {
       await conferenceService.startScreenShare();
-
       setScreenSharingData((prev) => ({
         ...prev,
         owner: participant,
@@ -555,7 +693,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     } catch (error) {
       const message = errorMapper(error);
       if (message) {
-        setErrors((prev) => ({ ...prev, screenShareErrors: [message, ...prev.screenShareErrors] }));
+        setSharingErrors(message);
       }
       if (message === ErrorCodes.LackOfBrowserPermissions || message === ErrorCodes.ScreenShareAutoTakeoverError) {
         setScreenSharingData((prev) => ({
@@ -564,7 +702,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
           status: Status.Other,
           isPresentationModeActive: false,
         }));
-      } else {
+      } else if (message !== ErrorCodes.ScreenShareAlreadyInProgress) {
         setScreenSharingData((prev) => ({
           ...prev,
           owner: participant,
@@ -597,7 +735,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       ...prev,
       status: Status.Loading,
     }));
-    setErrors((prev) => ({ ...prev, recordingErrors: [] }));
+    setRecordingErrors();
     try {
       await recordingService.start();
 
@@ -611,7 +749,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       return true;
     } catch (error) {
       if (error instanceof Error) {
-        console.log(error.message);
+        log(LogLevel.error, error.message);
       }
       const message = errorMapper(error);
       if (message) {
@@ -642,7 +780,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       }));
       return true;
     } catch (error) {
-      console.log(error);
+      log(LogLevel.error, JSON.stringify(error));
       return false;
     }
   };
@@ -653,7 +791,8 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       ...prev,
       status: Status.Loading,
     }));
-    setErrors((prev) => ({ ...prev, liveStreamingErrors: [] }));
+    setLiveStreamingErrors();
+
     try {
       await start();
       const timestamp = Date.now();
@@ -679,7 +818,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       return true;
     } catch (error: any) {
       if (error instanceof Error) {
-        console.log(error.message);
+        log(LogLevel.error, error.message);
       }
       const { message } = error.data;
       if (message) {
@@ -697,7 +836,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   };
 
   const stopLiveStreaming: CommsContextType['stopLiveStreaming'] = async (stop) => {
-    setErrors((prev) => ({ ...prev, liveStreamingErrors: [] }));
+    setLiveStreamingErrors();
     try {
       await stop();
       if (participant) {
@@ -720,7 +859,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       return true;
     } catch (error: any) {
       if (error instanceof Error) {
-        console.log(error.message);
+        log(LogLevel.error, error.message);
       }
       const { message: errorMessage } = error.data;
       const message = errorMapper(errorMessage);
@@ -777,7 +916,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       await commandService.send(JSON.stringify(message));
     } catch (error) {
       if (error instanceof Error) {
-        alert('Send message error!');
+        console.warn('Cannot send message');
       }
     }
   };
@@ -819,7 +958,19 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       if (updatedParticipant.id === liveStreamingData.owner?.id && liveStreamingData.status === Status.Active) {
         resetLiveStreamingData();
       }
+      /*
+       * Since we are getting error from SDK about emitting stopStream event, right now we need to explicitly clear data about screenSharing
+       * This occurs while screenSharing on Safari and mainly while rejoining and screenSharing
+       */
+      if (updatedParticipant.id === screenSharingData.owner?.id) {
+        setScreenSharingData(initialScreenSharingData);
+      }
+      return setParticipants((participants) => {
+        participants.delete(updatedParticipant.id);
+        return new Map(participants);
+      });
     }
+
     if (
       liveStreamingData.status === Status.Active &&
       liveStreamingData.isLiveStreamingModeActive &&
@@ -834,7 +985,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
         id: updatedParticipant.id,
       };
 
-      sendMessage(startMessage);
+      await sendMessage(startMessage);
       liveStreamAwareParticipants.add(updatedParticipant.id);
     }
     const p = participants.get(updatedParticipant.id);
@@ -847,20 +998,41 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
         } as Participant),
       );
     });
-    if (!p && isPageMuted) {
+    if (isPageMuted && updatedParticipant.id !== participant?.id) {
       await stopParticipantAudio(updatedParticipant, true);
     }
+
+    if (updatedParticipant.id !== participant?.id) {
+      if (
+        singleParticipantMutedSet.has(updatedParticipant.id) &&
+        (participantsStatus[updatedParticipant.id]?.isLocalAudio || !participantsStatus[updatedParticipant.id])
+      ) {
+        return stopParticipantAudio(updatedParticipant);
+      }
+    }
+    return true;
   };
 
-  const onStreamsChange = (participant: Participant) => {
+  const onStreamsChange = (updatedParticipant: Participant) => {
+    if (updatedParticipant.id === participant?.id) {
+      /*
+       * Updating local stream to force re-rendering of videoLocal while swap camera
+       */
+      if (updatedParticipant.streams.length && updatedParticipant.streams[0].getVideoTracks().length) {
+        const { streams } = participant;
+        const tracks = streams[0]?.getVideoTracks?.();
+        const videoTrack = tracks[0];
+        setLocalStream(videoTrack && new MediaStream([videoTrack]));
+      }
+    }
     setParticipants((participants) => {
-      const p = participants.get(participant.id);
+      const p = participants.get(updatedParticipant.id);
       if (p) {
         return new Map(
-          participants.set(participant.id, {
+          participants.set(updatedParticipant.id, {
             ...p,
-            ...participant,
-            audioReceivingFrom: participant.audioReceivingFrom,
+            ...updatedParticipant,
+            audioReceivingFrom: updatedParticipant.audioReceivingFrom,
           } as Participant),
         );
       }
@@ -868,10 +1040,33 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     });
   };
 
+  const onVideoUpdated = async (track: MediaStreamTrack) => {
+    setLocalStream(new MediaStream([track]));
+    if (track.readyState === 'ended') {
+      setErrors((prev) => ({
+        ...prev,
+        mediaDevicesErrors: { ...prev.mediaDevicesErrors, [ErrorCodes.CorruptedVideoTrack]: true },
+      }));
+      log(LogLevel.warn, 'We received a faulty video track');
+    }
+    if (track.label === localCamera?.label) {
+      return null;
+    }
+    const camera = (await MediaDevicesService.enumerateVideoInputDevices()).find(
+      (d) => track.label === d.label,
+    ) as MediaDeviceInfo;
+
+    return setLocalCamera(camera);
+    /*
+     * For just updating track - use
+     // * return setLocalStream(new MediaStream([track]));
+     */
+  };
+
   const onScreenShareStart = (participant: Participant, stream: MediaStreamWithType) => {
     if (stream.type === 'ScreenShare') {
       try {
-        setErrors((prev) => ({ ...prev, screenShareErrors: [] }));
+        setSharingErrors();
         setScreenSharingData((prev) => ({
           ...prev,
           owner: participant,
@@ -895,7 +1090,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   const onScreenShareStop = (participant: Participant, stream: MediaStreamWithType) => {
     if (stream.type === 'ScreenShare') {
       try {
-        setErrors((prev) => ({ ...prev, screenShareErrors: [] }));
+        setSharingErrors();
         setScreenSharingData((prev) => ({
           ...prev,
           owner: null,
@@ -916,7 +1111,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
 
   const onRecordingStatusUpdated = (isRecording: boolean, recording: Recording) => {
     try {
-      setErrors((prev) => ({ ...prev, recordingErrors: [] }));
+      setRecordingErrors();
       setRecordingData((prev) => ({
         ...prev,
         ownerId: recording ? recording.participantId : null,
@@ -925,7 +1120,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       }));
     } catch (error) {
       if (error instanceof Error) {
-        console.log(error.message);
+        log(LogLevel.error, error.message);
       }
       const message = errorMapper(error);
       if (message) setRecordingErrors(errorMapper(message));
@@ -940,26 +1135,38 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   };
 
   const setSharingErrors = (errorCode?: ErrorCodes) => {
-    setErrors((prev) => ({ ...prev, screenShareErrors: errorCode ? [errorCode, ...prev.screenShareErrors] : [] }));
+    setErrors((prev) => ({
+      ...prev,
+      screenShareErrors: errorCode ? { ...prev.screenShareErrors, [errorCode]: true } : {},
+    }));
   };
 
   const setRecordingErrors = (errorCode?: ErrorCodes) => {
-    setErrors((prev) => ({ ...prev, recordingErrors: errorCode ? [errorCode, ...prev.recordingErrors] : [] }));
+    setErrors((prev) => ({
+      ...prev,
+      recordingErrors: errorCode ? { ...prev.recordingErrors, [errorCode]: true } : {},
+    }));
   };
 
   const setLiveStreamingErrors = (errorCode?: ErrorCodes) => {
-    setErrors((prev) => ({ ...prev, liveStreamingErrors: errorCode ? [errorCode, ...prev.liveStreamingErrors] : [] }));
+    setErrors((prev) => ({
+      ...prev,
+      liveStreamingErrors: errorCode ? { ...prev.liveStreamingErrors, [errorCode]: true } : {},
+    }));
   };
 
-  const removeSdkErrors = (error?: ErrorCodes) => {
-    let newErrors: Errors['sdkErrors'];
-    if (error) {
-      newErrors = { ...errors.sdkErrors };
-      delete newErrors[error];
-    } else {
-      newErrors = {};
+  const removeSdkErrors = (error?: ErrorCodes) => removeError({ error, level: 'sdkErrors' });
+
+  const removeError = ({ error, level }: { error?: ErrorCodes; level?: keyof Errors }) => {
+    if (error && level) {
+      const levelErrors = { ...errors[level] };
+      delete levelErrors[error];
+      return setErrors((prev) => ({ ...prev, [level]: levelErrors }));
     }
-    setErrors((prev) => ({ ...prev, sdkErrors: newErrors }));
+    if (level) {
+      return setErrors((prev) => ({ ...prev, [level]: initialErrors[level] }));
+    }
+    return setErrors(initialErrors);
   };
 
   const onMessageReceived = (participant: Participant, message: string) => {
@@ -969,16 +1176,36 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     });
   };
 
+  useEffect(() => {
+    if (messageData.message?.text === AudioProcessingMessages.MUSIC_MODE_STARTED) {
+      setParticipantsStatus((participantsStatus) => {
+        return {
+          ...participantsStatus,
+          [messageData.sender?.id as string]: {
+            ...participantsStatus[messageData.sender?.id as string],
+            isRemoteMusicMode: true,
+          },
+        };
+      });
+    } else if (messageData.message?.text === AudioProcessingMessages.MUSIC_MODE_STOPPED) {
+      setParticipantsStatus((participantsStatus) => {
+        return {
+          ...participantsStatus,
+          [messageData.sender?.id as string]: {
+            ...participantsStatus[messageData.sender?.id as string],
+            isRemoteMusicMode: false,
+          },
+        };
+      });
+    }
+  }, [messageData]);
+
   const clearMessage = () => {
     setMessageData({
       sender: null,
       message: null,
     });
   };
-  // const onPermissionsChange = (permissions: ConferencePermission[]) => {
-  //   // eslint-disable-next-line no-console
-  //   console.log('PERMISSIONS UPDATED EVENT DATA: \n', JSON.stringify(permissions, null, 2));
-  // };
 
   useEffect(() => {
     const unsubscribers: Array<() => void> = [
@@ -991,11 +1218,23 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     return () => {
       unsubscribers.forEach((u) => u());
     };
-  }, []);
+  }, [participant]);
 
   useEffect(() => {
     return conferenceService.onParticipantsChange(onParticipantsChange);
-  }, [isPageMuted, liveStreamingData]);
+  }, [isPageMuted, liveStreamingData, participants, participant]);
+
+  useEffect(() => {
+    let unsubscribe: () => void;
+    if (!conference) {
+      unsubscribe = conferenceService.onLocalVideoUpdated(onVideoUpdated);
+    }
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
+  }, [localCamera, conference]);
 
   const showNotification = (notification: NotificationBase) => {
     const id = Date.now() * Math.random();
@@ -1026,21 +1265,108 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
           ...prev,
           sdkErrors: { ...prev.sdkErrors, [ErrorCodes.PeerConnectionDisconnectedError]: true },
         }));
-      }
-      if (error.message.includes(ErrorCodes.IncorrectSession)) {
+      } else if (error.message.includes(ErrorCodes.IncorrectSession)) {
         setErrors((prev) => ({
           ...prev,
           sdkErrors: { ...prev.sdkErrors, [ErrorCodes.IncorrectSession]: true },
         }));
+      } else if (error.message.includes(ErrorCodes.CouldNotStartVideoSource)) {
+        log(LogLevel.warn, 'Could not start video source - Retrying');
+        setErrors((prev) => ({
+          ...prev,
+          sdkErrors: { ...prev.sdkErrors, [ErrorCodes.CouldNotStartVideoSource]: true },
+        }));
+      } else {
+        throw error;
       }
     };
-
     const subscription = conferenceService.onConferenceError(sdkErrorsHandler);
-
     return () => {
       subscription();
     };
   }, []);
+
+  useEffect(() => {
+    if (errors.sdkErrors['Could not start video source']) {
+      retries += 1;
+      retryVideo();
+    }
+  }, [errors]);
+
+  /*
+   * This is retry mechanism for swap cameras on some android devices.
+   * Right now we're sometimes getting error from browser api while trying to swap cameras
+   */
+  const retryVideo = async () => {
+    setErrors((prev) => ({
+      ...prev,
+      sdkErrors: { ...prev.sdkErrors, [ErrorCodes.CouldNotStartVideoSource]: false },
+    }));
+    if (retries < 3) {
+      log(LogLevel.info, 'Retrying to start video');
+      const videoTrack = await conferenceService.startLocalVideo({ deviceId: localCamera?.deviceId, isBlurred });
+      setLocalStream(videoTrack && new MediaStream([videoTrack]));
+      retries = 0;
+    }
+  };
+
+  const getAudioCaptureMode = async () => {
+    if (!isAudio) {
+      log(LogLevel.warn, 'Audio is disabled');
+      if (audioMode) {
+        return audioMode;
+      }
+      throw new Error('There is no mode available');
+    } else {
+      const mode = await conferenceService.getCaptureMode();
+      setAudioMode(mode);
+      return mode;
+    }
+  };
+
+  const setAudioCaptureMode = async (option: Partial<AudioCaptureModeOptions>) => {
+    const preCheck = async () => {
+      if (!audioMode) {
+        return getAudioCaptureMode();
+      }
+      return audioMode;
+    };
+
+    if (!isAudio) {
+      return log(LogLevel.warn, 'Audio is disabled');
+    }
+
+    const currentMode = await preCheck();
+
+    if (currentMode) {
+      const mergedOptions = {
+        mode: option.mode || currentMode.mode,
+        modeOptions: { ...currentMode.modeOptions, ...option.modeOptions },
+      };
+      try {
+        await conferenceService.setCaptureMode(mergedOptions);
+        return setAudioMode(mergedOptions);
+      } catch (err: any) {
+        const message = errorMapper(err);
+        if (message) {
+          setErrors((prev) => ({
+            ...prev,
+            audioCapture: { ...prev.audioCapture, [message]: true },
+          }));
+        }
+      }
+    }
+    throw new Error('Problem with setting audio mode');
+  };
+
+  const setVideoForwarding = async (maxVideoForwarding: number, option?: VideoForwardingOptions) => {
+    await conferenceService.setVideoForwarding({
+      strategy: VideoForwardingStrategy.LastSpeaker,
+      ...option,
+      max: maxVideoForwarding,
+    });
+    setMaxVideoForwarding(maxVideoForwarding);
+  };
 
   const contextValue: CommsContextType = useMemo(() => {
     return {
@@ -1055,10 +1381,10 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       conferenceStatus,
       participants: participantsArray,
       participantsStatus,
-      isAudio:
-        participant?.id && participantsStatus[participant.id]
-          ? !!participantsStatus[participant.id]?.isRemoteAudio
-          : isAudio,
+      isAudio,
+      // participant?.id && participantsStatus[participant.id]
+      //   ? !!participantsStatus[participant.id]?.isLocalAudio
+      //   : isAudio,
       toggleAudio,
       playBlockedAudio,
       startParticipantAudio,
@@ -1095,11 +1421,8 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       messageData,
       clearMessage,
       setPendingTakeoverRequest,
-      screenShareErrorMessages: errors.screenShareErrors,
-      recordingErrorMessages: errors.recordingErrors,
-      liveStreamingErrorMessages: errors.liveStreamingErrors,
       errors,
-      // For additional errors provide proper pointers
+      removeError,
       resetScreenSharingData,
       resetRecordingData,
       removeSdkErrors,
@@ -1119,6 +1442,16 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       stopLiveStreaming,
       startLiveStreaming,
       resetLiveStreamingData,
+      getAudioCaptureMode,
+      setAudioCaptureMode,
+      audioMode,
+      startLocalVideo: conferenceService.startLocalVideo,
+      stopLocalVideo: conferenceService.stopLocalVideo,
+      setLocalStream,
+      localStream,
+      isSessionOpened: sessionService.isOpen,
+      setVideoForwarding,
+      maxVideoForwarding,
       // For additional errors provide proper pointers
       ...value,
     };
@@ -1149,6 +1482,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     recordingData,
     isBlurred,
     liveStreamingData,
+    localStream,
   ]);
 
   return (

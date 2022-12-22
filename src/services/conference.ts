@@ -1,10 +1,13 @@
 import VoxeetSDK from '@voxeet/voxeet-web-sdk';
+import type { AudioCaptureModeOptions } from '@voxeet/voxeet-web-sdk/types/models/Audio';
 import type { ConferencePermission, ConferenceStatus } from '@voxeet/voxeet-web-sdk/types/models/Conference';
 import type Conference from '@voxeet/voxeet-web-sdk/types/models/Conference';
 import type ConferenceOptions from '@voxeet/voxeet-web-sdk/types/models/ConferenceOptions';
 import type { MediaStreamWithType } from '@voxeet/voxeet-web-sdk/types/models/MediaStream';
 import type { JoinOptions } from '@voxeet/voxeet-web-sdk/types/models/Options';
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
+import type { VideoForwardingOptions } from '@voxeet/voxeet-web-sdk/types/models/VideoForwarding';
+import type { VideoProcessor } from '@voxeet/voxeet-web-sdk/types/models/VideoProcessor';
 
 export default class ConferenceService {
   public static create(options: ConferenceOptions) {
@@ -64,13 +67,52 @@ export default class ConferenceService {
     return VoxeetSDK.audio.local.stop();
   }
 
-  public static startLocalVideo(isBlurred?: boolean) {
-    // @ts-expect-error problem with enum import from SDK
-    return VoxeetSDK.video.local.start({}, isBlurred ? { type: 'bokeh' } : undefined);
+  public static getCaptureMode() {
+    return VoxeetSDK.audio.local.getCaptureMode();
+  }
+
+  public static setCaptureMode(options: AudioCaptureModeOptions) {
+    return VoxeetSDK.audio.local.setCaptureMode(options);
+  }
+
+  public static startLocalVideo({
+    deviceId,
+    constraints,
+    isBlurred,
+  }: {
+    deviceId?: string;
+    isBlurred?: boolean;
+    constraints?: MediaTrackConstraints;
+  }) {
+    const defaultVideoOptions: MediaStreamConstraints['video'] = {
+      width: { min: 1024, ideal: 1280, max: 1920 },
+      height: { min: 576, ideal: 720, max: 1080 },
+    };
+    const constraintsOptions = constraints || defaultVideoOptions;
+
+    if (deviceId) {
+      constraintsOptions.deviceId = deviceId;
+    }
+    return VoxeetSDK.video.local.start(
+      constraintsOptions,
+      isBlurred ? ({ type: 'bokeh' } as VideoProcessor) : undefined,
+    );
   }
 
   public static stopLocalVideo() {
     return VoxeetSDK.video.local.stop();
+  }
+
+  public static onLocalVideoUpdated(handler: (track: MediaStreamTrack) => void) {
+    /*
+     * Ts-ignore rule is due wrong type definitions for local video interface... SDK team is aware of this
+     */
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    VoxeetSDK.video.local.on('videoUpdated', handler);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return () => VoxeetSDK.video.local.removeListener('videoUpdated', handler);
   }
 
   public static isSpeaking(participant: Participant, callback: (value: boolean) => void) {
@@ -157,5 +199,9 @@ export default class ConferenceService {
 
   public static stopVideoProcessing() {
     return VoxeetSDK.video.local.disableProcessing();
+  }
+
+  public static setVideoForwarding(options: VideoForwardingOptions) {
+    return VoxeetSDK.conference.videoForwarding(options);
   }
 }

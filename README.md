@@ -49,9 +49,10 @@ The package consists of four basic elements:
 - A [Dolby.io](https://dashboard.dolby.io/signup/) account
 - A working webcam and microphone
 - A Dolby.io [client access token](https://dashboard.dolby.io/dashboard/applications/summary)
-- [Voxeet Web SDK >=3.6.0](https://www.npmjs.com/package/@voxeet/voxeet-web-sdk) or later
+- [Voxeet Web SDK >=3.8.0](https://www.npmjs.com/package/@voxeet/voxeet-web-sdk) or later
 - [Node.js 16.x](https://nodejs.org/en/) or later
 - A supported browser, either Chrome 100+, Safari 15+, Firefox 100+, or Edge 100+
+- [Yarn v1.22.19](https://yarnpkg.com) installed.
 
 ## How to use this guide
 
@@ -59,9 +60,11 @@ This guide demonstrates how to use video call UI components to quickly build the
 
 Each component demonstrated within [Add video call components](#add-video-call-components) can be built independent of the others. The code blocks within each section only include the code for that individual component, and exclude the components from other sections.
 
-If you prefer to get started by reviewing a complete code sample containing all of the features in this guide, see [the example here](examples/example_App.js).
+If you prefer to get started by reviewing a complete code sample containing all the features in this guide, see [the example here](examples/example_App.js).
 
 ## Setup
+
+**Note:** This guide is written with Yarn in mind. You can swap out yarn for NPM or a different package manager if you like.
 
 ```bash
 # Create a new React application
@@ -70,14 +73,11 @@ npx create-react-app my-app
 # Change into the app directory
 cd my-app
 
-# Install the Voxeet SDK and UI kit with npm...
-npm install @voxeet/voxeet-web-sdk @dolbyio/comms-uikit-react --save
-
-# ...or yarn (skip this if you used npm)
+# Install UI kit
 yarn add @voxeet/voxeet-web-sdk @dolbyio/comms-uikit-react
 
 # Start the dev server
-npm start
+yarn run start
 ```
 
 ## Steps
@@ -417,26 +417,29 @@ You can use the installed VoxeedSDK's APIs in the application directly without r
 // 1. import Voxeet SDK
 import VoxeetSDK from '@voxeet/voxeet-web-sdk';
 
+// 2. import `useEffect` from React.
+import { useEffect } from 'react';
+
 // ... exsiting code
 
 function Content() {
-
-  // 2. insert the useEffect hook here
+  // 3. insert the useEffect hook here
   useEffect(() => {
-    // 3. define the event handler here
+    // 4. define the event handler here
     const handler = (participant) => {
       console.log(participant.info.name, 'status:', participant.status);
       console.log(participant.info.name, 'has audio enabled:', participant.audioTransmitting);
-    }
-    // 4. register the handler for 'participantUpdated' event
+    };
+    // 5. register the handler for 'participantUpdated' event
     VoxeetSDK.conference.on('participantUpdated', handler);
     return () => {
-      // 5. unregister the handler
+      // 6. unregister the handler
       VoxeetSDK.conference.removeListener('participantUpdated', handler);
     };
   }, []);
 
   // ... existing code
+}
 ```
 
 > More information about Voxeet WebSDK is [here](https://docs.dolby.io/communications-apis/docs/js-overview)
@@ -532,7 +535,7 @@ function Content() {
             <ScreenSharingActionBar
               statusLabels={{
                 active: ScreenSharingActionBarTexts.status.active,
-                error: ScreenSharingActionBarTexts.status.issue,
+                error: ScreenSharingActionBarTexts.status.error,
                 loading: ScreenSharingActionBarTexts.status.loading,
                 other: ScreenSharingActionBarTexts.status.other,
               }}
@@ -612,7 +615,7 @@ function Content() {
             <RecordingActionBar
               statusLabels={{
                 active: RecordingActionBarTexts.status.active,
-                error: RecordingActionBarTexts.status.issue,
+                error: RecordingActionBarTexts.status.error,
                 loading: RecordingActionBarTexts.status.loading,
                 other: RecordingActionBarTexts.status.other,
               }}
@@ -689,25 +692,26 @@ The UI components use custom hooks to connect to the [Dolby.io Communications AP
 
 If you would like to connect to the Dolby.io Communications APIs using your own UI components, you can use the following exported hooks to add conferencing features to your application:
 
-| Hook                                                        | Description                                                                                              |
-| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| [useAudio](documentation/hooks/useAudio.md)                 | Can be used to mute or unmute audio for local and remote participants.                                   |
-| [useBlur](documentation/hooks/useBlur.md)                   | Can be used to toggle background blur effect for local participant                                       |
-| [useCamera](documentation/hooks/useCamera.md)               | Lists and selects available cameras, in addition to requesting camera permissions from the user.         |
-| [useConference](documentation/hooks/useConference.md)       | Enables creating, joining or leaving conferences.                                                        |
-| [useErrors](documentation/hooks/useErrors.md)               | Expose errors and methods to remove handled ones.                                                        |
-| [useLiveStreaming](documentation/hooks/useLiveStreaming.md) | Gathers functions responsible for managing live streaming.                                               |
-| [useLogger](documentation/hooks/useLogger.md)               | Exposes function to create logs with specific log type.                                                  |
-| [useMessage](documentation/hooks/useMessage.md)             | Gathers functions responsible for managing messages.                                                     |
-| [useMicrophone](documentation/hooks/useMicrophone.md)       | Lists and selects available microphones, in addition to requesting microphone permissions from the user. |
-| [useNotifications](documentation/hooks/useNotifications.md) | Expose notifications as well as handlers to remove display notification.                                 |
-| [useParticipants](documentation/hooks/useParticipants.md)   | Provides information about participants in the current conference and their status.                      |
-| [useRecording](documentation/hooks/useRecording.md)         | Gathers functions responsible for managing videocall recording.                                          |
-| [useScreenSharing](documentation/hooks/useScreenSharing.md) | Gathers functions responsible for managing screen sharing.                                               |
-| [useSession](documentation/hooks/useSession.md)             | Enables opening and closing sessions, as well as information about the local participant.                |
-| [useSpeaker](documentation/hooks/useSpeaker.md)             | Lists and selects available output speakers.                                                             |
-| [useTheme](documentation/hooks/useTheme.md)                 | Gathers functions responsible for managing themes.                                                       |
-| [useVideo](documentation/hooks/useVideo.md)                 | Can be used to enable or disable the camera for the local participant.                                   |
+| Hook                                                            | Description                                                                                              |
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| [useAudio](documentation/hooks/useAudio.md)                     | Can be used to mute or unmute audio for local and remote participants.                                   |
+| [useAudioProcessing](documentation/hooks/useAudioProcessing.md) | Gathers functions responsible for audio processing.                                                      |
+| [useBlur](documentation/hooks/useBlur.md)                       | Can be used to toggle background blur effect for local participant                                       |
+| [useCamera](documentation/hooks/useCamera.md)                   | Lists and selects available cameras, in addition to requesting camera permissions from the user.         |
+| [useConference](documentation/hooks/useConference.md)           | Enables creating, joining or leaving conferences.                                                        |
+| [useErrors](documentation/hooks/useErrors.md)                   | Expose errors and methods to remove handled ones.                                                        |
+| [useLiveStreaming](documentation/hooks/useLiveStreaming.md)     | Gathers functions responsible for managing live streaming.                                               |
+| [useLogger](documentation/hooks/useLogger.md)                   | Exposes function to create logs with specific log type.                                                  |
+| [useMessage](documentation/hooks/useMessage.md)                 | Gathers functions responsible for managing messages.                                                     |
+| [useMicrophone](documentation/hooks/useMicrophone.md)           | Lists and selects available microphones, in addition to requesting microphone permissions from the user. |
+| [useNotifications](documentation/hooks/useNotifications.md)     | Expose notifications as well as handlers to remove display notification.                                 |
+| [useParticipants](documentation/hooks/useParticipants.md)       | Provides information about participants in the current conference and their status.                      |
+| [useRecording](documentation/hooks/useRecording.md)             | Gathers functions responsible for managing videocall recording.                                          |
+| [useScreenSharing](documentation/hooks/useScreenSharing.md)     | Gathers functions responsible for managing screen sharing.                                               |
+| [useSession](documentation/hooks/useSession.md)                 | Enables opening and closing sessions, as well as information about the local participant.                |
+| [useSpeaker](documentation/hooks/useSpeaker.md)                 | Lists and selects available output speakers.                                                             |
+| [useTheme](documentation/hooks/useTheme.md)                     | Gathers functions responsible for managing themes.                                                       |
+| [useVideo](documentation/hooks/useVideo.md)                     | Can be used to enable or disable the camera for the local participant.                                   |
 
 ## License
 

@@ -1,7 +1,6 @@
 import type { JoinOptions } from '@voxeet/voxeet-web-sdk/types/models/Options';
 
 import useConference from '../../../hooks/useConference';
-import useSession from '../../../hooks/useSession';
 import Button, { ButtonProps } from '../../ui/Button/Button';
 import Tooltip, { TooltipProps } from '../../ui/Tooltip/Tooltip';
 
@@ -10,7 +9,6 @@ type JoinConferenceButtonProps = Partial<Omit<ButtonProps, 'onClick'>> & {
   meetingName: string;
   tooltipText: string;
   tooltipPosition?: TooltipProps['position'];
-  username: string;
   /**
    * Callback fired on session initialisation but before joining a conference
    */
@@ -27,23 +25,17 @@ const JoinConferenceButton = ({
   meetingName,
   tooltipText,
   tooltipPosition = 'top',
-  username,
   onInitialise,
   onSuccess,
   testID,
   ...rest
 }: JoinConferenceButtonProps) => {
-  const { openSession } = useSession();
   const { createConference, joinConference } = useConference();
 
   const handleJoinConference = async () => {
     if (onInitialise) {
       onInitialise();
     }
-
-    await openSession({
-      name: username,
-    });
 
     const newConference = await createConference({
       alias: meetingName,

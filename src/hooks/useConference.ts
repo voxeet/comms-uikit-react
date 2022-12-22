@@ -2,8 +2,16 @@ import type { UseConference } from './types/Conferencing';
 import useCommsContext from './useCommsContext';
 
 const useConference: UseConference = () => {
-  const { conference, createConference, fetchConference, joinConference, leaveConference, prevConference } =
-    useCommsContext();
+  const {
+    conference,
+    createConference,
+    fetchConference,
+    joinConference,
+    leaveConference,
+    prevConference,
+    maxVideoForwarding,
+    setVideoForwarding,
+  } = useCommsContext();
 
   return {
     conference,
@@ -12,6 +20,8 @@ const useConference: UseConference = () => {
     joinConference,
     leaveConference,
     prevConference,
+    maxVideoForwarding,
+    setVideoForwarding,
   };
 };
 

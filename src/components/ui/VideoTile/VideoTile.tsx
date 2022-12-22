@@ -34,22 +34,24 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
   const [currentStream, setCurrentStream] = useState<MediaStreamWithType | null>(null);
   const [isMirrorStream, setIsMirrorStream] = useState(isMirrored);
   const [isPiPEnabled, setIsPiPEnabled] = useState(false);
+  const [isVideoAvailable, setIsVideoAvailable] = useState(false);
 
   const isSmartphone = isMobileSmall || isMobile;
-
-  const videoStream = useMemo(() => {
-    const cameraStreams = participant.streams.filter((stream) => stream.type !== 'ScreenShare');
-    return cameraStreams[cameraStreams.length - 1]?.getVideoTracks().length > 0;
-  }, [participant]);
 
   useEffect(() => {
     if (participant.streams?.length) {
       const cameraStreams = participant.streams.filter((stream) => stream.type !== 'ScreenShare');
-      const stream = cameraStreams[cameraStreams.length - 1];
-      const facingMode = stream?.getVideoTracks()[0]?.getSettings()?.facingMode;
+      const stream = cameraStreams[0];
+      const track = stream?.getVideoTracks()[0];
+      const facingMode = track?.getSettings()?.facingMode;
       const facingUserMode = facingMode === 'user';
+      if (track) {
+        setIsVideoAvailable(true);
+      } else {
+        setIsVideoAvailable(false);
+      }
       setIsMirrorStream(facingMode ? facingUserMode : isMirrored);
-      setCurrentStream(cameraStreams[cameraStreams.length - 1]);
+      setCurrentStream(cameraStreams[0]);
     }
   }, [participant]);
 
@@ -72,7 +74,7 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
     } else {
       setIsLoading(true);
     }
-  }, [currentStream, participant]);
+  }, [currentStream, participant, isVideoAvailable]);
 
   useEffect(() => {
     if (!document.pictureInPictureEnabled || !videoRef.current) return;
@@ -97,17 +99,6 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
     setTimeout(() => {
       setIsLoading(false);
     }, 300);
-  };
-
-  const handleLoader = () => {
-    if ((isLocal || isLoading) && isVideo) {
-      return (
-        <Space className={styles.spinnerWrapper}>
-          <Spinner />
-        </Space>
-      );
-    }
-    return null;
   };
 
   const isPortraitVideo = () => {
@@ -148,8 +139,12 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
       ref={wrapperRef}
       {...props}
     >
-      {handleLoader()}
-      {videoStream ? (
+      {isLoading && (
+        <Space className={styles.spinnerWrapper}>
+          <Spinner />
+        </Space>
+      )}
+      {isVideoAvailable ? (
         <video
           ref={videoRef}
           data-testid={`${testID}-video`}
@@ -160,6 +155,7 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
           playsInline
           className={cx({ [styles.isLoading]: isLoading })}
           onLoadedData={handleLoadedVideo}
+          onError={handleLoadedVideo}
           style={{
             transform: `translate(-50%, -50%) scale(${!isMirrorStream || isPiPEnabled ? '' : '-'}1, 1)`,
             ...objectFitStyles(),

@@ -43,7 +43,7 @@ jest.mock('../../../hooks/useMessage', () => {
   }));
 });
 
-const RenderProp = ({ flag, callback }: { flag: boolean; callback: () => void }) => {
+const RenderProp = ({ flag, callback }: { flag: boolean | undefined; callback: () => void }) => {
   return flag ? (
     <div data-testid={testPropID}>
       <button type="button" onClick={callback}>

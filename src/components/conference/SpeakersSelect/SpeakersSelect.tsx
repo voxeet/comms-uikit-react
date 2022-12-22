@@ -2,27 +2,14 @@ import { useEffect, useState } from 'react';
 
 import useConference from '../../../hooks/useConference';
 import useSpeaker from '../../../hooks/useSpeaker';
-import type { ColorKey } from '../../../theme/types';
 import { deviceInfoToOptions } from '../../../utils/deviceInfoToOptions.util';
 import { throwErrorMessage } from '../../../utils/throwError.util';
-import Dropdown, { type DropdownOptionType } from '../../ui/Dropdown/Dropdown';
+import Dropdown, { type DropdownOptionType, type SelectPropsBase } from '../../ui/Dropdown/Dropdown';
 import DropdownControl from '../../ui/Dropdown/DropdownControl';
 import DropdownLabel from '../../ui/Dropdown/DropdownLabel';
 import DropdownList from '../../ui/Dropdown/DropdownList';
 
-type SpeakersSelectProps = {
-  labelColor?: ColorKey;
-  textColor?: ColorKey;
-  backgroundColor?: ColorKey;
-  iconColor?: ColorKey;
-  hoverColor?: ColorKey;
-  primaryBorderColor?: ColorKey;
-  secondaryBorderColor?: ColorKey;
-  defaultDeviceLabel?: string;
-  label: string;
-  placeholder: string;
-  testID?: string;
-};
+type SpeakersSelectProps = SelectPropsBase & { defaultDeviceLabel?: string };
 
 const SpeakersSelect = ({
   labelColor = 'grey.500',
@@ -36,6 +23,7 @@ const SpeakersSelect = ({
   label,
   placeholder,
   testID,
+  ...props
 }: SpeakersSelectProps) => {
   const [selectedDevice, setSelectedDevice] = useState<DropdownOptionType | null>(null);
   const [devices, setDevices] = useState<DropdownOptionType[]>([]);
@@ -73,7 +61,7 @@ const SpeakersSelect = ({
     return null;
   }
   return (
-    <Dropdown testID={testID} selected={selectedDevice}>
+    <Dropdown testID={testID} selected={selectedDevice} {...props}>
       <DropdownLabel label={label} color={labelColor} />
       <DropdownControl
         placeholder={placeholder}

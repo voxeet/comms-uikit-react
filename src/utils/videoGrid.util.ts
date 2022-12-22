@@ -12,7 +12,7 @@ export type CalculateGridOptions = {
 const RATIO = 0.5625;
 
 export const countMaxTiles = ({ container, maxTiles }: CountMaxTilesOptions) => {
-  let actualMax = 1;
+  let actualMax;
   const area = (container.width * container.height) / 10000;
   if (area < 10) {
     actualMax = 4;
@@ -35,7 +35,6 @@ export const calculateGrid = ({ container, elements, gap }: CalculateGridOptions
 
   let width;
   let height;
-
   if (elements === 1) {
     width = 100;
     height = 100;

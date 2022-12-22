@@ -39,7 +39,7 @@ export type ScreenShare = {
   /**
    * Indicates if browser has no permission to screen share
    */
-  permissionError: boolean;
+  permissionError?: boolean;
 
   /**
    * Indicates if other user is presenting while trying to share
@@ -77,7 +77,7 @@ export type ScreenShare = {
   isAutoStartShareError: boolean;
 
   /**
-   * Informs if there are not browser permissions to share screen.
+   * Informs if there are no browser permissions to share screen.
    */
   isLackOfBrowserPermissions: boolean;
 };
