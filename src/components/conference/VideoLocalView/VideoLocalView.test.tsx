@@ -7,6 +7,16 @@ const props = {
   testID: 'testID',
 };
 
+const localStreamMock = {
+  getVideoTracks: jest.fn(() => [
+    {
+      getCapabilities: jest.fn(() => ({
+        facingMode: [''],
+      })),
+    },
+  ]),
+} as unknown as MediaStream;
+
 const swapCamera = jest.fn();
 
 jest.mock('../../../hooks/useCamera', () => {
@@ -16,9 +26,11 @@ jest.mock('../../../hooks/useCamera', () => {
     getCameraPermission: jest.fn(async () => {
       return true;
     }),
+    startLocalVideo: jest.fn(),
   }));
 });
 const useCameraMock = useCamera as jest.MockedFunction<typeof useCamera>;
+
 jest.mock('../../../hooks/useMicrophone', () => {
   return jest.fn(() => ({
     ...jest.requireActual('../../../hooks/useMicrophone'),
@@ -38,7 +50,6 @@ let windowSpy: jest.SpyInstance;
 beforeEach(() => {
   windowSpy = jest.spyOn(window, 'navigator', 'get');
 });
-
 const setMediaDevicesSpy = () => windowSpy.mockImplementation(() => navigatorReturnMock());
 
 describe('VideoLocalView component', () => {
@@ -53,6 +64,11 @@ describe('VideoLocalView component', () => {
       themeValues: {
         isDesktop: false,
       },
+      commsProps: {
+        value: {
+          localStream: localStreamMock,
+        },
+      },
     });
     expect(getByTestId('ReverseCameraIcon')).toBeInTheDocument();
     expect(getByTestId(props.testID)).toHaveClass('mobile');
@@ -63,7 +79,7 @@ describe('VideoLocalView component', () => {
         isDesktop: false,
       },
       commsProps: {
-        value: { hasCameraPermission: true },
+        value: { hasCameraPermission: true, localStream: localStreamMock },
       },
     });
     const swapButton = getByTestId('ReverseCameraIcon');
@@ -94,6 +110,7 @@ describe('VideoLocalView component', () => {
             hasCameraPermission: true,
             isAudio: false,
             isVideo: true,
+            localStream: localStreamMock,
           },
         },
         themeValues: {

@@ -2,6 +2,7 @@ import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participan
 import cx from 'classnames';
 import React, { useEffect } from 'react';
 
+import useAudioProcessing from '../../../hooks/useAudioProcessing';
 import useParticipants from '../../../hooks/useParticipants';
 import useTheme from '../../../hooks/useTheme';
 import IconIndicator from '../../ui/indicators/IconIndicator/IconIndicator';
@@ -23,14 +24,18 @@ type ParticipantsGridItemProps = {
 const ParticipantsGridItem = React.memo(({ participant, localText }: ParticipantsGridItemProps) => {
   const { getColor, isMobileSmall, isMobile } = useTheme();
   const { addIsSpeakingListener, participantsStatus } = useParticipants();
+  const { isMusicMode, isMusicModeSupported } = useAudioProcessing();
 
-  const { isSpeaking, isRemoteAudio, isLocal, isLocalAudio } = participantsStatus[participant.id] || {};
+  const { isSpeaking, isRemoteAudio, isLocal, isLocalAudio, isRemoteMusicMode } =
+    participantsStatus[participant.id] || {};
 
   const isSmartphone = isMobileSmall || isMobile;
 
   useEffect(() => {
     return addIsSpeakingListener(participant);
   }, []);
+
+  const isMusicModeActive = isLocal ? isMusicModeSupported && isMusicMode : isRemoteMusicMode;
 
   return (
     <Space
@@ -70,7 +75,12 @@ const ParticipantsGridItem = React.memo(({ participant, localText }: Participant
         </Space>
       )}
 
-      <Space className={styles.talking}>
+      <Space className={styles.rightIndicatorsSection}>
+        {isMusicModeActive && (
+          <Space mr="xxs">
+            <IconIndicator testID="MusicModeIndicator" icon="tune" backgroundColor="white" iconColor="primary.400" />
+          </Space>
+        )}
         {isLocal ? (
           <LocalSpeakingIndicator testID="LocalSpeakingIndicator" />
         ) : (

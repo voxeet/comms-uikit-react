@@ -11,7 +11,7 @@ const useLiveStreaming: UseLiveStreaming = () => {
     liveStreamingData,
     resetLiveStreamingData,
     setLiveStreamingErrors,
-    liveStreamingErrorMessages: errorMessages,
+    errors: { liveStreamingErrors: errorMessages },
   } = useCommsContext();
 
   const { owner, timestamp, status, isLiveStreamingModeActive, provider, rtmp } = liveStreamingData;
@@ -32,7 +32,7 @@ const useLiveStreaming: UseLiveStreaming = () => {
     isLocalUserLiveStreamingOwner,
     setLiveStreamingErrors,
     provider,
-    isError: errorMessages.length > 0,
+    isError: Object.keys(errorMessages).length > 0,
     rtmp,
   };
 };

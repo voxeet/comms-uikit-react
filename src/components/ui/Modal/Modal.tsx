@@ -10,7 +10,7 @@ import Space from '../Space/Space';
 import styles from './Modal.module.scss';
 
 type ModalProps = {
-  isVisible: boolean;
+  isVisible?: boolean;
   close: () => void;
   backdropColor?: ColorKey;
   backgroundColor?: ColorKey;

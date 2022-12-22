@@ -10,7 +10,7 @@ const useRecording: UseRecording = () => {
     stopRecording,
     recordingData,
     setRecordingErrors,
-    recordingErrorMessages: errorMessages,
+    errors: { recordingErrors: errorMessages },
     resetRecordingData,
   } = useCommsContext();
   const { ownerId, timestamp, status, isRecordingModeActive } = recordingData;
@@ -30,7 +30,7 @@ const useRecording: UseRecording = () => {
     setRecordingErrors,
     resetRecordingData,
     isRecordingModeActive,
-    isError: errorMessages.length > 0,
+    isError: Object.keys(errorMessages).length > 0,
   };
 };
 

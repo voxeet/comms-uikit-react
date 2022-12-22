@@ -33,6 +33,7 @@ export const defaultNotificationConfig = {
   [NotificationVariants.Success]: { bgColor: 'success.600', icon: 'success' },
   [NotificationVariants.Warning]: { bgColor: 'infoWarning', icon: 'warning', color: 'black' },
   [NotificationVariants.Error]: { bgColor: 'infoError', icon: 'warning' },
+  [NotificationVariants.Neutral]: { bgColor: 'grey.800' },
 } as NotificationConfig;
 
 const Notification = ({
@@ -75,6 +76,15 @@ const Notification = ({
   const config = defaultNotificationConfig[variant];
   const color = useMemo(() => getColor(config.color, 'white'), []);
 
+  const isCloseButton = useMemo(() => {
+    const closeType = typeof instanceConfig?.close;
+
+    if (closeType === 'boolean' && instanceConfig?.close === false) {
+      return false;
+    }
+    return true;
+  }, [instanceConfig]);
+
   return (
     <Space
       mb="s"
@@ -96,7 +106,7 @@ const Notification = ({
       <Space className={styles.notificationLeftElement}>
         <Icon
           testID={`${instanceConfig?.icon || config.icon}-icon`}
-          name={instanceConfig?.icon || config.icon}
+          name={instanceConfig?.icon || config.icon || 'info'}
           color={color}
           size={size === 's' ? 'xs' : size}
         />
@@ -111,9 +121,11 @@ const Notification = ({
           </Text>
         </Space>
       </Space>
-      <Space p={size === 's' ? 'xxs' : 'xs'} className={styles.closeElement} onClick={fadeOut}>
-        <Icon size="xxs" name="close" color={color} testID="remove-button" />
-      </Space>
+      {isCloseButton && (
+        <Space p={size === 's' ? 'xxs' : 'xs'} className={styles.closeElement} onClick={fadeOut}>
+          <Icon size="xxs" name="close" color={color} testID="remove-button" />
+        </Space>
+      )}
     </Space>
   );
 };

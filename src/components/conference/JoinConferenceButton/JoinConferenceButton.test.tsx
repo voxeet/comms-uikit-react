@@ -4,7 +4,6 @@ import JoinConferenceButton from './JoinConferenceButton';
 
 const joinOptions = { constraints: { audio: true, video: true } };
 const meetingName = 'test-conference';
-const username = 'test-participant';
 const text = 'rejoin';
 const testID = 'testID';
 
@@ -30,13 +29,7 @@ jest.mock('../../../hooks/useConference', () => {
 describe('JoinConferenceButton component', () => {
   test('Passes TestID', async () => {
     const { getByTestId } = render(
-      <JoinConferenceButton
-        joinOptions={joinOptions}
-        meetingName={meetingName}
-        username={username}
-        testID={testID}
-        tooltipText={text}
-      />,
+      <JoinConferenceButton joinOptions={joinOptions} meetingName={meetingName} testID={testID} tooltipText={text} />,
     );
     await waitFor(() => {
       expect(getByTestId(testID)).not.toBeNull();
@@ -45,13 +38,7 @@ describe('JoinConferenceButton component', () => {
 
   test('Renders text in tooltip passed as prop', async () => {
     const { getByText } = render(
-      <JoinConferenceButton
-        joinOptions={joinOptions}
-        meetingName={meetingName}
-        username={username}
-        testID={testID}
-        tooltipText={text}
-      />,
+      <JoinConferenceButton joinOptions={joinOptions} meetingName={meetingName} testID={testID} tooltipText={text} />,
     );
     const regEx = new RegExp(text, 'i');
     await waitFor(() => {
@@ -66,7 +53,6 @@ describe('JoinConferenceButton component', () => {
       <JoinConferenceButton
         joinOptions={joinOptions}
         meetingName={meetingName}
-        username={username}
         testID={testID}
         tooltipText={text}
         onSuccess={onSuccess}

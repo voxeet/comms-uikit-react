@@ -1,6 +1,6 @@
 {
   "name": "@dolbyio/comms-uikit-react",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Dolby.io Communications UIKit for React",
   "license": "MIT",
   "main": "dist/index.es.js",
@@ -19,7 +19,7 @@
     "ui library"
   ],
   "peerDependencies": {
-    "@voxeet/voxeet-web-sdk": ">=3.7.0",
+    "@voxeet/voxeet-web-sdk": "3.8.0",
     "react": "*"
   },
   "dependencies": {

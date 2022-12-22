@@ -4,7 +4,7 @@ import type { UseSession } from './types/Session';
 import useCommsContext from './useCommsContext';
 
 const useSession: UseSession = () => {
-  const { participant, openSession, closeSession } = useCommsContext();
+  const { participant, openSession, closeSession, isSessionOpened } = useCommsContext();
 
   const getSDKVersion = () => {
     return SDKService.getSDKVersion();
@@ -15,6 +15,7 @@ const useSession: UseSession = () => {
     openSession,
     closeSession,
     getSDKVersion,
+    isSessionOpened,
   };
 };
 

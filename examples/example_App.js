@@ -73,8 +73,8 @@ const soundOffText = 'sound off'; // Displayed in a tooltip when a participant i
 // const localText = 'you';
 
 /*
-    We are re-using the previously declared `localText` in this example for `ParticipantsGrid` but you can use any value you prefer
-  */
+      We are re-using the previously declared `localText` in this example for `ParticipantsGrid` but you can use any value you prefer
+    */
 
 // Define the `CameraSelect`, `MicrophoneSelect`, and `SpeakersSelect` configurations: each component takes a `label` prop (shown above the component) and a `placeholder` prop (shown when no option is selected).
 const cameraLabel = 'Camera';
@@ -131,12 +131,12 @@ const RecordingActionBarTexts = {
 
 // Define the app container reset styles
 const appContainerStyles = `
-    body {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-  `;
+      body {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+    `;
 
 // Create Content component for bundle all app stuff
 const Content = () => {

@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { ErrorCodes } from '../providers/CommsProvider';
 
 import type { UseScreenSharing } from './types/ScreenShare';
@@ -12,16 +10,12 @@ const useScreenSharing: UseScreenSharing = () => {
     stopScreenShare,
     screenSharingData,
     setSharingErrors,
-    screenShareErrorMessages: errorMessages,
     setPendingTakeoverRequest,
     resetScreenSharingData,
+    errors: { screenShareErrors: errorMessages },
   } = useCommsContext();
   const { owner, status, stream, isPendingTakeoverRequest, isPresentationModeActive } = screenSharingData;
   const { participant } = useSession();
-
-  const isLocalUserPresentationOwner = useMemo(() => {
-    return owner?.id === participant?.id;
-  }, [owner, participant]);
 
   const handleStartScreenShare = async (takingOver?: boolean) => {
     if (stream && !takingOver) {
@@ -36,17 +30,17 @@ const useScreenSharing: UseScreenSharing = () => {
     stopScreenShare,
     stream,
     owner,
-    isLocalUserPresentationOwner,
+    isLocalUserPresentationOwner: owner?.id === participant?.id,
     status,
-    permissionError: errorMessages.some((error) => error === ErrorCodes.PermissionDeniedBySystem),
-    sharingInProgressError: errorMessages.some((error) => error === ErrorCodes.ScreenShareAlreadyInProgress),
+    permissionError: !!errorMessages[ErrorCodes.PermissionDeniedBySystem],
+    sharingInProgressError: !!errorMessages[ErrorCodes.ScreenShareAlreadyInProgress],
     setSharingErrors,
     isPendingTakeoverRequest,
     setPendingTakeoverRequest,
     resetScreenSharingData,
     isPresentationModeActive,
-    isAutoStartShareError: errorMessages.some((error) => error === ErrorCodes.ScreenShareAutoTakeoverError),
-    isLackOfBrowserPermissions: errorMessages.some((error) => error === ErrorCodes.LackOfBrowserPermissions),
+    isAutoStartShareError: !!errorMessages[ErrorCodes.ScreenShareAutoTakeoverError],
+    isLackOfBrowserPermissions: !!errorMessages[ErrorCodes.LackOfBrowserPermissions],
   };
 };
 

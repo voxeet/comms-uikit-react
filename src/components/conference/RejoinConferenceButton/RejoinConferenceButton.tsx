@@ -1,4 +1,6 @@
-import { Button, useAudio, useCamera, useConference, useMicrophone, useSession, useVideo, Text } from '../../../index';
+import type { JoinOptions } from '@voxeet/voxeet-web-sdk/types/models/Options';
+
+import { Button, useConference, Text } from '../../../index';
 import { throwErrorMessage } from '../../../utils/throwError.util';
 import type { ButtonProps } from '../../ui/Button/Button';
 
@@ -7,6 +9,7 @@ type RejoinConferenceButtonProps = Partial<ButtonProps> & {
   onStart?: (v: boolean) => void;
   onSuccess?: () => void;
   testID?: string;
+  joinOptions: JoinOptions;
 };
 
 const RejoinConferenceButton = ({
@@ -16,14 +19,10 @@ const RejoinConferenceButton = ({
   testID,
   style,
   className,
+  joinOptions,
   ...rest
 }: RejoinConferenceButtonProps) => {
-  const { openSession } = useSession();
   const { createConference, joinConference, prevConference } = useConference();
-  const { getCameraPermission } = useCamera();
-  const { isVideo } = useVideo();
-  const { getMicrophonePermission } = useMicrophone();
-  const { isAudio } = useAudio();
 
   const rejoin = async () => {
     if (prevConference) {
@@ -31,35 +30,11 @@ const RejoinConferenceButton = ({
         if (onStart) {
           onStart(true);
         }
-        const isCameraPermission = await getCameraPermission();
-        const isMicrophonePermission = await getMicrophonePermission();
-        await openSession({
-          name: prevConference.participant,
-        });
 
         const conferenceOptions = {
           alias: prevConference.name,
         };
         const conf = await createConference(conferenceOptions);
-
-        const joinOptions = {
-          constraints: {
-            audio: isAudio && isMicrophonePermission,
-            video:
-              isVideo && isCameraPermission
-                ? {
-                    width: {
-                      min: '1280',
-                      max: '1920',
-                    },
-                    height: {
-                      min: '720',
-                      max: '1080',
-                    },
-                  }
-                : false,
-          },
-        };
 
         await joinConference(conf, joinOptions);
         if (onStart) {

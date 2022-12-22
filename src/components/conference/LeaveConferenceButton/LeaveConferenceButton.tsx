@@ -1,6 +1,7 @@
-import { Status as RecordingStatus } from '../../../hooks/types/misc';
+import { Status } from '../../../hooks/types/misc';
 import useConference from '../../../hooks/useConference';
 import useRecording from '../../../hooks/useRecording';
+import useScreenSharing from '../../../hooks/useScreenSharing';
 import IconButton, { IconButtonProps } from '../../ui/IconButton/IconButton';
 import Tooltip, { TooltipProps } from '../../ui/Tooltip/Tooltip';
 
@@ -22,11 +23,15 @@ const LeaveConferenceButton = ({
 }: LeaveConferenceButtonProps) => {
   const { leaveConference } = useConference();
 
-  const { isLocalUserRecordingOwner, status, stopRecording } = useRecording();
+  const { isLocalUserRecordingOwner, status: recordingStatus, stopRecording } = useRecording();
+  const { isLocalUserPresentationOwner, stopScreenShare, status: screenSharingStatus } = useScreenSharing();
 
   const handleLeaveConference = async () => {
-    if (isLocalUserRecordingOwner && status === RecordingStatus.Active) {
+    if (isLocalUserRecordingOwner && recordingStatus === Status.Active) {
       await stopRecording();
+    }
+    if (isLocalUserPresentationOwner && screenSharingStatus === Status.Active) {
+      await stopScreenShare();
     }
 
     await preAction?.();
@@ -36,6 +41,7 @@ const LeaveConferenceButton = ({
       onSuccess();
     }
   };
+
   return (
     <Tooltip position={tooltipPosition} text={tooltipText}>
       <IconButton

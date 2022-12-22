@@ -2,27 +2,15 @@ import { useEffect, useState } from 'react';
 
 import useConference from '../../../hooks/useConference';
 import useMicrophone from '../../../hooks/useMicrophone';
-import type { ColorKey } from '../../../theme/types';
 import { deviceInfoToOptions } from '../../../utils/deviceInfoToOptions.util';
 import { throwErrorMessage } from '../../../utils/throwError.util';
-import Dropdown from '../../ui/Dropdown/Dropdown';
+import Dropdown, { type SelectPropsBase } from '../../ui/Dropdown/Dropdown';
 import type { DropdownOptionType } from '../../ui/Dropdown/Dropdown';
 import DropdownControl from '../../ui/Dropdown/DropdownControl';
 import DropdownLabel from '../../ui/Dropdown/DropdownLabel';
 import DropdownList from '../../ui/Dropdown/DropdownList';
 
-type MicrophoneSelectProps = {
-  labelColor?: ColorKey;
-  textColor?: ColorKey;
-  backgroundColor?: ColorKey;
-  iconColor?: ColorKey;
-  hoverColor?: ColorKey;
-  primaryBorderColor?: ColorKey;
-  secondaryBorderColor?: ColorKey;
-  label: string;
-  placeholder: string;
-  testID?: string;
-};
+type MicrophoneSelectProps = SelectPropsBase;
 
 const MicrophoneSelect = ({
   labelColor = 'grey.500',
@@ -35,6 +23,7 @@ const MicrophoneSelect = ({
   label,
   placeholder,
   testID,
+  ...props
 }: MicrophoneSelectProps) => {
   const [selectedDevice, setSelectedDevice] = useState<DropdownOptionType | null>(null);
   const [devices, setDevices] = useState<DropdownOptionType[]>([]);
@@ -71,7 +60,7 @@ const MicrophoneSelect = ({
     return null;
   }
   return (
-    <Dropdown testID={testID} selected={selectedDevice}>
+    <Dropdown testID={testID} selected={selectedDevice} {...props}>
       <DropdownLabel label={label} color={labelColor} />
       <DropdownControl
         placeholder={placeholder}

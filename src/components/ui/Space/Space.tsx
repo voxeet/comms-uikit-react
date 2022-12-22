@@ -6,7 +6,7 @@ import type { SpaceValues } from '../../../theme/types';
 type Falsy = null | false;
 type BoolCastableSpaceValues = Falsy | SpaceValues;
 
-type SpaceProps = React.HTMLAttributes<HTMLDivElement> & {
+export type SpaceProps = React.HTMLAttributes<HTMLDivElement> & {
   testID?: string;
   fw?: boolean | null;
   fh?: boolean | null;
@@ -172,5 +172,4 @@ const Space = ({
     </Tag>
   );
 };
-
 export default Space;

@@ -11,6 +11,8 @@ export type ParticipantStatus = {
   isRemoteAudio: boolean;
   /** Indicates if the local participant receives audio from the participant. */
   isLocalAudio: boolean;
+  /** Indicates if remote participant has turned on music mode. */
+  isRemoteMusicMode: boolean;
 };
 
 export type Participants = {

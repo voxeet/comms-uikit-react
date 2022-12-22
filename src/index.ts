@@ -5,6 +5,7 @@ export { default as LogProvider } from './providers/LogProvider';
 
 // Hooks
 export { default as useAudio } from './hooks/useAudio';
+export { default as useAudioProcessing } from './hooks/useAudioProcessing';
 export { default as useCamera } from './hooks/useCamera';
 export { default as useConference } from './hooks/useConference';
 export { default as useMicrophone } from './hooks/useMicrophone';
@@ -94,6 +95,7 @@ export { default as Modal } from './components/ui/Modal/Modal';
 export { default as RecordButton } from './components/conference/RecordButton/RecordButton';
 export { default as BlurButton } from './components/conference/BlurButton/BlurButton';
 export { default as LiveStreamButton } from './components/conference/LiveStreamButton/LiveStreamButton';
+export { default as MusicModeButton } from './components/conference/MusicModeButton/MusicModeButton';
 
 // Themes
 
@@ -109,6 +111,7 @@ export type { DropdownListProps } from './components/ui/Dropdown/DropdownList';
 export type { IconButtonProps } from './components/ui/IconButton/IconButton';
 export type { ColorKey, ColorHues, Colors, Theme, ThemeMode, Sizes, SpaceValues } from './theme/types';
 export { BlockedAudioState as BlockedAudioStateType } from './hooks/types/Audio';
+export { AudioCaptureMode, AudioEchoCancellation, AudioProcessingMessages } from './hooks/types/UseAudioProcessing';
 export { Status as GenericStatus } from './hooks/types/misc';
 export { Status as ShareStatus } from './hooks/types/misc';
 export { Status as RecordingStatus } from './hooks/types/misc';
