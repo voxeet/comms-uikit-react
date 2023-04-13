@@ -25,21 +25,32 @@ const CameraSelect = ({
 }: CameraSelectProps) => {
   const [selectedDevice, setSelectedDevice] = useState<DropdownOptionType | null>(null);
   const [devices, setDevices] = useState<DropdownOptionType[]>([]);
-  const { getCameras, selectCamera, localCamera, setLocalCamera } = useCamera();
+  const { cameras, getCameras, selectCamera, localCamera, setLocalCamera } = useCamera();
+
+  useEffect(() => {
+    getCameras();
+  }, []);
 
   useEffect(() => {
     (async () => {
-      const cameraDevices = await getCameras();
+      let defaultConfDevice;
       const { options, defaultDevice } = deviceInfoToOptions({
-        data: cameraDevices,
+        data: cameras,
         local: localCamera?.deviceId,
         renderLabel: (label: string) => label,
         icon: 'camera',
       });
       setDevices(options);
-      setSelectedDevice(defaultDevice);
+
+      if (localCamera) {
+        const device = options.find((o) => o.value === localCamera.deviceId);
+        if (device) {
+          defaultConfDevice = device;
+        }
+      }
+      setSelectedDevice(defaultConfDevice || defaultDevice);
     })();
-  }, []);
+  }, [cameras]);
 
   const onChange = async (e: DropdownOptionType) => {
     if (e.value === selectedDevice?.value) return;

@@ -8,6 +8,8 @@ export type PrevConference = {
   participant: string;
   /** Conference name */
   name: string;
+  /** Conference ID */
+  id: string;
 };
 
 export enum VideoForwardingStrategy {
@@ -40,14 +42,15 @@ export type Conferencing = {
    * @returns the `Conference` object that represents the conference that was fetched.
    */
   fetchConference: (id: string) => Promise<Conference>;
-
+  listeners: (eventName: string) => Promise<number>;
   /**
    * Joins a conference.
    * @param conference - The conference object.
    * @param options - The additional options for the joining participant.
+   * @param listener - whether the user should join the conference purely as a listener
    * @returns the `Conference` object that represents the conference that was joined.
    */
-  joinConference: (conference: Conference, options: JoinOptions) => Promise<Conference>;
+  joinConference: (conference: Conference, options: JoinOptions, listener?: boolean) => Promise<Conference>;
 
   /**
    * Leaves a conference.

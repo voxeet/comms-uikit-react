@@ -19,76 +19,82 @@ import styles from './ParticipantsGridItem.module.scss';
 type ParticipantsGridItemProps = {
   participant: Participant;
   localText: string;
+  showParticipantNamePill?: boolean;
+  forceShowAvatar?: boolean;
 };
 
-const ParticipantsGridItem = React.memo(({ participant, localText }: ParticipantsGridItemProps) => {
-  const { getColor, isMobileSmall, isMobile } = useTheme();
-  const { addIsSpeakingListener, participantsStatus } = useParticipants();
-  const { isMusicMode, isMusicModeSupported } = useAudioProcessing();
+const ParticipantsGridItem = React.memo(
+  ({ participant, localText, showParticipantNamePill = true, forceShowAvatar = false }: ParticipantsGridItemProps) => {
+    const { getColor, isMobileSmall, isMobile } = useTheme();
+    const { addIsSpeakingListener, participantsStatus } = useParticipants();
+    const { isMusicMode, isMusicModeSupported } = useAudioProcessing();
 
-  const { isSpeaking, isRemoteAudio, isLocal, isLocalAudio, isRemoteMusicMode } =
-    participantsStatus[participant.id] || {};
+    const { isSpeaking, isRemoteAudio, isLocal, isLocalAudio, isRemoteMusicMode } =
+      participantsStatus[participant.id] || {};
 
-  const isSmartphone = isMobileSmall || isMobile;
+    const isSmartphone = isMobileSmall || isMobile;
 
-  useEffect(() => {
-    return addIsSpeakingListener(participant);
-  }, []);
+    useEffect(() => {
+      return addIsSpeakingListener(participant);
+    }, []);
 
-  const isMusicModeActive = isLocal ? isMusicModeSupported && isMusicMode : isRemoteMusicMode;
+    const isMusicModeActive = isLocal ? isMusicModeSupported && isMusicMode : isRemoteMusicMode;
 
-  return (
-    <Space
-      testID="ParticipantsGridItem"
-      className={cx(styles.item, { [styles.mobile]: isSmartphone })}
-      fw
-      fh
-      css={{
-        '&:after': {
-          display: isSpeaking ? 'block' : 'none',
-          borderColor: isSpeaking && isRemoteAudio ? getColor('purple.400') : getColor('transparent'),
-        },
-      }}
-    >
-      {isLocal ? (
-        <LocalVideo testID="LocalVideo" />
-      ) : (
-        <ParticipantVideo testID="ParticipantVideo" participant={participant} />
-      )}
-      <Space className={styles.pill}>
+    return (
+      <Space
+        testID="ParticipantsGridItem"
+        className={cx(styles.item, { [styles.mobile]: isSmartphone })}
+        fw
+        fh
+        css={{
+          '&:after': {
+            display: isSpeaking ? 'block' : 'none',
+            borderColor: isSpeaking && isRemoteAudio ? getColor('purple.400') : getColor('transparent'),
+          },
+        }}
+      >
         {isLocal ? (
-          <LocalName text={localText} testID="LocalName" />
+          <LocalVideo testID="LocalVideo" />
         ) : (
-          <ParticipantName testID="ParticipantName" participant={participant} />
+          <ParticipantVideo testID="ParticipantVideo" participant={participant} forceShowAvatar={forceShowAvatar} />
         )}
-      </Space>
-      {!isLocal && !isLocalAudio && (
-        <Space
-          className={cx(styles.indicatorsContainer, isMobile && styles.mobile, isMobileSmall && styles.mobileSmall)}
-        >
-          <IconIndicator
-            testID="SpeakerOffIndicator"
-            icon="speakerOff"
-            backgroundColor="white"
-            iconColor="primary.400"
-          />
-        </Space>
-      )}
-
-      <Space className={styles.rightIndicatorsSection}>
-        {isMusicModeActive && (
-          <Space mr="xxs">
-            <IconIndicator testID="MusicModeIndicator" icon="tune" backgroundColor="white" iconColor="primary.400" />
+        {showParticipantNamePill && (
+          <Space className={styles.pill}>
+            {isLocal ? (
+              <LocalName text={localText} testID="LocalName" />
+            ) : (
+              <ParticipantName testID="ParticipantName" participant={participant} />
+            )}
           </Space>
         )}
-        {isLocal ? (
-          <LocalSpeakingIndicator testID="LocalSpeakingIndicator" />
-        ) : (
-          <ParticipantSpeakingIndicator testID="ParticipantSpeakingIndicator" participant={participant} />
+        {!isLocal && !isLocalAudio && (
+          <Space
+            className={cx(styles.indicatorsContainer, isMobile && styles.mobile, isMobileSmall && styles.mobileSmall)}
+          >
+            <IconIndicator
+              testID="SpeakerOffIndicator"
+              icon="speakerOff"
+              backgroundColor="white"
+              iconColor="primary.400"
+            />
+          </Space>
         )}
+
+        <Space className={styles.rightIndicatorsSection}>
+          {isMusicModeActive && (
+            <Space mr="xxs">
+              <IconIndicator testID="MusicModeIndicator" icon="tune" backgroundColor="white" iconColor="primary.400" />
+            </Space>
+          )}
+          {isLocal ? (
+            <LocalSpeakingIndicator testID="LocalSpeakingIndicator" />
+          ) : (
+            <ParticipantSpeakingIndicator testID="ParticipantSpeakingIndicator" participant={participant} />
+          )}
+        </Space>
       </Space>
-    </Space>
-  );
-});
+    );
+  },
+);
 
 export default ParticipantsGridItem;

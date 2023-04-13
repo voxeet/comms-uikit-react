@@ -1,9 +1,14 @@
 export type Microphone = {
   /**
-   * Gets the list of the available microphones.
-   * @returns the list of available microphones.
+   * Holds the list of the available microphones.
    */
-  getMicrophones: () => Promise<MediaDeviceInfo[]>;
+  microphones: MediaDeviceInfo[];
+
+  /**
+   * Gets the list of the available microphones.
+   * Sets internal microphones state.
+   */
+  getMicrophones: () => void;
 
   /**
    * Selects a microphone.
@@ -34,6 +39,12 @@ export type Microphone = {
    * @param microphone - MediaDeviceInfo object or null
    */
   setLocalMicrophone: (microphone: Partial<MediaDeviceInfo> | null) => void;
+
+  /**
+   * Gets currently selected microphone in conference.
+   * @returns the default microphone device information.
+   */
+  getSelectedMicrophone: () => MediaDeviceInfo | undefined;
 };
 
 export type UseMicrophone = () => Microphone;

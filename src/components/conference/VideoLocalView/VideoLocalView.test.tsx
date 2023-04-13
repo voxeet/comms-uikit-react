@@ -27,6 +27,7 @@ jest.mock('../../../hooks/useCamera', () => {
       return true;
     }),
     startLocalVideo: jest.fn(),
+    getDefaultLocalCamera: jest.fn(),
   }));
 });
 const useCameraMock = useCamera as jest.MockedFunction<typeof useCamera>;

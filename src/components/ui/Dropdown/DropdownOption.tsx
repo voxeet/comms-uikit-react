@@ -34,7 +34,7 @@ export const DropdownOption = ({
 
   return (
     <button
-      data-testid={testID}
+      data-testid={testID ?? 'Option'}
       type="button"
       className={cx(styles.option, { isActive })}
       css={{

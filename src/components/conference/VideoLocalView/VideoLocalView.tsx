@@ -5,10 +5,8 @@ import React, { useEffect, useRef, useMemo, useState } from 'react';
 import soundWave from '../../../assets/animations/soundWaveLottie.json';
 import useAudio from '../../../hooks/useAudio';
 import useCamera from '../../../hooks/useCamera';
-import useConference from '../../../hooks/useConference';
 import useLocalStream from '../../../hooks/useLocalStream';
 import useMicrophone from '../../../hooks/useMicrophone';
-import useSession from '../../../hooks/useSession';
 import useTheme from '../../../hooks/useTheme';
 import useVideo from '../../../hooks/useVideo';
 import { throwErrorMessage } from '../../../utils/throwError.util';
@@ -56,30 +54,28 @@ const VideoLocalView = ({
   className,
   ...props
 }: VideoViewProps) => {
-  const [videoSrcObject, setVideoSrcObject] = useState<MediaStream | null>(null);
-  const { participant } = useSession();
-  const { conference } = useConference();
   const [mediaStreams, setMediaStreams] = useState<MediaStream[]>([]);
   const [isUsingRearCamera, setIsUsingRearCamera] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoSrc, setVideoSrc] = useState<MediaStream | null>(null);
 
   const { getColor, isDesktop, isTablet } = useTheme();
   const { isVideo } = useVideo();
   const { isAudio } = useAudio();
-  const { localCamera, swapCamera, getCameraPermission, startLocalVideo } = useCamera();
+  const { localCamera, swapCamera, getDefaultLocalCamera } = useCamera();
   const { localMicrophone, getMicrophonePermission } = useMicrophone();
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const { localStream, setLocalStream } = useLocalStream();
+  const { localStream } = useLocalStream();
 
   const prevIsAudio = useRef<boolean>();
 
   const isMounted = useIsMounted();
 
   useEffect(() => {
-    if (participant) {
-      attachVideoStream();
+    if (!localCamera) {
+      getDefaultLocalCamera();
     }
-  }, [participant, localCamera]);
+  }, []);
 
   const clearAudioSource = async () => {
     mediaStreams.forEach((stream) => {
@@ -163,26 +159,11 @@ const VideoLocalView = ({
     // one for video and one for audio
   };
 
-  const attachVideoStream = async () => {
-    await getCameraPermission();
-    if (localStream && localStream.getVideoTracks()[0].readyState !== 'ended') {
-      return setVideoSrcObject(localStream);
-    }
-    if (isVideo && participant) {
-      try {
-        let streamTrack: MediaStreamTrack;
-        if (conference && participant.streams.length) {
-          const { streams } = participant;
-          const tracks = streams[0]?.getVideoTracks?.();
-          // eslint-disable-next-line prefer-destructuring
-          streamTrack = tracks[0];
-        } else {
-          streamTrack = await startLocalVideo({
-            deviceId: localCamera ? localCamera.deviceId : undefined,
-          });
-        }
-
-        if (!isDesktop && localStream) {
+  useEffect(() => {
+    if (localStream) {
+      if (!isDesktop && localStream) {
+        const streamTrack = localStream.getVideoTracks()[0];
+        if (streamTrack) {
           const { facingMode } = streamTrack.getCapabilities();
           if (facingMode?.[0] === FacingModes.Env) {
             setIsUsingRearCamera(true);
@@ -190,26 +171,7 @@ const VideoLocalView = ({
             setIsUsingRearCamera(false);
           }
         }
-        setLocalStream(new MediaStream([streamTrack]));
-      } catch (error) {
-        throwErrorMessage(error);
       }
-    }
-    return true;
-  };
-
-  useEffect(() => {
-    if (localStream) {
-      if (!isDesktop && localStream) {
-        const streamTrack = localStream.getVideoTracks()[0];
-        const { facingMode } = streamTrack.getCapabilities();
-        if (facingMode?.[0] === FacingModes.Env) {
-          setIsUsingRearCamera(true);
-        } else {
-          setIsUsingRearCamera(false);
-        }
-      }
-      setVideoSrcObject(localStream);
     }
   }, [localStream]);
 
@@ -241,14 +203,16 @@ const VideoLocalView = ({
   }, [isAudio]);
 
   useEffect(() => {
-    if (videoRef?.current) {
-      if (videoSrcObject) {
-        videoRef.current.srcObject = videoSrcObject;
-      } else {
-        videoRef.current.srcObject = null;
-      }
+    if (localStream) {
+      setVideoSrc(localStream);
     }
-  }, [videoSrcObject]);
+  }, [localStream]);
+
+  useEffect(() => {
+    if (videoRef?.current) {
+      videoRef.current.srcObject = videoSrc;
+    }
+  }, [videoSrc]);
 
   useEffect(() => {
     return () => {
@@ -259,7 +223,7 @@ const VideoLocalView = ({
         clearMediaStreams();
       }
     };
-  }, [mediaStreams, videoSrcObject, disabled]);
+  }, [mediaStreams, localStream, disabled]);
 
   const reverseCamera = async () => {
     await swapCamera();
@@ -282,6 +246,7 @@ const VideoLocalView = ({
           animationData={soundWave}
           backgroundColor={getColor('white')}
           contentColor={getColor('primary.500')}
+          testID="SpeakingIndicator"
         />
       );
     } else if (!isSpeaking && isAudio && isMicrophonePermission) {
@@ -301,7 +266,7 @@ const VideoLocalView = ({
       style={{ backgroundColor: getColor('grey.700'), width, height }}
       {...props}
     >
-      {videoSrcObject && isVideo && !disabled ? (
+      {videoSrc && isVideo && !disabled ? (
         <video
           muted
           data-testid="videoTag"

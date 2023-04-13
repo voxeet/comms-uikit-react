@@ -21,9 +21,19 @@ export type VideoTileProps = React.HTMLAttributes<HTMLDivElement> & {
   height?: number | string;
   noVideoFallback?: React.ReactNode;
   isMirrored?: boolean;
+  forceShowAvatar?: boolean;
 };
 
-const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirrored, ...props }: VideoTileProps) => {
+const VideoTile = ({
+  testID,
+  participant,
+  width,
+  height,
+  noVideoFallback,
+  isMirrored,
+  forceShowAvatar = false,
+  ...props
+}: VideoTileProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { getColor, isMobileSmall, isMobile } = useTheme();
@@ -38,27 +48,33 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
 
   const isSmartphone = isMobileSmall || isMobile;
 
+  const stream = participant.streams.filter((stream) => stream.type !== 'ScreenShare')[0];
+  const track = stream?.getVideoTracks()[0];
+
   useEffect(() => {
-    if (participant.streams?.length) {
-      const cameraStreams = participant.streams.filter((stream) => stream.type !== 'ScreenShare');
-      const stream = cameraStreams[0];
-      const track = stream?.getVideoTracks()[0];
-      const facingMode = track?.getSettings()?.facingMode;
-      const facingUserMode = facingMode === 'user';
-      if (track) {
-        setIsVideoAvailable(true);
-      } else {
-        setIsVideoAvailable(false);
-      }
-      setIsMirrorStream(facingMode ? facingUserMode : isMirrored);
-      setCurrentStream(cameraStreams[0]);
+    if (!track) {
+      setIsVideoAvailable(false);
+      return;
     }
-  }, [participant]);
+
+    const facingMode = track?.getSettings()?.facingMode;
+    const facingUserMode = facingMode === 'user';
+
+    if (track && !forceShowAvatar) {
+      setIsVideoAvailable(true);
+    } else {
+      setIsVideoAvailable(false);
+    }
+
+    setIsMirrorStream(facingMode ? facingUserMode : isMirrored);
+    if (stream.id !== currentStream?.id || stream.active !== currentStream?.active) {
+      setCurrentStream(stream);
+    }
+  }, [track, forceShowAvatar]);
 
   useEffect(() => {
     if (videoRef?.current && currentStream) {
-      // @ts-expect-error bad navigator type
-      navigator.attachMediaStream(videoRef.current, currentStream);
+      videoRef.current.srcObject = currentStream;
       /*
        * Below effect is applied due problem with muted stream track while sending camera stream from iOS device
        * ( this is connected with trusted events and gesture handlers)
@@ -74,7 +90,7 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
     } else {
       setIsLoading(true);
     }
-  }, [currentStream, participant, isVideoAvailable]);
+  }, [currentStream, isVideoAvailable]);
 
   useEffect(() => {
     if (!document.pictureInPictureEnabled || !videoRef.current) return;
@@ -141,7 +157,7 @@ const VideoTile = ({ testID, participant, width, height, noVideoFallback, isMirr
     >
       {isLoading && (
         <Space className={styles.spinnerWrapper}>
-          <Spinner />
+          <Spinner testID="videoLoading" />
         </Space>
       )}
       {isVideoAvailable ? (

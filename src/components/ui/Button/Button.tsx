@@ -8,7 +8,7 @@ import styles from './Button.module.scss';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   danger?: boolean;
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'tertiaryGrey';
   testID?: string;
   size?: Extract<Sizes, 'l' | 'm' | 's'>;
   fw?: boolean;
@@ -50,6 +50,36 @@ const colorsMap: Record<
       text: 'primary.400',
       hoverText: 'primary.500',
       border: 'primary.400',
+      hoverBorder: 'primary.500',
+    },
+    active: {
+      background: 'transparent',
+      text: 'primary.600',
+      hover: 'primary.500',
+      border: 'primary.600',
+    },
+    disabled: {
+      background: 'transparent',
+      hover: 'grey.200',
+      text: 'grey.200',
+      border: 'grey.200',
+    },
+    danger: {
+      background: 'transparent',
+      hover: 'transparent',
+      text: 'infoError',
+      hoverText: 'red.600',
+      border: 'infoError',
+      hoverBorder: 'red.600',
+    },
+  },
+  tertiaryGrey: {
+    base: {
+      background: 'transparent',
+      hover: 'transparent',
+      text: 'primary.400',
+      hoverText: 'primary.500',
+      border: 'grey.25',
       hoverBorder: 'primary.500',
     },
     active: {

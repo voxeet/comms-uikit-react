@@ -27,22 +27,32 @@ const MicrophoneSelect = ({
 }: MicrophoneSelectProps) => {
   const [selectedDevice, setSelectedDevice] = useState<DropdownOptionType | null>(null);
   const [devices, setDevices] = useState<DropdownOptionType[]>([]);
-  const { getMicrophones, selectMicrophone, localMicrophone, setLocalMicrophone } = useMicrophone();
+  const { microphones, getMicrophones, selectMicrophone, localMicrophone, setLocalMicrophone } = useMicrophone();
   const { conference } = useConference();
 
   useEffect(() => {
+    getMicrophones();
+  }, []);
+
+  useEffect(() => {
     (async () => {
-      const audioDevices = await getMicrophones();
+      let defaultConfDevice;
       const { options, defaultDevice } = deviceInfoToOptions({
-        data: audioDevices,
+        data: microphones,
         local: localMicrophone?.deviceId,
         renderLabel: (label: string) => label,
         icon: 'microphone',
       });
       setDevices(options);
-      setSelectedDevice(defaultDevice);
+      if (localMicrophone) {
+        const device = options.find((o) => o.value === localMicrophone.deviceId);
+        if (device) {
+          defaultConfDevice = device;
+        }
+      }
+      setSelectedDevice(defaultConfDevice || defaultDevice);
     })();
-  }, []);
+  }, [microphones]);
 
   const onChange = async (e: DropdownOptionType) => {
     setSelectedDevice(e);

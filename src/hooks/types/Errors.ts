@@ -1,4 +1,4 @@
-import type { Errors as ErrorsType, ErrorCodes } from '../../providers/CommsProvider';
+import type { Errors as ErrorsType, ErrorCodes, ErrorParams } from '../../providers/CommsProvider';
 
 export type Errors = {
   /**
@@ -20,6 +20,10 @@ export type Errors = {
    * Removes all current SDK errors.
    */
   removeSdkErrors: (error?: ErrorCodes) => void;
+  /**
+   * For debugging purposes - use this handler to populate error or artificially set error for messaging purposes
+   */
+  setErrorsExplicitly: (params: ErrorParams) => void;
 };
 
 export type UseErrors = () => Errors;

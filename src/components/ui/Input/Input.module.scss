@@ -27,8 +27,15 @@
     border-color: #aa33ff;
     outline: inherit;
   }
-  &.securePadding{
+  &.securePadding {
     padding: 12px 64px 12px 12px;
+  }
+  &::placeholder {
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 150%;
+    color: #bbbbbf;
+    letter-spacing: 0.015em;
   }
 }
 

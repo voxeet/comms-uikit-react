@@ -14,24 +14,27 @@ type ParticipantSpeakingIndicatorProps = {
   activeIconColor?: ColorKey;
   inactiveIconColor?: ColorKey;
   mutedIconColor?: ColorKey;
+  variant?: 'square' | 'circle';
   testID?: string;
 };
 
 const ParticipantSpeakingIndicator = ({
   participant,
-  testID,
   activeBackgroundColor = 'white',
   inactiveBackgroundColor,
   mutedBackgroundColor,
   activeIconColor = 'primary.500',
   inactiveIconColor,
   mutedIconColor,
+  variant = 'circle',
+  testID,
 }: ParticipantSpeakingIndicatorProps) => {
   const { participantsStatus } = useParticipants();
+  const status = participantsStatus[participant.id];
 
-  if (!participant) return null;
+  if (!participant || !status) return null;
 
-  const { isSpeaking, isRemoteAudio } = participantsStatus[participant.id] || {};
+  const { isSpeaking, isRemoteAudio } = status;
 
   if (!isRemoteAudio) {
     return (
@@ -40,6 +43,7 @@ const ParticipantSpeakingIndicator = ({
         icon="microphoneOff"
         backgroundColor={mutedBackgroundColor}
         iconColor={mutedIconColor}
+        variant={variant}
       />
     );
   }
@@ -51,6 +55,7 @@ const ParticipantSpeakingIndicator = ({
         testID={`${testID}-speaking`}
         backgroundColor={activeBackgroundColor}
         contentColor={activeIconColor}
+        variant={variant}
       />
     );
   }
@@ -61,6 +66,7 @@ const ParticipantSpeakingIndicator = ({
       icon="dotsHorizontal"
       backgroundColor={inactiveBackgroundColor}
       iconColor={inactiveIconColor}
+      variant={variant}
     />
   );
 };

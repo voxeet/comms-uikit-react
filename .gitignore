@@ -1,9 +1,5 @@
 node_modules
 .DS_Store
-*.local
-npm-debug.log
-yarn-debug.log
-yarn-error.log
 dist
-.gitconfig
-.idea
+dist-ssr
+*.local

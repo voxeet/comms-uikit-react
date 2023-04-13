@@ -7,7 +7,7 @@ The useTheme hook gathers functions responsible for managing themes.
 | Name                 | Type                | Description                                                                      |
 | -------------------- | ------------------- | -------------------------------------------------------------------------------- |
 | `theme`              | Theme               | Gets the theme object.                                                           |
-| `themes`             | CustomThemes        | Gets all themes in the project.                                            |
+| `themes`             | CustomThemes        | Gets all themes in the project.                                                  |
 | `activeTheme`        | string              | Gets the currently used theme mode name.                                         |
 | `availableThemes`    | string[]            | Gets array of available theme names.                                             |
 | `setActiveTheme`     | (ThemeMode) => void | Sets a theme mode.                                                               |

@@ -3,7 +3,7 @@ import type { NotificationBase, UseNotifications } from './types/Notifications';
 import useCommsContext from './useCommsContext';
 
 const useNotifications: UseNotifications = () => {
-  const { showNotification, removeNotification, notifications } = useCommsContext();
+  const { subscribe, showNotification, removeNotification, notifications } = useCommsContext();
 
   const showSuccessNotification = (message: string, instanceConfig?: NotificationBase[`instanceConfig`]) => {
     showNotification({ message, variant: NotificationVariants.Success, instanceConfig });
@@ -22,6 +22,7 @@ const useNotifications: UseNotifications = () => {
   };
 
   return {
+    subscribe,
     showNotification,
     showSuccessNotification,
     showInfoNotification,

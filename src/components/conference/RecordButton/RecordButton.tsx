@@ -4,7 +4,7 @@ import { Status as RecordingStatus } from '../../../hooks/types/misc';
 import useRecording from '../../../hooks/useRecording';
 import MediaButton, { MediaButtonProps } from '../MediaButton/MediaButton';
 
-type RecordButtonProps = Partial<Omit<MediaButtonProps, 'onClick' | 'isActive' | 'isDisabled'>> & {
+type RecordButtonProps = Partial<Omit<MediaButtonProps, 'onClick' | 'isActive'>> & {
   onStopRecordingAction?: () => void;
   onStartRecordingAction?: () => void;
   onError?: () => void;
@@ -13,6 +13,7 @@ type RecordButtonProps = Partial<Omit<MediaButtonProps, 'onClick' | 'isActive' |
 };
 
 const RecordButton = ({
+  isDisabled,
   size = 'm',
   onStopRecordingAction,
   onStartRecordingAction,
@@ -106,7 +107,7 @@ const RecordButton = ({
         activeIcon={activeIcon}
         disabledIcon={disabledIcon}
         isActive={isButtonActive}
-        isDisabled={status === RecordingStatus.Active && !isLocalUserRecordingOwner}
+        isDisabled={isDisabled || (status === RecordingStatus.Active && !isLocalUserRecordingOwner)}
         onClick={handleToggleRecording}
         size={size}
         testID={testID}

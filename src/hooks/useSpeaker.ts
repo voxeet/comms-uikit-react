@@ -4,9 +4,9 @@ import type { UseSpeaker } from './types/Speaker';
 import useCommsContext from './useCommsContext';
 
 const useSpeaker: UseSpeaker = () => {
-  const { localSpeakers, setLocalSpeakers } = useCommsContext();
-  const getSpeakers = () => {
-    return MediaDevicesService.enumerateAudioOutputDevices() as Promise<MediaDeviceInfo[]>;
+  const { localSpeakers, setLocalSpeakers, audioOutputDevices, setAudioOutputDevices } = useCommsContext();
+  const getSpeakers = async () => {
+    setAudioOutputDevices((await MediaDevicesService.enumerateAudioOutputDevices()) as MediaDeviceInfo[]);
   };
 
   const getDefaultLocalSpeaker = async () => {
@@ -21,16 +21,26 @@ const useSpeaker: UseSpeaker = () => {
     return null;
   };
 
-  const selectSpeaker = (device: string) => {
-    return MediaDevicesService.selectSpeaker(device);
+  const getSelectedSpeaker = () => {
+    return MediaDevicesService.getSelectedSpeaker();
+  };
+
+  const selectSpeaker = async (device: string) => {
+    const selectedDevice = getSelectedSpeaker();
+    if (device !== selectedDevice?.deviceId) {
+      return MediaDevicesService.selectSpeaker(device);
+    }
+    return device;
   };
 
   return {
+    speakers: audioOutputDevices,
     getSpeakers,
     selectSpeaker,
     localSpeakers,
     setLocalSpeakers,
     getDefaultLocalSpeaker,
+    getSelectedSpeaker,
   };
 };
 
