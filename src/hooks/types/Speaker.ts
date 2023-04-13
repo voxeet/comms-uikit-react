@@ -1,9 +1,14 @@
 export type Speaker = {
   /**
-   * Gets the list of the available speakers.
-   * @returns the list of available speakers.
+   * Holds the list of the available speakers.
    */
-  getSpeakers: () => Promise<MediaDeviceInfo[]>;
+  speakers: MediaDeviceInfo[];
+
+  /**
+   * Gets the list of the available speakers.
+   * Sets internal speakers state.
+   */
+  getSpeakers: () => void;
 
   /**
    * Selects a speaker.
@@ -28,6 +33,12 @@ export type Speaker = {
    * @param speakers - MediaDeviceInfo object or null
    */
   setLocalSpeakers: (speakers: Partial<MediaDeviceInfo> | null) => void;
+
+  /**
+   * Gets currently selected speaker in conference.
+   * @returns the default speaker device information.
+   */
+  getSelectedSpeaker: () => MediaDeviceInfo | undefined;
 };
 
 export type UseSpeaker = () => Speaker;

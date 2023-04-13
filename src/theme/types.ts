@@ -51,4 +51,4 @@ export type ThemeMode = keyof typeof customThemes;
 
 export type SpaceValues = keyof typeof defaultTheme['spaces'];
 
-export type Sizes = 'xxs' | 'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl' | 'xxxl';
+export type Sizes = 'xxxs' | 'xxs' | 'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl' | 'xxxl';

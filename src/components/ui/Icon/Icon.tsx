@@ -16,7 +16,7 @@ export type IconProps = React.HTMLAttributes<HTMLDivElement> & {
   name: IconComponentName;
   color?: ColorKey;
   colorTone?: ColorTone;
-  size?: Extract<Sizes, 'xxs' | 'xs' | 's' | 'm' | 'l' | 'xl'>;
+  size?: Extract<Sizes, 'xxxs' | 'xxs' | 'xs' | 's' | 'm' | 'l' | 'xl'>;
   testID?: string;
 };
 
@@ -37,11 +37,11 @@ const Icon = ({ name, color, colorTone = 'default', size = 'm', testID, ...props
 
   return (
     <Space
-      testID={testID}
+      testID={testID ?? `${name}Icon`}
       className={cx(styles.icon, styles[`size-${size}`], { [styles.clickable]: !!props.onClick })}
       {...props}
     >
-      <IconSVG testID="icon" fill={handleFillColor} />
+      <IconSVG testID={name} fill={handleFillColor} />
     </Space>
   );
 };

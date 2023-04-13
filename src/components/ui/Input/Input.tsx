@@ -63,7 +63,12 @@ const Input = ({
               backgroundColor: getColor(labelBackground, 'background'),
             }}
           >
-            <Text className={styles.labelText} type="captionRegular" color={getColor(labelColor, 'grey.500')}>
+            <Text
+              className={styles.labelText}
+              testID="Label"
+              type="captionRegular"
+              color={getColor(labelColor, 'grey.500')}
+            >
               {label}
             </Text>
           </Space>
@@ -89,6 +94,7 @@ const Input = ({
         <input
           ref={inputRef}
           className={cx(styles.input, { [styles.securePadding]: secure })}
+          data-testid="InputField"
           type={!isValueHidden ? 'text' : 'password'}
           autoComplete="false"
           value={value}
@@ -108,6 +114,7 @@ const Input = ({
       {validation?.message && (
         <Space mt="xs" className={styles.error}>
           <Text
+            testID="ErrorMessage"
             color={validation?.valid === false ? getColor('infoError') : getColor('grey.600')}
             type="captionRegular"
           >

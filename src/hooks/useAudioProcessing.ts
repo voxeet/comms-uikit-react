@@ -41,7 +41,7 @@ const useAudioProcessing: UseAudioProcessing = () => {
   );
 
   const removeAudioCaptureError = (error?: ErrorCodes) => {
-    return removeError({ error, level: 'audioCapture' });
+    return removeError({ error, context: 'audioCapture' });
   };
 
   return {

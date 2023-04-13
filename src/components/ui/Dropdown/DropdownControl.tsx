@@ -34,7 +34,7 @@ const DropdownControl = ({
     if (selected) {
       if (typeof selected.label === 'string') {
         return (
-          <Text type="bodySmall" color={getColor(color, 'grey.500')}>
+          <Text testID="SelectedText" type="bodySmall" color={getColor(color, 'grey.500')}>
             {selected.label}
           </Text>
         );
@@ -50,7 +50,7 @@ const DropdownControl = ({
 
   return (
     <button
-      data-testid={testID}
+      data-testid={testID ?? 'SelectedOption'}
       type="button"
       className={styles.control}
       css={{

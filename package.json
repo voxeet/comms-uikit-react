@@ -1,9 +1,12 @@
 {
   "name": "@dolbyio/comms-uikit-react",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Dolby.io Communications UIKit for React",
   "license": "MIT",
   "main": "dist/index.es.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "rollup -c",
     "prepack": "yarn build"
@@ -19,7 +22,7 @@
     "ui library"
   ],
   "peerDependencies": {
-    "@voxeet/voxeet-web-sdk": "3.8.0",
+    "@voxeet/voxeet-web-sdk": "^3.9.0-beta.3",
     "react": "*"
   },
   "dependencies": {
@@ -54,7 +57,7 @@
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-terser": "^7.0.2",
-    "typescript": "4.5.5",
+    "typescript": "4.9.5",
     "typescript-plugin-css-modules": "^3.4.0"
   },
   "eslintConfig": {
@@ -66,9 +69,5 @@
     }
   },
   "module": "dist/index.js",
-  "types": "dist/src/index.d.ts",
-  "source": "src/index",
-  "files": [
-    "dist"
-  ]
+  "types": "dist/src/index.d.ts"
 }

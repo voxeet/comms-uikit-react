@@ -28,6 +28,13 @@
       letter-spacing: -0.005em;
     }
 
+    &-h4Thin {
+      font-size: 32px;
+      line-height: 1.25em;
+      font-weight: 400;
+      letter-spacing: -0.0075em;
+    }
+
     &-h5Bold {
       font-size: 24px;
       line-height: 1.32em;
@@ -63,7 +70,6 @@
       letter-spacing: 0.01em;
     }
 
-
     &-paragraphLarge {
       font-size: 19px;
       line-height: 1.55em;
@@ -80,6 +86,13 @@
 
     &-paragraphSmall {
       font-size: 15px;
+      line-height: 1.5em;
+      font-weight: 500;
+      letter-spacing: 0.015em;
+    }
+
+    &-paragraphExtraSmall {
+      font-size: 14px;
       line-height: 1.5em;
       font-weight: 500;
       letter-spacing: 0.015em;
@@ -113,6 +126,13 @@
       font-size: 13px;
       line-height: 1.3em;
       font-weight: 500;
+      letter-spacing: 0.03em;
+    }
+
+    &-captionDemiBold {
+      font-size: 13px;
+      line-height: 1.3em;
+      font-weight: 600;
       letter-spacing: 0.03em;
     }
 

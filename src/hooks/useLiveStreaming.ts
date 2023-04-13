@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 
+import type { ErrorCodes } from '../providers/CommsProvider';
+
 import type { UseLiveStreaming } from './types/LiveStreaming';
 import useCommsContext from './useCommsContext';
 import useSession from './useSession';
@@ -10,8 +12,8 @@ const useLiveStreaming: UseLiveStreaming = () => {
     stopLiveStreaming,
     liveStreamingData,
     resetLiveStreamingData,
-    setLiveStreamingErrors,
     errors: { liveStreamingErrors: errorMessages },
+    setContextErrors,
   } = useCommsContext();
 
   const { owner, timestamp, status, isLiveStreamingModeActive, provider, rtmp } = liveStreamingData;
@@ -20,6 +22,10 @@ const useLiveStreaming: UseLiveStreaming = () => {
   const isLocalUserLiveStreamingOwner = useMemo(() => {
     return owner?.id === participant?.id;
   }, [owner, participant]);
+
+  const setLiveStreamingErrors = (error?: ErrorCodes) => {
+    setContextErrors({ error, context: 'liveStreamingErrors' });
+  };
 
   return {
     owner,

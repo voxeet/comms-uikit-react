@@ -6,29 +6,38 @@ import CameraSelect from './CameraSelect';
 const label = 'camera-label';
 const placeholder = 'camera-placeholder';
 const testID = 'testID';
-
-const getCamerasMock = jest
-  .fn()
-  .mockResolvedValueOnce([createDevice('device1')])
-  .mockResolvedValueOnce([createDevice('device1'), createDevice('device2')])
-  .mockResolvedValueOnce([createDevice('default'), createDevice('device2')])
-  .mockResolvedValue([createDevice('device1'), createDevice('device2')]);
+let cameras: MediaDeviceInfo[] = [];
 
 jest.mock('../../../hooks/useCamera', () => {
   return jest.fn(() => ({
     ...jest.requireActual('../../../hooks/useCamera'),
-    getCameras: getCamerasMock,
+    getCameras: jest.fn(),
+    cameras,
+    getSelectedCamera: jest.fn(),
   }));
 });
 
+beforeEach(() => {
+  jest.clearAllMocks();
+  cameras = [];
+});
+
 describe('CameraSelect component', () => {
+  test('Renders nothing if no devices', async () => {
+    const { queryByTestId } = render(<CameraSelect testID={testID} label={label} placeholder={placeholder} />);
+    await waitFor(() => {
+      expect(queryByTestId(testID)).toBeNull();
+    });
+  });
   test('Passes TestID', async () => {
+    cameras = [createDevice('device1')];
     const { getByTestId } = render(<CameraSelect testID={testID} label={label} placeholder={placeholder} />);
     await waitFor(() => {
       expect(getByTestId(testID)).toBeInTheDocument();
     });
   });
   test('Have label and placeholder when nothing is selected', async () => {
+    cameras = [createDevice('device1'), createDevice('device2')];
     const { getByText } = render(<CameraSelect testID={testID} label={label} placeholder={placeholder} />);
     await waitFor(async () => {
       const lrx = new RegExp(label, 'i');
@@ -38,6 +47,7 @@ describe('CameraSelect component', () => {
     });
   });
   test('Selects default device if it is available', async () => {
+    cameras = [createDevice('default')];
     const { getByText } = render(<CameraSelect testID={testID} label={label} placeholder={placeholder} />);
 
     await waitFor(async () => {
@@ -48,6 +58,7 @@ describe('CameraSelect component', () => {
     });
   });
   test('On click opens dropdown with list of devices', async () => {
+    cameras = [createDevice('device1'), createDevice('device2')];
     const { getByRole } = render(<CameraSelect testID={testID} label={label} placeholder={placeholder} />);
     await waitFor(() => {
       fireEvent.click(getByRole('button'));

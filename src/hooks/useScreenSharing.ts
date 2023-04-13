@@ -9,20 +9,24 @@ const useScreenSharing: UseScreenSharing = () => {
     startScreenShare,
     stopScreenShare,
     screenSharingData,
-    setSharingErrors,
     setPendingTakeoverRequest,
     resetScreenSharingData,
     errors: { screenShareErrors: errorMessages },
+    setContextErrors,
   } = useCommsContext();
   const { owner, status, stream, isPendingTakeoverRequest, isPresentationModeActive } = screenSharingData;
   const { participant } = useSession();
 
   const handleStartScreenShare = async (takingOver?: boolean) => {
     if (stream && !takingOver) {
-      setSharingErrors(ErrorCodes.ScreenShareAlreadyInProgress);
+      setContextErrors({ context: 'screenShareErrors', error: ErrorCodes.ScreenShareAlreadyInProgress });
       return false;
     }
     return startScreenShare();
+  };
+
+  const setSharingErrors = (error?: ErrorCodes) => {
+    setContextErrors({ context: 'screenShareErrors', error });
   };
 
   return {

@@ -1,5 +1,5 @@
 import deepMerge from 'lodash.merge';
-import React, { createContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 
 import defaultCustomThemes from '../theme/customThemes';
 import defaultTheme from '../theme/defaultTheme';
@@ -167,6 +167,24 @@ const ThemeProvider = ({ children, theme, customThemes, values }: ThemeProviderP
   useEffect(() => {
     setThemeState({ ...deepMerge(defaultTheme, themes[activeTheme], theme) } as Theme);
   }, [theme, activeTheme]);
+
+  // Expose every theme token as a CSS variable
+  useLayoutEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function exposeTokens(name: string[], val: Record<string, any> | string | number) {
+      if (typeof val === 'object' && val !== null) {
+        for (const [key, value] of Object.entries(val)) {
+          exposeTokens([...name, key], value);
+        }
+        return;
+      }
+      // Assume that any numbers are using pixel units
+      const formattedValue = typeof val === 'number' ? `${val}px` : val;
+      document.documentElement.style.setProperty(`--${name.join('-')}`, formattedValue);
+    }
+
+    exposeTokens([], themeState);
+  }, [themeState]);
 
   const contextValue: ThemeContext = useMemo(
     () => ({

@@ -1,5 +1,4 @@
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
-import { useMemo } from 'react';
 
 import useTheme from '../../../hooks/useTheme';
 import type { ColorKey, Sizes } from '../../../theme/types';
@@ -42,30 +41,26 @@ const sizeMap: Record<Size, { width: string; height: string; text: TextType }> =
 };
 
 const Avatar = ({ participant, size = 'l', borderColor, testID, ...props }: AvatarProps) => {
+  const { avatars, getColor } = useTheme();
+  const name = typeof participant === 'string' ? participant : participant?.info.name;
+  let firstNameLetter;
+  let lastNameLetter;
+  if (name) {
+    firstNameLetter = name.charAt(0);
+    const nameArray = name.split(' ');
+    lastNameLetter = nameArray.length > 1 ? nameArray[nameArray.length - 1].charAt(0) : '';
+  }
+
+  const backgroundColor =
+    avatars[
+      stringToNumber(name + (typeof participant === 'object' ? (participant as Participant).id.slice(0, 3) : '')) %
+        avatars.length
+    ];
+
   if (!participant) {
     return null;
   }
-  const { avatars, getColor } = useTheme();
-  const name = typeof participant === 'string' ? participant : participant.info.name;
-  const [firstNameLetter, lastNameLetter] = useMemo(() => {
-    let firstValue;
-    let lastValue;
-    if (name) {
-      firstValue = name.charAt(0);
-      const nameArray = name.split(' ');
-      lastValue = nameArray.length > 1 ? nameArray[nameArray.length - 1].charAt(0) : '';
-    }
-    return [firstValue, lastValue];
-  }, [name]);
 
-  const backgroundColor = useMemo(
-    () =>
-      avatars[
-        stringToNumber(name + (typeof participant === 'object' ? (participant as Participant).id.slice(0, 2) : '')) %
-          avatars.length
-      ],
-    [name],
-  );
   const { width, height, text } = sizeMap[size];
   return (
     <Space
