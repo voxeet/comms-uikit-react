@@ -27,23 +27,33 @@ const SpeakersSelect = ({
 }: SpeakersSelectProps) => {
   const [selectedDevice, setSelectedDevice] = useState<DropdownOptionType | null>(null);
   const [devices, setDevices] = useState<DropdownOptionType[]>([]);
-  const { getSpeakers, selectSpeaker, localSpeakers, setLocalSpeakers } = useSpeaker();
+  const { speakers, getSpeakers, selectSpeaker, localSpeakers, setLocalSpeakers } = useSpeaker();
   const { conference } = useConference();
 
   useEffect(() => {
+    getSpeakers();
+  }, []);
+
+  useEffect(() => {
     (async () => {
-      const speakerDevices = await getSpeakers();
+      let defaultConfDevice;
       const { options, defaultDevice } = deviceInfoToOptions({
-        data: speakerDevices,
+        data: speakers,
         local: localSpeakers?.deviceId,
         renderLabel: (label: string) => label,
         icon: 'speaker',
         defaultDeviceLabel,
       });
       setDevices(options);
-      setSelectedDevice(defaultDevice);
+      if (localSpeakers) {
+        const device = options.find((o) => o.value === localSpeakers.deviceId);
+        if (device) {
+          defaultConfDevice = device;
+        }
+      }
+      setSelectedDevice(defaultConfDevice || defaultDevice);
     })();
-  }, []);
+  }, [speakers]);
 
   const onChange = async (e: DropdownOptionType) => {
     setSelectedDevice(e);

@@ -1,5 +1,4 @@
 .indicator {
-  border-radius: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,5 +13,13 @@
       width: 32px;
       height: 32px;
     }
+  }
+
+  &.square {
+    border-radius: var(--borderRadius);
+  }
+
+  &.circle {
+    border-radius: 100%;
   }
 }

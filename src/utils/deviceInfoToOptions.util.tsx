@@ -9,27 +9,33 @@ export type DeviceInfoToOptionsArguments = {
   defaultDeviceLabel?: string;
 };
 
+type Option = DropdownOptionType & { info: MediaDeviceInfo };
+type Options = Array<Option>;
+type DefaultDevice = Option | null;
+
 export const deviceInfoToOptions = ({
   data,
   local,
   renderLabel,
   icon,
   defaultDeviceLabel = '',
-}: DeviceInfoToOptionsArguments) => {
-  let defaultDevice: DropdownOptionType | null = null;
-  const options: Array<DropdownOptionType & { info: MediaDeviceInfo }> = [];
-  data.forEach((item) => {
-    const label = item.label.length ? item.label : defaultDeviceLabel;
-    const option = {
-      value: item.deviceId,
-      label: renderLabel ? renderLabel(label) : label,
-      info: item,
-      icon,
-    };
-    options.push(option);
-    if (item.deviceId === local || item.deviceId === 'default' || data.length === 1) {
-      defaultDevice = option;
-    }
-  });
+}: DeviceInfoToOptionsArguments): { options: Options; defaultDevice: DefaultDevice } => {
+  let defaultDevice: DefaultDevice = null;
+  const options: Options = [];
+  if (data) {
+    data.forEach((item) => {
+      const label = item.label.length ? item.label : defaultDeviceLabel;
+      const option = {
+        value: item.deviceId,
+        label: renderLabel ? renderLabel(label) : label,
+        info: item,
+        icon,
+      };
+      options.push(option);
+      if (item.deviceId === local || item.deviceId === 'default' || data.length === 1) {
+        defaultDevice = option;
+      }
+    });
+  }
   return { options, defaultDevice };
 };

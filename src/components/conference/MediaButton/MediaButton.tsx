@@ -61,7 +61,7 @@ const MediaButton = ({
   isDisabled = false,
   size = 'm',
   onClick,
-  testID,
+  testID = 'LocalTogglePresentButton',
   style,
 }: MediaButtonProps) => {
   const [timedDisable, setTimedDisable] = useState(false);

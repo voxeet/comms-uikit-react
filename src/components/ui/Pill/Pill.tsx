@@ -1,9 +1,9 @@
 import useTheme from '../../../hooks/useTheme';
 import type { Sizes } from '../../../theme/types';
 import Space from '../Space/Space';
-import Text from '../Text/Text';
+import Text, { TextType } from '../Text/Text';
 
-type PillSize = Extract<Sizes, 's' | 'm'>;
+type PillSize = Extract<Sizes, 's' | 'm' | 'l'>;
 
 export type PillProps = React.HTMLAttributes<HTMLDivElement> & {
   text?: string;
@@ -43,7 +43,7 @@ const Pill = ({ text, label, active = false, size = 'm', testID, ...props }: Pil
       <Text
         color={active ? getColor('purple.400') : getColor('white')}
         testID={testID && `${testID}-text`}
-        type={size === 'm' ? 'captionSmallDemiBold' : 'captionSmallDemiBoldMobile'}
+        type={getTextType()}
       >
         {text}
       </Text>
@@ -53,7 +53,7 @@ const Pill = ({ text, label, active = false, size = 'm', testID, ...props }: Pil
           <Text
             color={active ? getColor('purple.400') : getColor('white')}
             testID={testID && `${testID}-text-local`}
-            type={size === 'm' ? 'captionSmallDemiBold' : 'captionSmallDemiBoldMobile'}
+            type={getTextType()}
           >
             {`(${label})`}
           </Text>
@@ -61,6 +61,17 @@ const Pill = ({ text, label, active = false, size = 'm', testID, ...props }: Pil
       )}
     </Space>
   );
+
+  function getTextType(): TextType {
+    switch (size) {
+      case 'm':
+        return 'captionSmallDemiBold';
+      case 'l':
+        return 'caption';
+      default:
+        return 'captionSmallDemiBoldMobile';
+    }
+  }
 };
 
 export default Pill;

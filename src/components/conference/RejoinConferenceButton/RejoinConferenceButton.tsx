@@ -22,7 +22,7 @@ const RejoinConferenceButton = ({
   joinOptions,
   ...rest
 }: RejoinConferenceButtonProps) => {
-  const { createConference, joinConference, prevConference } = useConference();
+  const { createConference, fetchConference, joinConference, prevConference } = useConference();
 
   const rejoin = async () => {
     if (prevConference) {
@@ -31,12 +31,14 @@ const RejoinConferenceButton = ({
           onStart(true);
         }
 
-        const conferenceOptions = {
-          alias: prevConference.name,
-        };
-        const conf = await createConference(conferenceOptions);
+        try {
+          const conf = await fetchConference(prevConference.id);
+          await joinConference(conf, joinOptions);
+        } catch (error) {
+          const conf = await createConference({ alias: prevConference.name });
+          await joinConference(conf, joinOptions);
+        }
 
-        await joinConference(conf, joinOptions);
         if (onStart) {
           onStart(false);
         }

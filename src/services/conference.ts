@@ -1,13 +1,15 @@
 import VoxeetSDK from '@voxeet/voxeet-web-sdk';
 import type { AudioCaptureModeOptions } from '@voxeet/voxeet-web-sdk/types/models/Audio';
-import type { ConferencePermission, ConferenceStatus } from '@voxeet/voxeet-web-sdk/types/models/Conference';
+import type { ConferencePermission } from '@voxeet/voxeet-web-sdk/types/models/Conference';
 import type Conference from '@voxeet/voxeet-web-sdk/types/models/Conference';
 import type ConferenceOptions from '@voxeet/voxeet-web-sdk/types/models/ConferenceOptions';
 import type { MediaStreamWithType } from '@voxeet/voxeet-web-sdk/types/models/MediaStream';
-import type { JoinOptions } from '@voxeet/voxeet-web-sdk/types/models/Options';
+import type { JoinOptions, ListenType } from '@voxeet/voxeet-web-sdk/types/models/Options';
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
 import type { VideoForwardingOptions } from '@voxeet/voxeet-web-sdk/types/models/VideoForwarding';
 import type { VideoProcessor } from '@voxeet/voxeet-web-sdk/types/models/VideoProcessor';
+
+export type HandledEventStatus = 'ended' | 'joined' | 'left' | 'error';
 
 export default class ConferenceService {
   public static create(options: ConferenceOptions) {
@@ -25,6 +27,14 @@ export default class ConferenceService {
     if (prefix) {
       VoxeetSDK.packageUrlPrefix = prefix;
     }
+  }
+
+  public static listeners(eventName: string) {
+    return VoxeetSDK.conference.listenerCount(eventName);
+  }
+
+  public static listen(conference: Conference) {
+    return VoxeetSDK.conference.listen(conference, { type: 'mixed' as ListenType });
   }
 
   public static current() {
@@ -104,14 +114,7 @@ export default class ConferenceService {
   }
 
   public static onLocalVideoUpdated(handler: (track: MediaStreamTrack) => void) {
-    /*
-     * Ts-ignore rule is due wrong type definitions for local video interface... SDK team is aware of this
-     */
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     VoxeetSDK.video.local.on('videoUpdated', handler);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     return () => VoxeetSDK.video.local.removeListener('videoUpdated', handler);
   }
 
@@ -159,14 +162,16 @@ export default class ConferenceService {
     };
   }
 
-  public static onConferenceStatusChange(handler: (data: ConferenceStatus) => void) {
-    VoxeetSDK.conference.on('ended', handler);
-    VoxeetSDK.conference.on('joined', handler);
-    VoxeetSDK.conference.on('left', handler);
+  public static onConferenceStatusChange(handler: (data: HandledEventStatus, info: any) => void) {
+    VoxeetSDK.conference.on('ended', (info) => handler('ended', info));
+    VoxeetSDK.conference.on('joined', (info) => handler('joined', info));
+    VoxeetSDK.conference.on('left', (info) => handler('left', info));
+    VoxeetSDK.conference.on('error', (info) => handler('error', info));
     return () => {
       VoxeetSDK.conference.removeListener('ended', handler);
       VoxeetSDK.conference.removeListener('joined', handler);
       VoxeetSDK.conference.removeListener('left', handler);
+      VoxeetSDK.conference.removeListener('error', handler);
     };
   }
 

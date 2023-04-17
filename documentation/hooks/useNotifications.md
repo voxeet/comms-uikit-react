@@ -5,7 +5,7 @@ The useNotifications hook expose notifications as well as handlers to remove dis
 ## Members
 
 | Name                            | Type                                                                             | Description                                               |
-|---------------------------------|----------------------------------------------------------------------------------|-----------------------------------------------------------|
+| ------------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | `showNotification`              | (Omit<Notification, `id`>) => void                                               | Display notification in notification center.              |
 | `showSuccessNotification`       | (message : string , instanceConfig?: NotificationBase[`instanceConfig`]) => void | Display success type notification in notification center. |
 | `showWarningNotification`       | (message : string , instanceConfig?: NotificationBase[`instanceConfig`]) => void | Display warning type notification in notification center. |

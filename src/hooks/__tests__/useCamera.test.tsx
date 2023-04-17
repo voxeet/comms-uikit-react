@@ -7,11 +7,12 @@ import useCamera from '../useCamera';
 const localCamera = { deviceId: '123', label: 'this is one local camera' };
 const faceTimeCamera = { deviceId: '12345', label: 'FaceTime' };
 const setLocalCamera = jest.fn();
+const videoInputDevices = [localCamera, faceTimeCamera] as MediaDeviceInfo[];
 
 const setup = () =>
   setupHook(useCamera, {
     commsProps: {
-      value: { localCamera, setLocalCamera },
+      value: { localCamera, setLocalCamera, videoInputDevices },
     },
   });
 
@@ -30,10 +31,9 @@ beforeEach(() => {
 });
 
 describe('useCamera', () => {
-  test('getLocalCameras', async () => {
+  test('getCameras', async () => {
     const hookValues = setup();
-    const cameras = await hookValues.getCameras();
-    expect(cameras).toStrictEqual([localCamera, { deviceId: '12345', label: 'FaceTime' }]);
+    expect(hookValues.cameras).toStrictEqual(videoInputDevices);
   });
   test('Should invoke selectCamera ', () => {
     const selectCamera = jest.fn();

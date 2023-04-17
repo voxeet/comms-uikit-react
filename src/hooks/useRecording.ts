@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 
+import type { ErrorCodes } from '../providers/CommsProvider';
+
 import type { UseRecording } from './types/Recording';
 import useCommsContext from './useCommsContext';
 import useSession from './useSession';
@@ -9,8 +11,8 @@ const useRecording: UseRecording = () => {
     startRecording,
     stopRecording,
     recordingData,
-    setRecordingErrors,
     errors: { recordingErrors: errorMessages },
+    setContextErrors,
     resetRecordingData,
   } = useCommsContext();
   const { ownerId, timestamp, status, isRecordingModeActive } = recordingData;
@@ -19,6 +21,10 @@ const useRecording: UseRecording = () => {
   const isLocalUserRecordingOwner = useMemo(() => {
     return ownerId === participant?.id;
   }, [ownerId, participant]);
+
+  const setRecordingErrors = (error?: ErrorCodes) => {
+    setContextErrors({ error, context: 'recordingErrors' });
+  };
 
   return {
     startRecording,

@@ -1,7 +1,16 @@
 import type { IconComponentName } from '../../components/ui/Icon/IconComponents';
+import type { Subscription } from '../../services/notification';
 import type { ColorKey } from '../../theme/types';
 
 export type Notifications = {
+  /**
+   * Subscribes to an event. The handler will be called when the event is emitted.
+   * @param subscription
+   * @param handler
+   * @returns cleanup function to remove event listeners and unsubscribes from the event
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  subscribe: (subscription: Subscription, handler: (...args: any[]) => void) => () => void;
   /**
    * Show notification in NotificationCenter
    */

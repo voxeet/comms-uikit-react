@@ -5,21 +5,22 @@ import useSpeaker from '../useSpeaker';
 const local1 = { deviceId: '123', label: 'this is one local speaker' };
 const local2 = { deviceId: '321', label: 'this is one local speaker' };
 const defaultSpeaker = { deviceId: 'default', label: 'this is one local speaker' };
-const speakers = [local1, local2, defaultSpeaker];
+const audioOutputDevices = [local1, local2, defaultSpeaker] as MediaDeviceInfo[];
 const setLocalSpeakers = jest.fn();
 
 const setup = () =>
   setupHook(useSpeaker, {
     commsProps: {
-      value: { localSpeakers: local1, setLocalSpeakers },
+      value: { localSpeakers: local1, setLocalSpeakers, audioOutputDevices },
     },
   });
 
 jest.mock('../../services/mediaDevices', () => {
   return {
-    enumerateAudioOutputDevices: jest.fn(() => speakers),
+    enumerateAudioOutputDevices: jest.fn(() => audioOutputDevices),
     selectSpeaker: jest.fn(),
     onDeviceListChanged: jest.fn(),
+    getSelectedSpeaker: jest.fn(),
   };
 });
 
@@ -30,8 +31,7 @@ beforeEach(() => {
 describe('useSpeakers', () => {
   test('getSpeakers', async () => {
     const hookValues = setup();
-    const cameras = await hookValues.getSpeakers();
-    expect(cameras).toStrictEqual(speakers);
+    expect(hookValues.speakers).toStrictEqual(audioOutputDevices);
   });
   test('Should invoke selectSpeaker ', () => {
     const selectSpeaker = jest.fn();

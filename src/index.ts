@@ -22,6 +22,7 @@ export { default as useLogger } from './hooks/useLogger';
 export { default as useBlur } from './hooks/useBlur';
 export { default as useRecording } from './hooks/useRecording';
 export { default as useLiveStreaming } from './hooks/useLiveStreaming';
+export { default as useCommsContext } from './hooks/useCommsContext';
 
 // Components - UI
 export { default as Avatar } from './components/ui/Avatar/Avatar';

@@ -1,10 +1,13 @@
+import type ConferenceType from '@voxeet/voxeet-web-sdk/types/models/Conference';
+
+import useConference from '../../../hooks/useConference';
 import { fireEvent, render, waitFor } from '../../../utils/tests/test-utils';
 
 import JoinConferenceButton from './JoinConferenceButton';
 
 const joinOptions = { constraints: { audio: true, video: true } };
 const meetingName = 'test-conference';
-const text = 'rejoin';
+const text = 'join';
 const testID = 'testID';
 
 const openSession = jest.fn();
@@ -25,6 +28,8 @@ jest.mock('../../../hooks/useConference', () => {
     joinConference,
   }));
 });
+
+const useConferenceHookMock = useConference as jest.MockedFunction<typeof useConference>;
 
 describe('JoinConferenceButton component', () => {
   test('Passes TestID', async () => {
@@ -57,13 +62,6 @@ describe('JoinConferenceButton component', () => {
         tooltipText={text}
         onSuccess={onSuccess}
       />,
-      {
-        commsProps: {
-          value: {
-            joinConference,
-          },
-        },
-      },
     );
 
     await waitFor(() => {
@@ -71,6 +69,32 @@ describe('JoinConferenceButton component', () => {
       fireEvent.click(element);
       expect(onSuccess).toHaveBeenCalled();
       expect(joinConference).toHaveBeenCalled();
+    });
+  });
+  test('Should invoke onError callback ', async () => {
+    const onError = jest.fn();
+    const rejectedJoin = jest.fn(() => Promise.reject(new Error('ERROR')));
+    useConferenceHookMock.mockImplementation(() => ({
+      ...jest.requireActual('../../../hooks/useConference'),
+      createConference,
+      joinConference: rejectedJoin,
+      conference: { id: 4321, alias: 'conference2' } as unknown as ConferenceType,
+    }));
+    const { getByTestId } = render(
+      <JoinConferenceButton
+        joinOptions={joinOptions}
+        meetingName={meetingName}
+        testID={testID}
+        tooltipText={text}
+        onError={onError}
+      />,
+    );
+
+    await waitFor(() => {
+      const element = getByTestId(testID);
+      fireEvent.click(element);
+      expect(rejectedJoin).toHaveBeenCalled();
+      expect(onError).toHaveBeenCalled();
     });
   });
 });

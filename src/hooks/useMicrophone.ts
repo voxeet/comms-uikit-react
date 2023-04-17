@@ -9,9 +9,16 @@ import useTheme from './useTheme';
 const defaultMics = ['default'];
 
 const useMicrophone: UseMicrophone = () => {
-  const { localMicrophone, setLocalMicrophone, hasMicrophonePermission, setHasMicrophonePermission } =
-    useCommsContext();
+  const {
+    localMicrophone,
+    setLocalMicrophone,
+    hasMicrophonePermission,
+    setHasMicrophonePermission,
+    audioInputDevices,
+    setAudioInputDevices,
+  } = useCommsContext();
   const { isDesktop } = useTheme();
+
   const getMicrophones = async () => {
     /*
      * Additional refreshing for permissions on Firefox due to assumption of lack of permissions bug
@@ -19,11 +26,21 @@ const useMicrophone: UseMicrophone = () => {
     if (navigator.userAgent.indexOf('Firefox') !== -1) {
       await navigator.mediaDevices.getUserMedia({ audio: true });
     }
-    return (await MediaDevicesService.enumerateAudioInputDevices()).filter((d) => d.deviceId) as MediaDeviceInfo[];
+    setAudioInputDevices(
+      (await MediaDevicesService.enumerateAudioInputDevices()).filter((d) => d.deviceId) as MediaDeviceInfo[],
+    );
   };
 
-  const selectMicrophone = (device: string) => {
-    return MediaDevicesService.selectMicrophone(device);
+  const getSelectedMicrophone = () => {
+    return MediaDevicesService.getSelectedMicrophone();
+  };
+
+  const selectMicrophone = async (device: string) => {
+    const selectedDevice = getSelectedMicrophone();
+    if (device !== selectedDevice?.deviceId) {
+      return MediaDevicesService.selectMicrophone(device);
+    }
+    return device;
   };
 
   const getMicrophonePermission = async () => {
@@ -80,12 +97,14 @@ const useMicrophone: UseMicrophone = () => {
   };
 
   return {
+    microphones: audioInputDevices,
     getMicrophones,
     selectMicrophone,
     getMicrophonePermission,
     localMicrophone,
     setLocalMicrophone,
     getDefaultLocalMicrophone,
+    getSelectedMicrophone,
   };
 };
 

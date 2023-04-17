@@ -4,15 +4,15 @@ The useParticipants hook gathers functions responsible for managing conference p
 
 ## Members
 
-| Name                               | Type                           | Description                                                                           |
-| ---------------------------------- | ------------------------------ | ------------------------------------------------------------------------------------- |
-| `participants`                     | Participant[]                  | The list of conference participants.                                                  |
-| `participantsStatus.isVideo`       | boolean                        | Indicates if the selected participant has enabled camera.                                 |
-| `participantsStatus.isSpeaking`    | boolean                        | Indicates if the selected participant is currently speaking.                                   |
-| `participantsStatus.isLocal`       | boolean                        | Indicates if the selected participant is local user.                                      |
-| `participantsStatus.isRemoteAudio` | boolean                        | Indicates if the selected participant is sending audio to the conference i.e. the selected participant has not muted themselves. |
-| `participantsStatus.isLocalAudio`  | boolean                        | Indicates if local user is receiving audio from selected participant.                     |
-| `addIsSpeakingListener`            | (Participant) => () => void    | Checks if participant is currently speaking.                                               |
+| Name                               | Type                        | Description                                                                                                                      |
+| ---------------------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `participants`                     | Participant[]               | The list of conference participants.                                                                                             |
+| `participantsStatus.isVideo`       | boolean                     | Indicates if the selected participant has enabled camera.                                                                        |
+| `participantsStatus.isSpeaking`    | boolean                     | Indicates if the selected participant is currently speaking.                                                                     |
+| `participantsStatus.isLocal`       | boolean                     | Indicates if the selected participant is local user.                                                                             |
+| `participantsStatus.isRemoteAudio` | boolean                     | Indicates if the selected participant is sending audio to the conference i.e. the selected participant has not muted themselves. |
+| `participantsStatus.isLocalAudio`  | boolean                     | Indicates if local user is receiving audio from selected participant.                                                            |
+| `addIsSpeakingListener`            | (Participant) => () => void | Checks if participant is currently speaking.                                                                                     |
 
 ## Examples
 

@@ -10,7 +10,7 @@ The SDK itself doesn't provide methods for this.
 ## Members
 
 | Name                            | Type                                                | Description                                                                                 |
-| ------------------------------- | --------------------------------------------------- |---------------------------------------------------------------------------------------------|
+| ------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | `owner`                         | Participant                                         | The object of the participant who started the live stream.                                  |
 | `startLiveStreaming`            | (start: () => Promise<boolean>) => Promise<boolean> | Starts Live Streaming. User has to pass his own start method connected with backend service |
 | `stopLiveStreaming`             | (stop: () => Promise<boolean>) => Promise<boolean>; | Stops Live Streaming. User has to pass his own start method connected with backend service  |

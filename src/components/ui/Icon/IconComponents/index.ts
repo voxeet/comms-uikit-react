@@ -1,5 +1,6 @@
 import type { SVGProps } from 'react';
 
+import Add from './Add';
 import ArrowLeft from './ArrowLeft';
 import BackgroundBlur from './BackgroundBlur';
 import Camera from './Camera';
@@ -10,6 +11,9 @@ import CameraReverse from './CameraReverse';
 import CameraReverseGradient from './CameraReverseGradient';
 import Chat from './Chat';
 import ChatGradient from './ChatGradient';
+import ChevronDown from './ChevronDown';
+import ChevronUp from './ChevronUp';
+import Circle from './Circle';
 import Close from './Close';
 import Copy from './Copy';
 import CopyGradient from './CopyGradient';
@@ -18,6 +22,7 @@ import DotsHorizontalGradient from './DotsHorizontalGradient';
 import DotsVertical from './DotsVertical';
 import DotsVerticalGradient from './DotsVerticalGradient';
 import Echo from './Echo';
+import Exit from './Exit';
 import EyeClosed from './EyeClosed';
 import EyeOpen from './EyeOpen';
 import Failure from './Failure';
@@ -77,6 +82,7 @@ const IconComponents = {
   dotsHorizontalGradient: DotsHorizontalGradient,
   dotsVertical: DotsVertical,
   dotsVerticalGradient: DotsVerticalGradient,
+  exit: Exit,
   eyeClosed: EyeClosed,
   eyeOpen: EyeOpen,
   failure: Failure,
@@ -118,6 +124,10 @@ const IconComponents = {
   tune: Tune,
   tiles: Tiles,
   echo: Echo,
+  add: Add,
+  chevronUp: ChevronUp,
+  chevronDown: ChevronDown,
+  circle: Circle,
 };
 
 export default IconComponents;

@@ -5,7 +5,7 @@ import { useState, useMemo, ButtonHTMLAttributes } from 'react';
 import useTheme from '../../../hooks/useTheme';
 import type { ColorKey, Sizes } from '../../../theme/types';
 import Badge from '../Badge/Badge';
-import Icon, { ColorTone } from '../Icon/Icon';
+import Icon, { ColorTone, IconProps } from '../Icon/Icon';
 import type { IconComponentName } from '../Icon/IconComponents';
 import Space from '../Space/Space';
 
@@ -22,6 +22,7 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
   rightBadge?: boolean;
   strokeColor?: ColorKey;
   size?: Extract<Sizes, 'xxs' | 'xs' | 's' | 'm' | 'l'>;
+  iconSize?: IconProps['size'];
   disabled?: boolean;
   icon: IconComponentName;
   onClick?: () => void;
@@ -40,6 +41,7 @@ const IconButton = ({
   rightBadge,
   strokeColor,
   size = 'm',
+  iconSize,
   disabled = false,
   icon,
   onClick,
@@ -65,13 +67,13 @@ const IconButton = ({
   }, [iconColor, disabled, isHovered, theme, isDesktop, isTouched]);
 
   const handleBackgroundColor = useMemo(() => {
-    let color = getColorOrGradient(backgroundColor, 'grey.800');
+    let color = getColorOrGradient(backgroundColor, 'grey.600');
 
     if (!isGradient && backgroundColor !== 'transparent') {
       if (backgroundColor) color = getColor(backgroundColor as string);
-      if ((isHovered && !disabled && isDesktop) || (isTouched && !disabled && !isDesktop))
+      if ((isHovered && !disabled && isDesktop) || (isTouched && !disabled && !isDesktop)) {
         color = Color(color).lighten(0.2).hex();
-      else color = getColor(backgroundColor as string, 'grey.600');
+      }
     }
 
     if (
@@ -153,7 +155,7 @@ const IconButton = ({
           )}
         >
           <Badge
-            testID="IconButtonBadge"
+            testID={`${icon}Badge`}
             content={handleBadgeContent}
             backgroundColor={badgeColor}
             contentColor={badgeContentColor}
@@ -163,13 +165,14 @@ const IconButton = ({
       {icon && (
         <Icon
           style={{ pointerEvents: 'none' }}
-          testID="IconButtonIcon"
+          testID={`${icon}Icon`}
           name={icon}
           color={iconColor}
           colorTone={handleIconColorTone}
-          size={size}
+          size={iconSize || size}
         />
       )}
+      {props.children}
     </button>
   );
 };
