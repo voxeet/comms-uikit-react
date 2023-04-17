@@ -15,4 +15,12 @@
       height: 32px;
     }
   }
+
+  &.square {
+    border-radius: var(--borderRadius);
+  }
+
+  &.circle {
+    border-radius: 100%;
+  }
 }

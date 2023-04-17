@@ -29,26 +29,22 @@ const RecordingActionBar = ({
   const { stopRecording, isLocalUserRecordingOwner, status, startRecording, resetRecordingData, setRecordingErrors } =
     useRecording();
 
-  const stopRecordingHandler = async () => {
-    const result = await stopRecording();
-    if (result) {
-      onActionSuccess?.();
-    }
-  };
-
-  const startRecordingHandler = async () => {
-    const result = await startRecording();
-    if (result) {
-      onActionSuccess?.();
-    }
-  };
-
   const callbacks = useMemo(
     () => ({
-      [RecordingStatus.Active]: stopRecordingHandler,
-      [RecordingStatus.Error]: startRecordingHandler,
+      [RecordingStatus.Active]: async () => {
+        const result = await stopRecording();
+        if (result) {
+          onActionSuccess?.();
+        }
+      },
+      [RecordingStatus.Error]: async () => {
+        const result = await startRecording();
+        if (result) {
+          onActionSuccess?.();
+        }
+      },
     }),
-    [status],
+    [],
   );
 
   const onErrorClose = async () => {

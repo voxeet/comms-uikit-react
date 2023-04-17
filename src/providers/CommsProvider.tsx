@@ -1,7 +1,6 @@
 /* eslint-disable no-alert */
 import type { AudioCaptureModeOptions } from '@voxeet/voxeet-web-sdk/types/models/Audio';
 import type Conference from '@voxeet/voxeet-web-sdk/types/models/Conference';
-import type { ConferenceStatus } from '@voxeet/voxeet-web-sdk/types/models/Conference';
 import type ConferenceOptions from '@voxeet/voxeet-web-sdk/types/models/ConferenceOptions';
 import type { MediaStreamWithType } from '@voxeet/voxeet-web-sdk/types/models/MediaStream';
 import type { JoinOptions, ParticipantInfo } from '@voxeet/voxeet-web-sdk/types/models/Options';
@@ -12,7 +11,7 @@ import React, { createContext, ReactNode, useCallback, useEffect, useMemo, useSt
 
 import { BlockedAudioState } from '../hooks/types/Audio';
 import type { LocalVideoParams } from '../hooks/types/Camera';
-import { VideoForwardingStrategy } from '../hooks/types/Conferencing';
+import { PrevConference, VideoForwardingStrategy } from '../hooks/types/Conferencing';
 import type { LiveStreamProvider } from '../hooks/types/LiveStreaming';
 import { LiveStreamingMessages } from '../hooks/types/LiveStreaming';
 import { LogLevel } from '../hooks/types/Logger';
@@ -22,8 +21,9 @@ import type { ParticipantStatus } from '../hooks/types/Participants';
 import { AudioCaptureMode, AudioProcessingMessages } from '../hooks/types/UseAudioProcessing';
 import useLogger from '../hooks/useLogger';
 import commandService from '../services/command';
-import conferenceService from '../services/conference';
-import MediaDevicesService from '../services/mediaDevices';
+import conferenceService, { HandledEventStatus } from '../services/conference';
+import MediaDevicesService, { UpdatedList } from '../services/mediaDevices';
+import notificationService, { Subscription } from '../services/notification';
 import recordingService from '../services/recording';
 import sdkService from '../services/sdk';
 import sessionService from '../services/session';
@@ -33,6 +33,10 @@ type DolbyIoWindow = {
   dolbyio: {
     isInitialized: boolean;
   };
+};
+
+const narrowObj = (thing: unknown) => {
+  return typeof thing === 'object' && thing !== null ? thing : null;
 };
 
 const dioWindow = window as Window & typeof globalThis & DolbyIoWindow;
@@ -97,7 +101,8 @@ export type CommsContextType = {
   closeSession: () => Promise<void>;
   createConference: (options: ConferenceOptions) => Promise<Conference>;
   fetchConference: (id: string) => Promise<Conference>;
-  joinConference: (conference: Conference, options: JoinOptions) => Promise<Conference>;
+  joinConference: (conference: Conference, options: JoinOptions, listener?: boolean) => Promise<Conference>;
+  listeners: (status: string) => Promise<number>;
   leaveConference: () => Promise<void>;
   toggleAudio: () => Promise<void>;
   isAudio: boolean;
@@ -110,15 +115,12 @@ export type CommsContextType = {
   stopRemoteParticipantVideo: (participant: Participant) => Promise<void>;
   participant: Participant | null;
   conference: Conference | null;
-  conferenceStatus: ConferenceStatus | null;
+  conferenceStatus: HandledEventStatus | null;
   participants: Participant[];
   participantsStatus: {
     [key: string]: ParticipantStatus;
   };
-  prevConference: {
-    participant: string;
-    name: string;
-  } | null;
+  prevConference: PrevConference | null;
   addIsSpeakingListener: (participant: Participant) => () => void;
   resetVideo: () => void;
   resetAudio: () => void;
@@ -136,9 +138,7 @@ export type CommsContextType = {
   stopScreenShare: () => Promise<void>;
   screenSharingData: ScreenSharingDataType;
   recordingData: RecordingDataType;
-  setSharingErrors: (error?: ErrorCodes) => void;
-  setRecordingErrors: (error?: ErrorCodes) => void;
-  setLiveStreamingErrors: (error?: ErrorCodes) => void;
+  subscribe: (subscription: Subscription, handler: (...args: unknown[]) => void) => () => void;
   showNotification: (notification: NotificationBase) => void;
   notifications: Notification[];
   removeNotification: (notificationId: number) => void;
@@ -149,10 +149,9 @@ export type CommsContextType = {
   resetScreenSharingData: () => void;
   resetRecordingData: () => void;
   errors: Errors;
-  removeError: (params: { error?: ErrorCodes; level?: keyof Errors }) => void;
+  removeError: (params: Partial<ErrorParams>) => void;
   stopRecording: () => Promise<boolean>;
   startRecording: () => Promise<boolean>;
-  removeSdkErrors: (error?: ErrorCodes) => void;
   hasCameraPermission: boolean;
   hasMicrophonePermission: boolean;
   setHasCameraPermission: React.Dispatch<React.SetStateAction<boolean>>;
@@ -176,7 +175,16 @@ export type CommsContextType = {
   isSessionOpened: () => boolean;
   setVideoForwarding: (maxVideoForwarding: number, option?: Partial<VideoForwardingOptions>) => Promise<void>;
   maxVideoForwarding: number;
+  audioInputDevices: MediaDeviceInfo[];
+  setAudioInputDevices: React.Dispatch<React.SetStateAction<MediaDeviceInfo[]>>;
+  audioOutputDevices: MediaDeviceInfo[];
+  setAudioOutputDevices: React.Dispatch<React.SetStateAction<MediaDeviceInfo[]>>;
+  videoInputDevices: MediaDeviceInfo[];
+  setVideoInputDevices: React.Dispatch<React.SetStateAction<MediaDeviceInfo[]>>;
+  setContextErrors: (params: ErrorParams) => void;
 };
+
+export type ErrorParams = { error?: ErrorCodes; context: keyof Errors };
 
 export type CommsProviderProps = {
   children: ReactNode;
@@ -231,6 +239,7 @@ export enum ErrorCodes {
   'ConferenceIsNotInitialized' = 'Conference is not initialized.',
   'CorruptedVideoTrack' = 'CorruptedVideoTrack',
   'ExpiredOrInvalidToken' = 'Expired or invalid token',
+  'RecordingAlreadyInProgress' = 'Recording already in progress',
 }
 
 /*
@@ -242,7 +251,11 @@ const liveStreamAwareParticipants = new Set();
 let retries = 0;
 
 export const errorMapper = (error: unknown) => {
-  const { message } = (error as Error) || { message: '' };
+  if (!(error instanceof Error)) {
+    return undefined;
+  }
+  const { message } = error;
+
   switch (message) {
     case ErrorCodes.PermissionDeniedBySystem:
     case ErrorCodes.PermissionDeniedBySystemMozilla:
@@ -275,7 +288,7 @@ const initialErrors = {
 const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix }: CommsProviderProps) => {
   const [participant, setParticipant] = useState<CommsContextType['participant']>(null);
   const [conference, setConference] = useState<CommsContextType['conference']>(null);
-  const [conferenceStatus, setConferenceStatus] = useState<CommsContextType['conferenceStatus']>(null);
+  const [conferenceStatus, setConferenceStatus] = useState<HandledEventStatus | null>(null);
 
   const [participants, setParticipants] = useState<Map<string, Participant>>(new Map());
   const [participantsStatus, setParticipantsStatus] = useState<CommsContextType['participantsStatus']>({});
@@ -306,6 +319,9 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   const { log } = useLogger();
   const [localStream, dispatchSetLocalStream] = useState<MediaStream | null>(null);
   const [participantsWithMusic, setParticipantsWithMusic] = useState<string[]>([]);
+  const [audioInputDevices, setAudioInputDevices] = useState<MediaDeviceInfo[]>([]);
+  const [audioOutputDevices, setAudioOutputDevices] = useState<MediaDeviceInfo[]>([]);
+  const [videoInputDevices, setVideoInputDevices] = useState<MediaDeviceInfo[]>([]);
 
   useEffect(() => {
     if (conference) {
@@ -431,6 +447,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       setPrevConference({
         participant: participant.info.name,
         name: conference.alias,
+        id: conference.id,
       });
     }
   }, [participant, conference]);
@@ -617,7 +634,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   };
 
   useEffect(() => {
-    if (isVideo && participant && !conference) {
+    if (isVideo && participant && !conference && localCamera) {
       (async () => {
         if (localStream && localCamera && /android/i.test(navigator.userAgent || navigator.vendor)) {
           return MediaDevicesService.selectCamera(localCamera?.deviceId || '');
@@ -630,7 +647,10 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
         return setLocalStream(stream);
       })();
     }
-  }, [localCamera]);
+    if (!localCamera) {
+      setLocalStream(undefined);
+    }
+  }, [localCamera, participant]);
 
   const playBlockedAudio = async (): Promise<void> => {
     await conferenceService.playBlockedAudio();
@@ -646,11 +666,26 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     return conferenceService.fetch(id);
   }, []);
 
-  const joinConference = useCallback(async (conference: Conference, joinOptions: JoinOptions): Promise<Conference> => {
-    const joinedConference = await conferenceService.join(conference, joinOptions);
-    setConference(joinedConference);
-    return joinedConference;
+  const listeners = useCallback(async (status: string) => {
+    return conferenceService.listeners(status);
   }, []);
+
+  const joinConference = useCallback(
+    async (conference: Conference, joinOptions: JoinOptions, listener?: boolean): Promise<Conference> => {
+      if (listener) {
+        const joinedConference = await conferenceService.listen(conference);
+        setConference(joinedConference);
+
+        return joinedConference;
+      }
+
+      const joinedConference = await conferenceService.join(conference, joinOptions);
+
+      setConference(joinedConference);
+      return joinedConference;
+    },
+    [],
+  );
 
   const leaveConference = useCallback(async (): Promise<void> => {
     await conferenceService.leave();
@@ -661,7 +696,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     setConferenceStatus(null);
     setParticipants(new Map());
     setLocalStream(undefined);
-    // TODO remove when video blur preview will be available in setup
+    setLocalCamera(null);
     setIsBlurred(false);
   }, []);
 
@@ -680,7 +715,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       ...prev,
       status: Status.Loading,
     }));
-    setSharingErrors();
+    setContextErrors({ context: 'screenShareErrors' });
 
     try {
       await conferenceService.startScreenShare();
@@ -693,7 +728,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     } catch (error) {
       const message = errorMapper(error);
       if (message) {
-        setSharingErrors(message);
+        setContextErrors({ context: 'screenShareErrors', error: message });
       }
       if (message === ErrorCodes.LackOfBrowserPermissions || message === ErrorCodes.ScreenShareAutoTakeoverError) {
         setScreenSharingData((prev) => ({
@@ -731,11 +766,15 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   };
 
   const startRecording = async () => {
+    if (recordingData.status === Status.Active && recordingData.ownerId) {
+      setContextErrors({ context: 'recordingErrors', error: ErrorCodes.RecordingAlreadyInProgress });
+      return false;
+    }
     setRecordingData((prev) => ({
       ...prev,
       status: Status.Loading,
     }));
-    setRecordingErrors();
+    removeError({ context: 'recordingErrors' });
     try {
       await recordingService.start();
 
@@ -753,9 +792,8 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       }
       const message = errorMapper(error);
       if (message) {
-        setRecordingErrors(errorMapper(message));
+        setContextErrors({ context: 'recordingErrors', error: message });
       }
-
       if (participant) {
         setRecordingData((prev) => ({
           ...prev,
@@ -791,7 +829,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       ...prev,
       status: Status.Loading,
     }));
-    setLiveStreamingErrors();
+    setContextErrors({ context: 'liveStreamingErrors' });
 
     try {
       await start();
@@ -816,13 +854,23 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
         await sendMessage(startMessage);
       }
       return true;
-    } catch (error: any) {
+    } catch (error) {
       if (error instanceof Error) {
         log(LogLevel.error, error.message);
       }
-      const { message } = error.data;
-      if (message) {
-        setLiveStreamingErrors(message);
+      const checkedError = narrowObj(error);
+
+      if (checkedError && 'data' in checkedError) {
+        const checkedData = narrowObj(checkedError.data);
+
+        if (checkedData && 'message' in checkedData) {
+          if (checkedData.message) {
+            /*
+             * We are not getting specificcheckedData. messages from the server yet
+             */
+            setContextErrors({ error: checkedData.message as ErrorCodes, context: 'liveStreamingErrors' });
+          }
+        }
       }
 
       setLiveStreamingData((prev) => ({
@@ -836,7 +884,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   };
 
   const stopLiveStreaming: CommsContextType['stopLiveStreaming'] = async (stop) => {
-    setLiveStreamingErrors();
+    setContextErrors({ context: 'liveStreamingErrors' });
     try {
       await stop();
       if (participant) {
@@ -857,16 +905,23 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       await sendMessage(stopMessage);
       liveStreamAwareParticipants.clear();
       return true;
-    } catch (error: any) {
+    } catch (error) {
       if (error instanceof Error) {
         log(LogLevel.error, error.message);
       }
-      const { message: errorMessage } = error.data;
-      const message = errorMapper(errorMessage);
-      if (message) {
-        setLiveStreamingErrors(errorMapper(message));
-      }
 
+      const checkedError = narrowObj(error);
+
+      if (checkedError && 'data' in checkedError) {
+        const checkedData = narrowObj(checkedError.data);
+        if (checkedData && 'message' in checkedData) {
+          const message = errorMapper(checkedData.message);
+
+          if (message) {
+            setContextErrors({ error: message, context: 'liveStreamingErrors' });
+          }
+        }
+      }
       return false;
     }
   };
@@ -916,7 +971,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       await commandService.send(JSON.stringify(message));
     } catch (error) {
       if (error instanceof Error) {
-        console.warn('Cannot send message');
+        log(LogLevel.warn, 'Cannot send message');
       }
     }
   };
@@ -948,7 +1003,8 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
 
   // ADDING EVENT HANDLERS
 
-  const onConferenceStatusChange = (status: ConferenceStatus) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const onConferenceStatusChange = (status: HandledEventStatus, _info: any) => {
     setConferenceStatus(status);
   };
 
@@ -1018,13 +1074,18 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       /*
        * Updating local stream to force re-rendering of videoLocal while swap camera
        */
+
       if (updatedParticipant.streams.length && updatedParticipant.streams[0].getVideoTracks().length) {
-        const { streams } = participant;
+        const { streams } = updatedParticipant;
         const tracks = streams[0]?.getVideoTracks?.();
         const videoTrack = tracks[0];
-        setLocalStream(videoTrack && new MediaStream([videoTrack]));
+        /*
+         * We need to create a new stream since the SDK is just updating tracks in the current stream, we're updating component by media stream reference
+         */
+        setLocalStream(videoTrack ? new MediaStream([videoTrack]) : undefined);
       }
     }
+
     setParticipants((participants) => {
       const p = participants.get(updatedParticipant.id);
       if (p) {
@@ -1066,7 +1127,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   const onScreenShareStart = (participant: Participant, stream: MediaStreamWithType) => {
     if (stream.type === 'ScreenShare') {
       try {
-        setSharingErrors();
+        setContextErrors({ context: 'screenShareErrors' });
         setScreenSharingData((prev) => ({
           ...prev,
           owner: participant,
@@ -1076,7 +1137,9 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
         log(LogLevel.info, `Owner ${participant.info.name} finished their screen share stream.`);
       } catch (error) {
         const message = errorMapper(error);
-        if (message) setSharingErrors(errorMapper(message));
+        if (message) {
+          setContextErrors({ context: 'screenShareErrors', error: message });
+        }
         setScreenSharingData((prev) => ({
           ...prev,
           owner: participant,
@@ -1090,7 +1153,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   const onScreenShareStop = (participant: Participant, stream: MediaStreamWithType) => {
     if (stream.type === 'ScreenShare') {
       try {
-        setSharingErrors();
+        setContextErrors({ context: 'screenShareErrors' });
         setScreenSharingData((prev) => ({
           ...prev,
           owner: null,
@@ -1099,7 +1162,9 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
         }));
       } catch (error) {
         const message = errorMapper(error);
-        if (message) setSharingErrors(errorMapper(message));
+        if (message) {
+          setContextErrors({ context: 'screenShareErrors', error: message });
+        }
         setScreenSharingData((prev) => ({
           ...prev,
           owner: participant,
@@ -1111,7 +1176,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
 
   const onRecordingStatusUpdated = (isRecording: boolean, recording: Recording) => {
     try {
-      setRecordingErrors();
+      setContextErrors({ context: 'recordingErrors' });
       setRecordingData((prev) => ({
         ...prev,
         ownerId: recording ? recording.participantId : null,
@@ -1123,7 +1188,9 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
         log(LogLevel.error, error.message);
       }
       const message = errorMapper(error);
-      if (message) setRecordingErrors(errorMapper(message));
+      if (message) {
+        setContextErrors({ context: 'recordingErrors', error: message });
+      }
     }
   };
 
@@ -1134,37 +1201,29 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     }));
   };
 
-  const setSharingErrors = (errorCode?: ErrorCodes) => {
+  const setContextErrors = ({ error, context }: ErrorParams) => {
     setErrors((prev) => ({
       ...prev,
-      screenShareErrors: errorCode ? { ...prev.screenShareErrors, [errorCode]: true } : {},
+      [context]: error ? { ...prev[context], [error]: true } : {},
     }));
   };
 
-  const setRecordingErrors = (errorCode?: ErrorCodes) => {
-    setErrors((prev) => ({
-      ...prev,
-      recordingErrors: errorCode ? { ...prev.recordingErrors, [errorCode]: true } : {},
-    }));
-  };
-
-  const setLiveStreamingErrors = (errorCode?: ErrorCodes) => {
-    setErrors((prev) => ({
-      ...prev,
-      liveStreamingErrors: errorCode ? { ...prev.liveStreamingErrors, [errorCode]: true } : {},
-    }));
-  };
-
-  const removeSdkErrors = (error?: ErrorCodes) => removeError({ error, level: 'sdkErrors' });
-
-  const removeError = ({ error, level }: { error?: ErrorCodes; level?: keyof Errors }) => {
-    if (error && level) {
-      const levelErrors = { ...errors[level] };
+  const removeError = ({ error, context }: Partial<ErrorParams>) => {
+    if (error && context) {
+      const levelErrors = { ...errors[context] };
       delete levelErrors[error];
-      return setErrors((prev) => ({ ...prev, [level]: levelErrors }));
+      return setErrors((prev) => ({ ...prev, [context]: levelErrors }));
     }
-    if (level) {
-      return setErrors((prev) => ({ ...prev, [level]: initialErrors[level] }));
+    if (context) {
+      return setErrors((prev) => ({ ...prev, [context]: initialErrors[context] }));
+    }
+    if (error) {
+      Object.entries(errors).some(([key, value]) => {
+        if (error in value) {
+          return removeError({ error, context: key as keyof Errors });
+        }
+        return false;
+      });
     }
     return setErrors(initialErrors);
   };
@@ -1207,6 +1266,12 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     });
   };
 
+  const onDeviceListChanged = (updated: UpdatedList) => {
+    setAudioInputDevices(updated.list.audioInput);
+    setAudioOutputDevices(updated.list.audioOutput);
+    setVideoInputDevices(updated.list.videoInput);
+  };
+
   useEffect(() => {
     const unsubscribers: Array<() => void> = [
       conferenceService.onConferenceStatusChange(onConferenceStatusChange),
@@ -1214,6 +1279,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       conferenceService.onScreenShareChange(onScreenShareStart, onScreenShareStop),
       commandService.onMessageReceived(onMessageReceived),
       recordingService.onStatusUpdated(onRecordingStatusUpdated),
+      MediaDevicesService.onDeviceListChanged(onDeviceListChanged),
     ];
     return () => {
       unsubscribers.forEach((u) => u());
@@ -1235,6 +1301,10 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       }
     };
   }, [localCamera, conference]);
+
+  const subscribe = (subscription: Subscription, handler: (...args: unknown[]) => void) => {
+    return notificationService.subscribe(subscription, handler);
+  };
 
   const showNotification = (notification: NotificationBase) => {
     const id = Date.now() * Math.random();
@@ -1269,6 +1339,11 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
         setErrors((prev) => ({
           ...prev,
           sdkErrors: { ...prev.sdkErrors, [ErrorCodes.IncorrectSession]: true },
+        }));
+      } else if (error.message.includes(ErrorCodes.ExpiredOrInvalidToken)) {
+        setErrors((prev) => ({
+          ...prev,
+          sdkErrors: { ...prev.sdkErrors, [ErrorCodes.ExpiredOrInvalidToken]: true },
         }));
       } else if (error.message.includes(ErrorCodes.CouldNotStartVideoSource)) {
         log(LogLevel.warn, 'Could not start video source - Retrying');
@@ -1346,7 +1421,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       try {
         await conferenceService.setCaptureMode(mergedOptions);
         return setAudioMode(mergedOptions);
-      } catch (err: any) {
+      } catch (err) {
         const message = errorMapper(err);
         if (message) {
           setErrors((prev) => ({
@@ -1375,6 +1450,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       createConference,
       fetchConference,
       joinConference,
+      listeners,
       leaveConference,
       participant,
       conference,
@@ -1382,9 +1458,6 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       participants: participantsArray,
       participantsStatus,
       isAudio,
-      // participant?.id && participantsStatus[participant.id]
-      //   ? !!participantsStatus[participant.id]?.isLocalAudio
-      //   : isAudio,
       toggleAudio,
       playBlockedAudio,
       startParticipantAudio,
@@ -1411,9 +1484,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       startScreenShare,
       stopScreenShare,
       screenSharingData,
-      setSharingErrors,
-      setRecordingErrors,
-      setLiveStreamingErrors,
+      subscribe,
       showNotification,
       notifications,
       removeNotification,
@@ -1425,7 +1496,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       removeError,
       resetScreenSharingData,
       resetRecordingData,
-      removeSdkErrors,
+      setContextErrors,
       hasCameraPermission,
       hasMicrophonePermission,
       setHasCameraPermission,
@@ -1452,7 +1523,12 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       isSessionOpened: sessionService.isOpen,
       setVideoForwarding,
       maxVideoForwarding,
-      // For additional errors provide proper pointers
+      audioInputDevices,
+      audioOutputDevices,
+      videoInputDevices,
+      setAudioInputDevices,
+      setAudioOutputDevices,
+      setVideoInputDevices,
       ...value,
     };
   }, [
@@ -1483,6 +1559,9 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     isBlurred,
     liveStreamingData,
     localStream,
+    audioInputDevices,
+    audioOutputDevices,
+    videoInputDevices,
   ]);
 
   return (

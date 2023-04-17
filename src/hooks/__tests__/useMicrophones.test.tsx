@@ -5,21 +5,22 @@ import useMicrophone from '../useMicrophone';
 const local1 = { deviceId: '123', label: 'mic' };
 const local2 = { deviceId: '321', label: 'mic' };
 const defaultMic = { deviceId: 'default', label: 'mic' };
-const speakers = [local1, local2, defaultMic];
+const audioInputDevices = [local1, local2, defaultMic] as MediaDeviceInfo[];
 const setLocalMicrophone = jest.fn();
 
 const setup = () =>
   setupHook(useMicrophone, {
     commsProps: {
-      value: { localMicrophone: local1, setLocalMicrophone },
+      value: { localMicrophone: local1, setLocalMicrophone, audioInputDevices },
     },
   });
 
 jest.mock('../../services/mediaDevices', () => {
   return {
-    enumerateAudioInputDevices: jest.fn(() => speakers),
+    enumerateAudioInputDevices: jest.fn(() => audioInputDevices),
     selectMicrophone: jest.fn(),
     onDeviceListChanged: jest.fn(),
+    getSelectedMicrophone: jest.fn(),
   };
 });
 
@@ -31,9 +32,8 @@ beforeEach(() => {
 describe('useMicrophone', () => {
   test('getMicrophones', async () => {
     const hookValues = setup();
-    const cameras = await hookValues.getMicrophones();
     await waitFor(() => {
-      expect(cameras).toStrictEqual(speakers);
+      expect(hookValues.microphones).toStrictEqual(audioInputDevices);
     });
   });
   test('Should invoke selectSpeaker ', () => {

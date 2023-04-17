@@ -6,10 +6,15 @@ export type LocalVideoParams = {
 
 export type Camera = {
   /**
-   * Gets the list of the available cameras.
-   * @returns the list of available cameras.
+   * Holds the list of the available cameras.
    */
-  getCameras: () => Promise<MediaDeviceInfo[]>;
+  cameras: MediaDeviceInfo[];
+
+  /**
+   * Gets the list of the available cameras.
+   * Sets internal cameras state.
+   */
+  getCameras: () => void;
 
   /**
    * Selects a camera.
@@ -60,6 +65,11 @@ export type Camera = {
    * Resets error message
    */
   removeError: () => void;
+  /**
+   * Gets currently selected camera in conference.
+   * @returns the default camera device information.
+   */
+  getSelectedCamera: () => MediaDeviceInfo | undefined;
 };
 
 export type UseCamera = () => Camera;

@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.9.0](https://www.npmjs.com/package/@dolbyio/comms-uikit-react/v/0.9.0)
+
+- Improve error handling
+- Introduced new components such as exit, add, chevron up and chevron down
+
 ## [v0.8](https://www.npmjs.com/package/@dolbyio/comms-uikit-react/v/0.8.0)
 
 Released on 2022-12-22

@@ -4,11 +4,13 @@ The useSpeaker hook gathers functions responsible for managing speakers.
 
 ## Members
 
-| Name                     | Type                                   | Description                              |
-| ------------------------ | -------------------------------------- | ---------------------------------------- |
-| `getSpeakers`            | () => Promise<MediaDeviceInfo[]>       | Gets the list of the available speakers. |
-| `selectSpeaker`          | (string) => Promise<string>            | Selects a speaker.                       |
-| `getDefaultLocalSpeaker` | () => Promise<MediaDeviceInfo\|null> | Gets data of default speaker.            |
+| Name                     | Type                                 | Description                                                                                    |
+| ------------------------ | ------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| `speakers`               | MediaDeviceInfo[]                    | Holds the list of the available speakers. `getSpeakers` should be invoked to set this variable |
+| `getSpeakers`            | () => void                           | Gets a list of the available speakers and saves it to `speakers` variable                      |
+| `selectSpeaker`          | (string) => Promise<string>          | Selects a speaker.                                                                             |
+| `getDefaultLocalSpeaker` | () => Promise<MediaDeviceInfo\|null> | Gets data of default speaker.                                                                  |
+| `getSelectedSpeaker`     | () => MediaDeviceInfo \| undefined   | Gets currently selected speaker in the conference.                                             |
 
 ## Examples
 
@@ -17,8 +19,10 @@ The useSpeaker hook gathers functions responsible for managing speakers.
 ### Select main speaker
 
 ```javascript
-const { getSpeakers, selectSpeaker } = useSpeaker();
-const speakers = getSpeakers();
+const { speakers, getSpeakers, selectSpeaker } = useSpeaker();
+useEffect(() => {
+  getSpeakers();
+}, []);
 
 return speakers.map((s) => <div onClick={() => selectSpeaker(s)}>...</div>);
 ```

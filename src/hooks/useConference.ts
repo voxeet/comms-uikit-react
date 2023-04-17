@@ -11,6 +11,7 @@ const useConference: UseConference = () => {
     prevConference,
     maxVideoForwarding,
     setVideoForwarding,
+    listeners,
   } = useCommsContext();
 
   return {
@@ -22,6 +23,7 @@ const useConference: UseConference = () => {
     prevConference,
     maxVideoForwarding,
     setVideoForwarding,
+    listeners,
   };
 };
 

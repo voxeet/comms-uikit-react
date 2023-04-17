@@ -6,29 +6,38 @@ import MicrophoneSelect from './MicrophoneSelect';
 const label = 'microphone-label';
 const placeholder = 'microphone-placeholder';
 const testID = 'testID';
-
-const getMicrophonesMock = jest
-  .fn()
-  .mockResolvedValueOnce([createDevice('device1')])
-  .mockResolvedValueOnce([createDevice('device1'), createDevice('device2')])
-  .mockResolvedValueOnce([createDevice('default'), createDevice('device2')])
-  .mockResolvedValue([createDevice('device1'), createDevice('device2')]);
+let microphones: MediaDeviceInfo[] = [];
 
 jest.mock('../../../hooks/useMicrophone', () => {
   return jest.fn(() => ({
     ...jest.requireActual('../../../hooks/useMicrophone'),
-    getMicrophones: getMicrophonesMock,
+    microphones,
+    getMicrophones: jest.fn(),
+    getSelectedMicrophone: jest.fn(),
   }));
 });
 
+beforeEach(() => {
+  jest.clearAllMocks();
+  microphones = [];
+});
+
 describe('MicrophoneSelect component', () => {
+  test('Renders nothing if no devices', async () => {
+    const { queryByTestId } = render(<MicrophoneSelect testID={testID} label={label} placeholder={placeholder} />);
+    await waitFor(() => {
+      expect(queryByTestId(testID)).toBeNull();
+    });
+  });
   test('Passes TestID', async () => {
+    microphones = [createDevice('device1')];
     const { getByTestId } = render(<MicrophoneSelect testID={testID} label={label} placeholder={placeholder} />);
     await waitFor(() => {
       expect(getByTestId(testID)).toBeInTheDocument();
     });
   });
   test('Have label and placeholder when nothing is selected', async () => {
+    microphones = [createDevice('device1'), createDevice('device2')];
     const { getByText } = render(<MicrophoneSelect testID={testID} label={label} placeholder={placeholder} />);
     await waitFor(async () => {
       const lrx = new RegExp(label, 'i');
@@ -38,6 +47,7 @@ describe('MicrophoneSelect component', () => {
     });
   });
   test('Selects default device if it is available', async () => {
+    microphones = [createDevice('default')];
     const { getByText } = render(<MicrophoneSelect testID={testID} label={label} placeholder={placeholder} />);
 
     await waitFor(async () => {
@@ -48,6 +58,7 @@ describe('MicrophoneSelect component', () => {
     });
   });
   test('On click opens dropdown with list of devices', async () => {
+    microphones = [createDevice('device1'), createDevice('device2')];
     const { getByRole } = render(<MicrophoneSelect testID={testID} label={label} placeholder={placeholder} />);
     await waitFor(() => {
       fireEvent.click(getByRole('button'));

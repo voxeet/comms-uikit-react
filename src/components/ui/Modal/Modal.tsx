@@ -57,6 +57,13 @@ const Modal = ({
           width: isSmartphone && !isLandscape ? '100%' : `${modalWidth}px`,
           height: isMobile && isLandscape ? '100vh' : 'auto',
         }}
+        onClick={(e) => {
+          // Prevent the click event from bubbling up to the overlay if the user clicks on the modal.
+          // Otherwise, the modal will close if the user clicks on the modal.
+          if (overlayClickClose) {
+            e.stopPropagation();
+          }
+        }}
       >
         <>
           {closeButton && (

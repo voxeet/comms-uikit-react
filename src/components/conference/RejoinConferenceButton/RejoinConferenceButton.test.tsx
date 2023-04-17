@@ -45,6 +45,7 @@ describe('RejoinConferenceButton component', () => {
             prevConference: {
               name: 'conference',
               participant: 'dolby',
+              id: 'test-id',
             },
             joinConference,
             createConference,

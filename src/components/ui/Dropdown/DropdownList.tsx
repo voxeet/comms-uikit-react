@@ -35,7 +35,7 @@ const DropdownList = ({
   if (isOpen) {
     return (
       <Space
-        testID={testID}
+        testID={testID ?? 'List'}
         className={styles.dropdown}
         css={{
           borderTopLeftRadius: 8,

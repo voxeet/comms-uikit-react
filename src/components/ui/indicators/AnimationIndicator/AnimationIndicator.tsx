@@ -14,6 +14,7 @@ export type AnimationIndicatorProps = React.HTMLAttributes<HTMLDivElement> & {
   contentColor?: ColorKey;
   animationData: Record<string, unknown>;
   size?: Extract<Sizes, 's' | 'm'>;
+  variant?: 'square' | 'circle';
   testID?: string;
 };
 
@@ -22,6 +23,7 @@ const AnimationIndicator = ({
   contentColor,
   animationData,
   size = 'm',
+  variant = 'circle',
   testID,
   ...props
 }: AnimationIndicatorProps) => {
@@ -54,7 +56,12 @@ const AnimationIndicator = ({
   return (
     <Space
       testID={testID}
-      className={cx(styles.indicator, styles[`size-${size}`])}
+      className={cx(
+        styles.indicator,
+        styles[`size-${size}`],
+        variant === 'square' && styles.square,
+        variant === 'circle' && styles.circle,
+      )}
       style={{ backgroundColor: getColor(backgroundColor, 'rgba(255, 255, 255, 0.3)') }}
       {...props}
     >

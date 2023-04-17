@@ -1,10 +1,11 @@
 import WebSDK from '@voxeet/voxeet-web-sdk';
 
 export type UpdatedList = {
-  list: { videoInput: MediaDeviceInfo[]; audioInput: MediaDeviceInfo[] };
+  list: { videoInput: MediaDeviceInfo[]; audioInput: MediaDeviceInfo[]; audioOutput: MediaDeviceInfo[] };
   updates: {
     videoInput: { added: MediaDeviceInfo[]; removed: MediaDeviceInfo[] };
     audioInput: { added: MediaDeviceInfo[]; removed: MediaDeviceInfo[] };
+    audioOutput: { added: MediaDeviceInfo[]; removed: MediaDeviceInfo[] };
   };
 };
 
@@ -35,6 +36,14 @@ export default class MediaDevicesService {
 
   public static getSelectedCamera() {
     return WebSDK.mediaDevice.selectedVideoInputDevice;
+  }
+
+  public static getSelectedMicrophone() {
+    return WebSDK.mediaDevice.selectedAudioInputDevice;
+  }
+
+  public static getSelectedSpeaker() {
+    return WebSDK.mediaDevice.selectedAudioOutputDevice;
   }
 
   public static onDeviceListChanged(handler: (updatedList: UpdatedList) => void) {

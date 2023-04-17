@@ -17,20 +17,23 @@ const useCamera: UseCamera = () => {
     stopLocalVideo,
     errors,
     removeError,
+    videoInputDevices,
+    setVideoInputDevices,
   } = useCommsContext();
+
   const { isDesktop } = useTheme();
   const getCameras = async () => {
-    /*
-     * Additional refreshing for permissions on Firefox due to assumption of lack of permissions bug
-     */
-    if (navigator.userAgent.indexOf('Firefox') !== -1) {
-      await navigator.mediaDevices.getUserMedia({ video: true });
-    }
-    return (await MediaDevicesService.enumerateVideoInputDevices()).filter((d) => d.deviceId) as MediaDeviceInfo[];
+    setVideoInputDevices(
+      (await MediaDevicesService.enumerateVideoInputDevices()).filter((d) => d.deviceId) as MediaDeviceInfo[],
+    );
+  };
+
+  const getSelectedCamera = () => {
+    return MediaDevicesService.getSelectedCamera();
   };
 
   const selectCamera = async (device: string) => {
-    const selectedDevice = await MediaDevicesService.getSelectedCamera();
+    const selectedDevice = getSelectedCamera();
     if (device !== selectedDevice?.deviceId) {
       return MediaDevicesService.selectCamera(device);
     }
@@ -85,16 +88,17 @@ const useCamera: UseCamera = () => {
   };
 
   const swapCamera = async () => {
-    const cameras = await getCameras();
     if (!localCamera) {
-      return setLocalCamera(cameras[1]);
+      return setLocalCamera(videoInputDevices[1]);
     }
-    const activeCameraIndex = cameras.findIndex((camera) => localCamera.deviceId === camera.deviceId);
-    const swap: MediaDeviceInfo = cameras[activeCameraIndex === cameras.length - 1 ? 0 : activeCameraIndex + 1];
+    const activeCameraIndex = videoInputDevices.findIndex((camera) => localCamera.deviceId === camera.deviceId);
+    const swap: MediaDeviceInfo =
+      videoInputDevices[activeCameraIndex === videoInputDevices.length - 1 ? 0 : activeCameraIndex + 1];
     return setLocalCamera(swap);
   };
 
   return {
+    cameras: videoInputDevices,
     getCameras,
     selectCamera,
     getDefaultLocalCamera,
@@ -106,6 +110,7 @@ const useCamera: UseCamera = () => {
     stopLocalVideo,
     videoError: !!errors.mediaDevicesErrors.CorruptedVideoTrack,
     removeError: () => removeError({ error: ErrorCodes.CorruptedVideoTrack }),
+    getSelectedCamera,
   };
 };
 
