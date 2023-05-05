@@ -1,6 +1,16 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## [v1.0.0](https://www.npmjs.com/package/@dolbyio/comms-uikit-react/v/1.0.0)
+
+Version 1.0.0 is a stable release of UI kit, rounding out this patch of development. There are only a few changes here, however having this stable release allows us to move on to an improved version 2 development, where we are going to completely reassess our APIs to ensure we are giving you the best experience possible.
+
+## Changes
+
+- New hook for [`useRealtimeStreaming`](./documentation/hooks/useRealTimeStreaming.md)
+- New hook for [`useLiveStreaming`](./documentation/hooks/useLiveStreaming.md)
+- Documentation review and improvements
+- `<Badge />` component is now exported from ui-kit. See [badge documentation](./documentation/components/Badge.md) for usage.
+- internal code improvements
 
 ## [v0.9.0](https://www.npmjs.com/package/@dolbyio/comms-uikit-react/v/0.9.0)
 

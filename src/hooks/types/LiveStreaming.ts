@@ -65,6 +65,32 @@ export type LiveStreaming = {
    * Informs if some error exists in live streaming.
    */
   isError: boolean;
+
+  /**
+   * A handy function to start live streaming using proxy server
+   * Note: please don't use this function if your own proxy server implementation
+   * is different with the dolby.io demo proxy server, instead please use `startLiveStreaming`
+   * @param baseUrl the base URL of the proxy server to start live streaming
+   * @param rtmp RTMP url
+   * @returns true means operation success, false means failure
+   */
+  startLiveStreamingByProxy: (baseUrl: string, rtmp: string) => Promise<boolean>;
+
+  /**
+   * A handy function to stop live streaming using proxy server
+   * Note: please don't use this function if your own proxy server implementation
+   * is different with the dolby.io demo proxy server, instead please use `stopLiveStreaming`
+   * @param baseUrl the base URL of the proxy server to stop live streaming
+   * @returns true means operation success, false means failure
+   */
+  stopLiveStreamingByProxy: (baseUrl: string) => Promise<boolean>;
+
+  /**
+   * While refreshing the page with the live stream active we need to inform backend about
+   * this by sending beacon to stop the streaming
+   * @param baseUrl the base URL of the proxy server to stop live streaming
+   */
+  sendStreamingBeacon: (baseUrl: string) => void;
 };
 
 export type UseLiveStreaming = () => LiveStreaming;

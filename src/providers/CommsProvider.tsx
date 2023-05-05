@@ -1302,9 +1302,9 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     };
   }, [localCamera, conference]);
 
-  const subscribe = (subscription: Subscription, handler: (...args: unknown[]) => void) => {
+  const subscribe = useCallback((subscription: Subscription, handler: (...args: unknown[]) => void) => {
     return notificationService.subscribe(subscription, handler);
-  };
+  }, []);
 
   const showNotification = (notification: NotificationBase) => {
     const id = Date.now() * Math.random();

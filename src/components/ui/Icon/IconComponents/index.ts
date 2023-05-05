@@ -17,6 +17,7 @@ import Circle from './Circle';
 import Close from './Close';
 import Copy from './Copy';
 import CopyGradient from './CopyGradient';
+import Delete from './Delete';
 import DotsHorizontal from './DotsHorizontal';
 import DotsHorizontalGradient from './DotsHorizontalGradient';
 import DotsVertical from './DotsVertical';
@@ -78,6 +79,7 @@ const IconComponents = {
   close: Close,
   copy: Copy,
   copyGradient: CopyGradient,
+  delete: Delete,
   dotsHorizontal: DotsHorizontal,
   dotsHorizontalGradient: DotsHorizontalGradient,
   dotsVertical: DotsVertical,

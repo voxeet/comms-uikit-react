@@ -65,7 +65,7 @@ const AnimationIndicator = ({
       style={{ backgroundColor: getColor(backgroundColor, 'rgba(255, 255, 255, 0.3)') }}
       {...props}
     >
-      <div className={cx(styles.indicator, styles[`size-${size}`])} ref={animation} />
+      <div data-testid="animation" className={cx(styles.indicator, styles[`size-${size}`])} ref={animation} />
     </Space>
   );
 };
