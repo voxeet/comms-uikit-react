@@ -122,10 +122,10 @@ Dolby.io integration is provided by a `CommsProvider` component (for communicati
 // src/App.js
 
 // 1. Import `CommsProvider` and `ThemeProvider` from the UI kit.
-import { CommsProvider, InfoBar } from '@dolbyio/comms-uikit-react';
+import { CommsProvider, InfoBar } from "@dolbyio/comms-uikit-react";
 
 // 2. Define the `CommsProvider` configuration. We need two properties, a `token` and an async function that refreshes it.
-const token = 'YOUR_CLIENT_ACCESS_TOKEN_HERE';
+const token = "YOUR_CLIENT_ACCESS_TOKEN_HERE";
 const refreshToken = async () => token;
 
 // 3. Create wrapper with `CommsProvider` for entire app. Pass the `token` and `refreshToken` properties.
@@ -141,22 +141,30 @@ const AppBase = ({ children }) => {
 // 4. Create `Content` component. It will be main component of our app. Wrap it with previously created `AppBase`. We'll also add a fixed height to the content as we'll need this later in the guide.
 
 function Content() {
-  // 5. Define styles for the containers
+  // 5. Define styles for the main content and button containers
   const contentContainerStyle = {
-    minHeight: '100vh',
-    gap: '10px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    justifyContent: 'center',
-    backgroundColor: '#14141A',
-    padding: '20px 0',
-    boxSizing: 'border-box',
+    minHeight: "100vh",
+    gap: "10px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    justifyContent: "center",
+    backgroundColor: "#14141A",
+    padding: "20px 0",
+    boxSizing: "border-box",
+  };
+  const buttonContainerStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   };
 
   return (
     <div className="App" style={contentContainerStyle}>
-      <InfoBar text="Voxeet Web SDK has been initialized." style={{ margin: '0 auto' }} />
+      <InfoBar
+        text="Voxeet Web SDK has been initialized."
+        style={{ margin: "0 auto" }}
+      />
       ...
     </div>
   );
@@ -184,20 +192,20 @@ A session is a connection between the client application and the Dolby.io Commun
 1. Import `Session` from the UI kit.
 
 ```javascript
-import { Session } from '@dolbyio/comms-uikit-react';
+import { Session } from "@dolbyio/comms-uikit-react";
 ```
 
 2. Define the `Session` configurations in the `Content` Component. You should provide a name using a [`participantInfo`](https://docs.dolby.io/communications-apis/docs/js-client-sdk-model-participantinfo) object, eg. the name of the participant who established the session.
 
 ```javascript
-const participantInfo = { name: 'John Doe' };
+const participantInfo = { name: "John Doe" };
 ```
 
 3. Insert the `Session` component inside the return statement in `Content` component.
 
 ```javascript
 <Session participantInfo={participantInfo}>
-  <InfoBar text="Session has been created." style={{ margin: '0 auto' }} />
+  <InfoBar text="Session has been created." style={{ margin: "0 auto" }} />
 </Session>
 ```
 
@@ -214,8 +222,12 @@ A conference connects participants to one another, enabling them to communicate 
 1. Import `Conference`, `JoinConferenceButton` and `LeaveConferenceButton` from the UI kit. Import `useState` from React.
 
 ```javascript
-import { Session, Conference, JoinConferenceButton, LeaveConferenceButton } from '@dolbyio/comms-uikit-react';
-import { useState } from 'react';
+import {
+  Conference,
+  JoinConferenceButton,
+  LeaveConferenceButton,
+} from "@dolbyio/comms-uikit-react";
+import { useState } from "react";
 ```
 
 2. Define the `JoinConferenceButton` configuration in the `Content` component. The [`joinOptions`](https://docs.dolby.io/communications-apis/docs/js-client-sdk-model-joinoptions) property allows you to specify whether to join the conference with audio and/or video enabled, in addition to a meetingName and username (usually the name of current user) which can be made visible to all participants.
@@ -229,32 +241,17 @@ const joinOptions = {
 };
 ```
 
-3. Define the state for the conference ID in the `Content` component.
-
-```javascript
-const [conferenceId, setConferenceId] = useState();
-```
-
-4. Define styles for the buttoncontainers in the `Content` component
-
-```javascript
-const buttonContainerStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '10px',
-};
-```
-
-5. Insert the `Conference`, `JoinConferenceButton` and `LeaveConferenceButton` components, along with the `joinOptions` and `meetingName` properties, anywhere inside of `Session`. We want to show "JoinConferenceButton" when there's no conference ID, and "Conference" (which includes the `LeaveConferenceButton`) when there is. You can customise the `toolipText` property each respective join/leave buttons.
+3. Define a functional component `JoinOrLeave` with a state for conference ID. Insert the `Conference`, `JoinConferenceButton` and `LeaveConferenceButton` components, along with the `joinOptions` and `meetingName`. We want to show `JoinConferenceButton` when there's no conference ID, and `Conference` (which includes the `LeaveConferenceButton`) when there is. You can customise the `toolipText` property each respective join/leave buttons. Now, insert `<JoinOrLeave>` component inside the return statement in `Content` component (ie. Nested inside `Session`).
 
 We also pass `setConferenceId` as a callback to the `onSuccess` properties for both buttons which will set (or unset) the conference ID when the action is successful.
 
 > IMPORTANT: Rendering a <Conference /> component will establish a call using Dolby.io, If you are using your free minutes for this demo, remember to leave the conference or close the browser tab when you're done!
 
 ```javascript
-{
-  !conferenceId ? (
+const JoinOrLeave = () => {
+  const [conferenceId, setConferenceId] = useState();
+
+  return !conferenceId ? (
     <div style={buttonContainerStyle}>
       <JoinConferenceButton
         joinOptions={joinOptions}
@@ -269,11 +266,14 @@ We also pass `setConferenceId` as a callback to the `onSuccess` properties for b
   ) : (
     <Conference id={conferenceId}>
       <div style={buttonContainerStyle}>
-        <LeaveConferenceButton tooltipText="Leave Meeting" onSuccess={() => setConferenceId(null)} />
+        <LeaveConferenceButton
+          tooltipText="Leave Meeting"
+          onSuccess={() => setConferenceId(null)}
+        />
       </div>
     </Conference>
   );
-}
+};
 ```
 
 > If you would like to create, join or leave a conference using your own components, refer to the [useConference](documentation/hooks/useConference.md) hook.
@@ -296,13 +296,19 @@ The `ParticipantsList` component can display a list of participants in the curre
 1. Import `ParticipantsList` from the UI kit.
 
 ```javascript
-import { ParticipantsList } from '@dolbyio/comms-uikit-react';
+import { ParticipantsList } from "@dolbyio/comms-uikit-react";
 ```
 
-2. Insert the `ParticipantsList` component anywhere inside of `Conference` (Refer to). You can customize the text properties shown for each participant and their status.
+2. Insert the `ParticipantsList` component anywhere inside of `Conference`. You can customize the text properties shown for each participant and their status.
 
 ```javascript
-<ParticipantsList localText="you" muteText="mute" unmuteText="unmute" soundOnText="sound on" soundOffText="sound off" />
+<ParticipantsList
+  localText="you"
+  muteText="mute"
+  unmuteText="unmute"
+  soundOnText="sound on"
+  soundOffText="sound off"
+/>
 ```
 
 > If you would like to display participants using your own component, refer to the [useParticipants](documentation/hooks/useParticipants.md) hook.
@@ -314,7 +320,7 @@ The `ParticipantsGrid` component displays the video streams of conference partic
 1. Import `ParticipantsGrid` from the UI kit.
 
 ```javascript
-import { ParticipantsGrid } from '@dolbyio/comms-uikit-react';
+import { ParticipantsGrid } from "@dolbyio/comms-uikit-react";
 ```
 
 3. Insert the `ParticipantsGrid` component anywhere inside of `Conference`.You can customize the `localText` property, which is shown for the local participant.
@@ -330,7 +336,10 @@ The `LocalToggleAudioButton` and `LocalToggleVideoButton` components enable the 
 1. Import `LocalToggleAudioButton` and `LocalToggleVideoButton` from the UI kit.
 
 ```javascript
-import { LocalToggleAudioButton, LocalToggleVideoButton } from '@dolbyio/comms-uikit-react';
+import {
+  LocalToggleAudioButton,
+  LocalToggleVideoButton,
+} from "@dolbyio/comms-uikit-react";
 ```
 
 2. Insert the `LocalToggleAudioButton` and `LocalToggleVideoButton` components anywhere inside of `Conference`.
@@ -351,7 +360,11 @@ The local participant can change their preferred camera, microphone or output sp
 1. Import `CameraSelect`, `MicrophoneSelect` and `SpeakersSelect` from the UI kit.
 
 ```javascript
-import { CameraSelect, MicrophoneSelect, SpeakersSelect } from '@dolbyio/comms-uikit-react';
+import {
+  CameraSelect,
+  MicrophoneSelect,
+  SpeakersSelect,
+} from "@dolbyio/comms-uikit-react";
 ```
 
 2. Insert the `CameraSelect`, `MicrophoneSelect` and `SpeakersSelect` components, along with the `label` and `placeholder` properties, anywhere inside of `Conference`. You can customize the text shown for the `label` prop (shown above the component) and a `placeholder` prop (shown when no option is selected).
@@ -371,8 +384,8 @@ You can use the installed VoxeedSDK's APIs in the application directly without r
 1. Import Voxeet SDK. Import `useEffect` from React.
 
 ```javascript
-import VoxeetSDK from '@voxeet/voxeet-web-sdk';
-import { useEffect } from 'react';
+import VoxeetSDK from "@voxeet/voxeet-web-sdk";
+import { useEffect } from "react";
 ```
 
 2. Insert the useEffect hook here to the `Content` component. This hook subscribes to the `participantUpdated` event from the voxeet SDK. Define the effect of the handler. Here, you observe the participant's status and the state of their audio through the console.
@@ -381,14 +394,18 @@ import { useEffect } from 'react';
 useEffect(() => {
   // define the event handler here
   const handler = (participant) => {
-    console.log(participant.info.name, 'status:', participant.status);
-    console.log(participant.info.name, 'has audio enabled:', participant.audioTransmitting);
+    console.log(participant.info.name, "status:", participant.status);
+    console.log(
+      participant.info.name,
+      "has audio enabled:",
+      participant.audioTransmitting
+    );
   };
   // register the handler for 'participantUpdated' event
-  VoxeetSDK.conference.on('participantUpdated', handler);
+  VoxeetSDK.conference.on("participantUpdated", handler);
   return () => {
     // unregister the handler
-    VoxeetSDK.conference.removeListener('participantUpdated', handler);
+    VoxeetSDK.conference.removeListener("participantUpdated", handler);
   };
 }, []);
 ```
