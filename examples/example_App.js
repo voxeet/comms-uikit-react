@@ -1,3 +1,5 @@
+// The components below are from our UIKit library,
+// please check the documents [here](https://github.com/DolbyIO/comms-uikit-react/tree/main/documentation)
 import {
   CommsProvider,
   ThemeProvider,
@@ -24,8 +26,15 @@ import {
   ShareStatus,
   RecordingActionBar,
 } from '@dolbyio/comms-uikit-react';
+
+// This is Dolby.io vanilla JS SDK for Communications API
+// You could get more information [here](https://docs.dolby.io/communications-apis/docs/js-overview)
 import VoxeetSDK from '@voxeet/voxeet-web-sdk';
 import React, { useEffect, useState } from 'react';
+
+// Define the `CommsProvider` configuration: we need two props, a `token` and an async function that refreshes it.
+const token = 'YOUR_CLIENT_ACCESS_TOKEN_HERE';
+const refreshToken = async () => token;
 
 // Create AppBase component which bundles CommsProvider and ThemeProvider
 const AppBase = ({ children }) => {
@@ -38,15 +47,12 @@ const AppBase = ({ children }) => {
   );
 };
 
-// Define the `CommsProvider` configuration: we need two props, a `token` and an async function that refreshes it.
-const token = 'YOUR_CLIENT_ACCESS_TOKEN_HERE';
-const refreshToken = async () => token;
-
-// Define the `Session` configuration: you should provide a name using a `participantInfo` object, eg. the name of the participant who established the session.
+// Define the `Session` configuration: you should provide a name using a `participantInfo` object,
+// eg. the name of the participant who established the session.
 const participantInfo = { name: 'John Doe' };
 
-// Define the `JoinConferenceButton` configuration: you can specify whether to join the conference with audio and/or video enabled, in addition to a meetingName and username (usually the name of current user) which can be made visible to all participants.
-
+// Define the `JoinConferenceButton` configuration: you can specify whether to join the conference with audio and/or video enabled,
+// in addition to a meetingName and username (usually the name of current user) which can be made visible to all participants.
 const joinOptions = {
   constraints: {
     audio: true,
@@ -54,7 +60,10 @@ const joinOptions = {
   },
 };
 
+// The name of the conference
 const meetingName = 'My Meeting';
+
+// The name of current participant
 const username = 'John Doe';
 
 // Define the tooltips that are shown when hovering over the Join or Leave buttons.
@@ -62,19 +71,14 @@ const joinTooltipText = 'Join meeting';
 const leaveTooltipText = 'Leave';
 
 // Define the `ParticipantsList` configuration: you can customise the text shown for each participant and their status.
-const localText = 'you'; // The local participant's name.
+const localText = 'you'; // The text shown for the current participant's name.
 const muteText = 'mute'; // Displayed in a tooltip when a participant is not muted.
 const unmuteText = 'unmute'; // Displayed in a tooltip when a participant is muted.
 const soundOnText = 'sound on'; // Displayed in a tooltip when a participant is speaking.
 const soundOffText = 'sound off'; // Displayed in a tooltip when a participant is not speaking.
 
 // Define the `ParticipantsGrid` configuration: you can customise the text shown for the current participant and their status.
-
-// const localText = 'you';
-
-/*
-      We are re-using the previously declared `localText` in this example for `ParticipantsGrid` but you can use any value you prefer
-    */
+const localTextInGrid = 'you';
 
 // Define the `CameraSelect`, `MicrophoneSelect`, and `SpeakersSelect` configurations: each component takes a `label` prop (shown above the component) and a `placeholder` prop (shown when no option is selected).
 const cameraLabel = 'Camera';
@@ -87,7 +91,6 @@ const speakersLabel = 'Speaker';
 const speakersPlaceholder = 'Choose a speaker';
 
 // Define the `ScreenSharingActionBar` configurations: component takes a statusLabels (shown depends of sharing status) and buttonLabels.
-
 const screenSharingActionBarTexts = {
   status: {
     active: 'Screen sharing active',
@@ -103,12 +106,10 @@ const screenSharingActionBarTexts = {
 };
 
 // Define the `ScreenSharingPresentationBox` configurations: component takes a "fallbacktext" and "fallbackButtonText" props for default fallback content.
-
 const fallbackText = 'There is some problem with screen sharing';
 const fallbackButtonText = 'try again';
 
 // Define the `RecordingActionBar` configurations: component takes a statusLabels (shown depends of recording status) and buttonLabels.
-
 const RecordingActionBarTexts = {
   status: {
     active: 'Recording active',
@@ -140,13 +141,12 @@ const appContainerStyles = `
 
 // Create Content component for bundle all app stuff
 const Content = () => {
-  // Define the state for the conference ID.
+  // Current conference ID. It's undefined until we create the conference.
   const [conferenceId, setConferenceId] = useState();
   const { status, isLocalUserPresentationOwner, isPresentationModeActive } = useScreenSharing();
   const { status: recordingStatus, isLocalUserRecordingOwner } = useRecording();
 
   // Define styles for the containers
-
   const contentContainerStyle = {
     minHeight: '100vh',
     gap: '10px',
@@ -167,7 +167,7 @@ const Content = () => {
   // We are using conference service of VoxeetSDK here
   // to observe the participants' status
   useEffect(() => {
-    // define the event handler here
+    // define the event handler for `participantUpdated` here
     const handler = (participant) => {
       console.log(participant.info.name, 'status:', participant.status);
       console.log(participant.info.name, 'has audio enabled:', participant.audioTransmitting);
@@ -175,17 +175,17 @@ const Content = () => {
     // register the handler for 'participantUpdated' event
     VoxeetSDK.conference.on('participantUpdated', handler);
     return () => {
-      // unregister the handler
+      // unregister the handler when the component is unloaded
       VoxeetSDK.conference.removeListener('participantUpdated', handler);
     };
   }, []);
 
-  // We are defining if presentation is active primary we are basing on ShareStatus. Secondary if share status is other than ACTIVE, but local user is presentation owner, we are checking if isPresentationModeActive
+  // Presentation mode can be considered active if either `ShareStatus` is `.Active` or if the local user is presenting
   const isPresentationActive =
     status === ShareStatus.Active || (isLocalUserPresentationOwner && isPresentationModeActive);
 
-  // We are defining if recording is active primary we are basing on RecordingStatus. Secondary if recording status is other than ACTIVE, we check if local user is recording owner.
-
+  // We are defining if recording is active primary we are basing on RecordingStatus.
+  // Secondary if recording status is other than ACTIVE, we check if local user is recording owner.
   const isRecordingActive = isLocalUserRecordingOwner || recordingStatus === RecordingStatus.Active;
 
   return (
@@ -217,7 +217,7 @@ const Content = () => {
                 soundOffText={soundOffText}
               />
             </Space>
-
+            {/* Screen Sharing */}
             {isPresentationActive && (
               <ScreenSharingActionBar
                 statusLabels={{
@@ -233,6 +233,7 @@ const Content = () => {
                 guestLabel={screenSharingActionBarTexts.guest}
               />
             )}
+            {/* Conference Recording */}
             {isRecordingActive && (
               <RecordingActionBar
                 statusLabels={{
@@ -262,16 +263,17 @@ const Content = () => {
               )}
 
               <Space style={{ height: 400, flexGrow: 1 }}>
-                <ParticipantsGrid localText={localText} additionalContainerStyle={{ height: 400 }} />
+                <ParticipantsGrid localText={localTextInGrid} additionalContainerStyle={{ height: 400 }} />
               </Space>
             </Space>
-
+            {/* Media Control Buttons */}
             <div style={{ ...buttonContainerStyle, gap: '10px' }}>
               <LocalToggleAudioButton />
               <LocalToggleVideoButton />
               <ScreenShareButton />
               <RecordButton />
             </div>
+            {/* Camera, Microphone and Speaker selection */}
             <CameraSelect label={cameraLabel} placeholder={cameraPlaceholder} labelColor="white" />
             <MicrophoneSelect label={microphoneLabel} placeholder={microphonePlaceholder} labelColor="white" />
             <SpeakersSelect label={speakersLabel} placeholder={speakersPlaceholder} labelColor="white" />

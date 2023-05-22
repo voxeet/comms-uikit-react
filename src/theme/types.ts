@@ -28,7 +28,7 @@ export type Colors = Record<string, Partial<ColorHues> | string>;
 
 export type Theme = {
   colors: Colors;
-  spaces: typeof defaultTheme['spaces'];
+  spaces: (typeof defaultTheme)['spaces'];
   avatars: string[];
   // SHADOWS
   shadowColor?: string; // mobile only
@@ -49,6 +49,6 @@ export type test = CustomThemes['dark'];
 
 export type ThemeMode = keyof typeof customThemes;
 
-export type SpaceValues = keyof typeof defaultTheme['spaces'];
+export type SpaceValues = keyof (typeof defaultTheme)['spaces'];
 
 export type Sizes = 'xxxs' | 'xxs' | 'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl' | 'xxxl';

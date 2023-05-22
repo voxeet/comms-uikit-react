@@ -22,10 +22,12 @@ export { default as useLogger } from './hooks/useLogger';
 export { default as useBlur } from './hooks/useBlur';
 export { default as useRecording } from './hooks/useRecording';
 export { default as useLiveStreaming } from './hooks/useLiveStreaming';
+export { default as useRealTimeStreaming } from './hooks/useRealTimeStreaming';
 export { default as useCommsContext } from './hooks/useCommsContext';
 
 // Components - UI
 export { default as Avatar } from './components/ui/Avatar/Avatar';
+export { default as Badge } from './components/ui/Badge/Badge';
 export { default as Button } from './components/ui/Button/Button';
 export { default as Icon } from './components/ui/Icon/Icon';
 export { default as IconButton } from './components/ui/IconButton/IconButton';
