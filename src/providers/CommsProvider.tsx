@@ -309,7 +309,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   const [recordingData, setRecordingData] = useState<RecordingDataType>(initialRecordingData);
   const [liveStreamingData, setLiveStreamingData] = useState<LiveStreamingDataType>(initialLiveStreamingData);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  // We should expand this with specific context errors
+  // TODO: We should expand this with specific context errors
   const [errors, setErrors] = useState<Errors>(initialErrors);
   const [messageData, setMessageData] = useState<MessageData>({ sender: null, message: null });
   const [hasCameraPermission, setHasCameraPermission] = useState(false);
@@ -1302,9 +1302,9 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     };
   }, [localCamera, conference]);
 
-  const subscribe = (subscription: Subscription, handler: (...args: unknown[]) => void) => {
+  const subscribe = useCallback((subscription: Subscription, handler: (...args: unknown[]) => void) => {
     return notificationService.subscribe(subscription, handler);
-  };
+  }, []);
 
   const showNotification = (notification: NotificationBase) => {
     const id = Date.now() * Math.random();

@@ -17,6 +17,7 @@ import Circle from './Circle';
 import Close from './Close';
 import Copy from './Copy';
 import CopyGradient from './CopyGradient';
+import Delete from './Delete';
 import DotsHorizontal from './DotsHorizontal';
 import DotsHorizontalGradient from './DotsHorizontalGradient';
 import DotsVertical from './DotsVertical';
@@ -26,6 +27,7 @@ import Exit from './Exit';
 import EyeClosed from './EyeClosed';
 import EyeOpen from './EyeOpen';
 import Failure from './Failure';
+import Friends from './Friends';
 import Handset from './Handset';
 import HandsetGradient from './HandsetGradient';
 import Headphones from './Headphones';
@@ -78,6 +80,7 @@ const IconComponents = {
   close: Close,
   copy: Copy,
   copyGradient: CopyGradient,
+  delete: Delete,
   dotsHorizontal: DotsHorizontal,
   dotsHorizontalGradient: DotsHorizontalGradient,
   dotsVertical: DotsVertical,
@@ -86,6 +89,7 @@ const IconComponents = {
   eyeClosed: EyeClosed,
   eyeOpen: EyeOpen,
   failure: Failure,
+  friends: Friends,
   handset: Handset,
   handsetGradient: HandsetGradient,
   headphones: Headphones,
