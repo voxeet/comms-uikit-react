@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+### Patch Changes
+
+- 9f537472: Turn off echo cancellation with music mode
+
 ## 1.0.0
 
 ### Patch Changes

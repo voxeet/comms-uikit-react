@@ -21,10 +21,15 @@ const useAudioProcessing: UseAudioProcessing = () => {
     }
   }, [isAudio]);
 
+  // https://docs.dolby.io/communications-apis/docs/guides-music-mode#echo-cancellation
+  // Turn off echo cancellation if music mode is enabled.
   const toggleEchoCancellation = useCallback(async () => {
     return setAudioCaptureMode({
       modeOptions: {
-        echoCancellation: !echoCancellation ? AudioEchoCancellation.On : AudioEchoCancellation.Off,
+        echoCancellation:
+          echoCancellation || audioMode?.mode === AudioCaptureMode.Music
+            ? AudioEchoCancellation.Off
+            : AudioEchoCancellation.On,
       },
     });
   }, [audioMode, isAudio, echoCancellation]);
