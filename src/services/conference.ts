@@ -4,8 +4,9 @@ import type { ConferencePermission } from '@voxeet/voxeet-web-sdk/types/models/C
 import type Conference from '@voxeet/voxeet-web-sdk/types/models/Conference';
 import type ConferenceOptions from '@voxeet/voxeet-web-sdk/types/models/ConferenceOptions';
 import type { MediaStreamWithType } from '@voxeet/voxeet-web-sdk/types/models/MediaStream';
-import type { JoinOptions, ListenType } from '@voxeet/voxeet-web-sdk/types/models/Options';
+import type { JoinOptions, ListenType, ScreenshareOptions } from '@voxeet/voxeet-web-sdk/types/models/Options';
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
+import type { ParticipantQuality } from '@voxeet/voxeet-web-sdk/types/models/Simulcast';
 import type { VideoForwardingOptions } from '@voxeet/voxeet-web-sdk/types/models/VideoForwarding';
 import type { VideoProcessor } from '@voxeet/voxeet-web-sdk/types/models/VideoProcessor';
 
@@ -122,8 +123,8 @@ export default class ConferenceService {
     return VoxeetSDK.conference.isSpeaking(participant, callback);
   }
 
-  public static startScreenShare() {
-    return VoxeetSDK.conference.startScreenShare();
+  public static startScreenShare(screenshareOptions: ScreenshareOptions) {
+    return VoxeetSDK.conference.startScreenShare(screenshareOptions);
   }
 
   public static stopScreenShare() {
@@ -208,5 +209,9 @@ export default class ConferenceService {
 
   public static setVideoForwarding(options: VideoForwardingOptions) {
     return VoxeetSDK.conference.videoForwarding(options);
+  }
+
+  public static setQuality(quality: Array<ParticipantQuality>) {
+    return VoxeetSDK.conference.simulcast(quality);
   }
 }

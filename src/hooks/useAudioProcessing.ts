@@ -13,26 +13,24 @@ import useCommsContext from './useCommsContext';
 
 const useAudioProcessing: UseAudioProcessing = () => {
   const { getAudioCaptureMode, setAudioCaptureMode, audioMode, errors, removeError, isAudio } = useCommsContext();
-  const echoCancellation = audioMode?.modeOptions?.echoCancellation === AudioEchoCancellation.On;
+  // echoCancellation is on by default
+  const isEchoCancellationOn =
+    (audioMode?.modeOptions?.echoCancellation || AudioEchoCancellation.On) === AudioEchoCancellation.On;
 
   useEffect(() => {
     if (isAudio && !audioMode) {
       getAudioCaptureMode();
     }
-  }, [isAudio]);
+  }, [audioMode, getAudioCaptureMode, isAudio]);
 
-  // https://docs.dolby.io/communications-apis/docs/guides-music-mode#echo-cancellation
-  // Turn off echo cancellation if music mode is enabled.
   const toggleEchoCancellation = useCallback(async () => {
     return setAudioCaptureMode({
       modeOptions: {
-        echoCancellation:
-          echoCancellation || audioMode?.mode === AudioCaptureMode.Music
-            ? AudioEchoCancellation.Off
-            : AudioEchoCancellation.On,
+        echoCancellation: isEchoCancellationOn ? AudioEchoCancellation.Off : AudioEchoCancellation.On,
       },
+      mode: audioMode?.mode || AudioCaptureMode.Standard,
     });
-  }, [audioMode, isAudio, echoCancellation]);
+  }, [audioMode?.mode, isEchoCancellationOn, setAudioCaptureMode]);
 
   const setNoiseReductionLevel = useCallback(
     async (value: NoiseReductionLevel) => {
@@ -40,9 +38,10 @@ const useAudioProcessing: UseAudioProcessing = () => {
         modeOptions: {
           noiseReductionLevel: value,
         },
+        mode: audioMode?.mode || AudioCaptureMode.Standard,
       });
     },
-    [audioMode, isAudio],
+    [audioMode?.mode, setAudioCaptureMode],
   );
 
   const removeAudioCaptureError = (error?: ErrorCodes) => {
@@ -53,7 +52,7 @@ const useAudioProcessing: UseAudioProcessing = () => {
     setAudioCaptureMode,
     getAudioCaptureMode,
     audioMode,
-    echoCancellation,
+    isEchoCancellationOn,
     isMusicMode: audioMode?.mode === AudioCaptureMode.Music,
     toggleEchoCancellation,
     setNoiseReductionLevel,

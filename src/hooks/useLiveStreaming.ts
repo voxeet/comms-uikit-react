@@ -34,7 +34,7 @@ const useLiveStreaming: UseLiveStreaming = () => {
   const { participant } = useSession();
   const { conference } = useConference();
 
-  const startLiveStreamingByProxy = async (baseUrl: string, rtmp: string) => {
+  const startLiveStreamingByProxy = async (baseUrl: string, rtmpUrl: string) => {
     const params = {
       method: 'POST',
       headers: {
@@ -42,15 +42,15 @@ const useLiveStreaming: UseLiveStreaming = () => {
       },
       body: JSON.stringify({
         conferenceId: conference?.id,
-        rtmp,
+        rtmpUrl,
       }),
     } as const;
     const request = async () => {
-      const result = await fetch(`${baseUrl}/streaming/start`, params);
+      const result = await fetch(`${baseUrl}/stream/rtmp/start`, params);
       if (result.status === 400) throw new Error(`${result.statusText}`);
     };
-    const provider = determineProvider(rtmp) as LiveStreamProvider;
-    return startLiveStreaming(request, rtmp, provider);
+    const provider = determineProvider(rtmpUrl) as LiveStreamProvider;
+    return startLiveStreaming(request, rtmpUrl, provider);
   };
 
   const stopLiveStreamingByProxy = async (baseUrl: string) => {
@@ -62,9 +62,10 @@ const useLiveStreaming: UseLiveStreaming = () => {
       body: JSON.stringify({
         conferenceId: conference?.id,
       }),
+      keepalive: true,
     } as const;
     const request = async () => {
-      await fetch(`${baseUrl}/streaming/stop`, params);
+      await fetch(`${baseUrl}/stream/rtmp/stop`, params);
     };
     return stopLiveStreaming(request);
   };
@@ -82,7 +83,9 @@ const useLiveStreaming: UseLiveStreaming = () => {
       const data = JSON.stringify({
         conferenceId: conference?.id,
       });
-      navigator.sendBeacon(`${baseUrl}/streaming/stop`, data);
+      if (!navigator.sendBeacon(`${baseUrl}/stream/rtmp/stop`, data)) {
+        console.error('failed to send beacon to stop rtmp stream');
+      }
     }
   };
 

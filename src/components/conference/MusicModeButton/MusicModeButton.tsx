@@ -41,11 +41,19 @@ const MusicModeButton = ({
   }, [message]);
 
   const startMusicMode = async () => {
-    await setAudioCaptureMode({ mode: AudioCaptureMode.Music });
-    const startMessage = {
-      text: AudioProcessingMessages.MUSIC_MODE_STARTED,
-    };
-    sendMessage(startMessage);
+    try {
+      await setAudioCaptureMode({ mode: AudioCaptureMode.Music });
+      const startMessage = {
+        text: AudioProcessingMessages.MUSIC_MODE_STARTED,
+      };
+      return sendMessage(startMessage);
+    } catch (error) {
+      const errorMessage = {
+        text: AudioProcessingMessages.MUSIC_MODE_FAILED,
+      };
+      sendMessage(errorMessage);
+      return Promise.reject();
+    }
   };
 
   const stopMusicMode = async () => {
@@ -69,16 +77,14 @@ const MusicModeButton = ({
       if (renderStartConfirmation) {
         setIsStartConfirmationVisible(true);
       } else {
-        startMusicMode();
-        onStartMusicModeAction?.();
+        startMusicMode().then(() => onStartMusicModeAction?.());
       }
     }
   };
 
   const handleStartMusicMode = () => {
     setIsStartConfirmationVisible(false);
-    startMusicMode();
-    onStartMusicModeAction?.();
+    startMusicMode().then(() => onStartMusicModeAction?.());
   };
 
   const handleStopMusicMode = () => {

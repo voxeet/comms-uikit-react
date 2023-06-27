@@ -1,4 +1,4 @@
-@import '../../../style/zIndex';
+$margin: 10px;
 
 .wrapper {
   position: relative;
@@ -6,18 +6,37 @@
 }
 
 .tooltip {
-  position: fixed;
-  z-index: $zI_tooltip;
+  position: absolute;
+  width: max-content;
   display: flex;
   flex-direction: row;
   justify-content: center;
-  backdrop-filter: blur(8px);
-  .content {
-    border-radius: 6px;
+  border-radius: 6px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  z-index: 1;
+
+  &.top {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, calc(-100% - $margin));
   }
-}
-.hidden {
-  opacity: 0;
-  visibility: hidden;
-  z-index: -1;
+
+  &.bottom {
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, calc(100% + $margin));
+  }
+
+  &.left {
+    top: 50%;
+    left: 0;
+    transform: translate(calc(-100% - $margin), -50%);
+  }
+
+  &.right {
+    top: 50%;
+    right: 0;
+    transform: translate(calc(100% + $margin), -50%);
+  }
 }

@@ -9,7 +9,7 @@ export type ScreenShare = {
   /**
    * Starts screen share. while starting via taking over- provide appropriate flag
    */
-  startScreenShare: (takingOver?: boolean) => Promise<boolean>;
+  startScreenShare: (takingOver?: boolean) => Promise<boolean | undefined>;
 
   /**
    * Stops screen share.
@@ -17,9 +17,9 @@ export type ScreenShare = {
   stopScreenShare: () => Promise<void>;
 
   /**
-   * Participant which sharing screen.
+   * A map of the participant and the stream which sharing screen.
    */
-  owner: Participant | null;
+  owners: Map<Participant, MediaStreamWithType | null>;
 
   /**
    * Informs if local user is presentation owner.
@@ -27,9 +27,9 @@ export type ScreenShare = {
   isLocalUserPresentationOwner: boolean;
 
   /**
-   * Stream object of current screen sharing.
+   * First participant who is presenting
    */
-  stream: MediaStreamWithType | null;
+  firstPresenter: Participant | null;
 
   /**
    * Sharing stream current status.

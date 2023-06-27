@@ -4,6 +4,8 @@
   justify-content: center;
   align-items: center;
   overflow: auto;
+  padding-left: var(--spaces-xs);
+  padding-right: var(--spaces-xs);
   video {
     width: 100%;
     height: 100%;
@@ -16,4 +18,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.pill {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spaces-xs);
+  position: absolute;
+  bottom: var(--spaces-s);
+  left: var(--spaces-s);
 }

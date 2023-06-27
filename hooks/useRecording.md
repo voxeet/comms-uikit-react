@@ -28,7 +28,7 @@ import { useRecording } from '@dolbyio/comms-uikit-react';
 ### Check if recording is active
 
 ```javascript
-const { isLocalUserRecordingOwner, isPresentationModeActive, status } = useRecording();
+const { isLocalUserRecordingOwner, isRecordingModeActive, status } = useRecording();
 
 const isRecordingActive = status === RecordingStatus.Active || (isLocalUserRecordingOwner && isRecordingModeActive);
 ```

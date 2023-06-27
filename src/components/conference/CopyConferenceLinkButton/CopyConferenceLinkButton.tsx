@@ -9,6 +9,7 @@ import Space from '../../ui/Space/Space';
 import Tooltip, { TooltipProps } from '../../ui/Tooltip/Tooltip';
 
 type CopyConferenceLinkButtonProps = Partial<Omit<IconButtonProps, 'onClick'>> & {
+  id?: string;
   tooltipText?: string;
   successText?: string;
   url: string;
@@ -20,9 +21,10 @@ type CopyConferenceLinkButtonProps = Partial<Omit<IconButtonProps, 'onClick'>> &
 };
 
 const CopyConferenceLinkButton = ({
+  id,
   tooltipText,
   successText,
-  tooltipPosition = 'top',
+  tooltipPosition = 'right',
   url,
   width = 143,
   height = 40,
@@ -64,12 +66,20 @@ const CopyConferenceLinkButton = ({
   return (
     <Tooltip position={tooltipPosition} text={isDesktop ? desktopTooltipText : ''}>
       {children ? (
-        <Button style={{ width, height }} testID={testID} variant="primary" onClick={copy}>
+        <Button id={id} style={{ width, height }} testID={testID} variant="primary" onClick={copy}>
           <Space mr="xs">{children}</Space>
           <Icon name={icon} size="s" />
         </Button>
       ) : (
-        <IconButton testID={testID} backgroundColor="transparent" size="s" icon={icon} onClick={copy} {...rest} />
+        <IconButton
+          id={id}
+          testID={testID}
+          backgroundColor="transparent"
+          size="s"
+          icon={icon}
+          onClick={copy}
+          {...rest}
+        />
       )}
     </Tooltip>
   );

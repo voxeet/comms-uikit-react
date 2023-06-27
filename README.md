@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Dolby.io Communications UIKit for React is designed to help React developers reduce the complexity of building a Dolby.io video call and events applications for web.
+The Dolby.io Communications UIKit for React is designed to help React developers reduce the complexity of building apps based on the [Dolby.io Communications SDK for Web](https://docs.dolby.io/communications-apis/docs/js-overview).
 
 The package consists of four basic elements:
 
@@ -31,6 +31,7 @@ The following Dolby.io sample projects demonstrates the UIkit in action:
   - [Sample Projects](#sample-projects)
   - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
+    - [Supported Browsers](#supported-browsers)
   - [How to use this guide](#how-to-use-this-guide)
   - [Setup](#setup)
     - [How to get a Dolby.io account](#how-to-get-a-dolbyio-account)
@@ -39,8 +40,8 @@ The following Dolby.io sample projects demonstrates the UIkit in action:
     - [Connect your app to Dolby.io](#connect-your-app-to-dolbyio)
       - [Initialize the SDK](#initialize-the-sdk)
       - [Open a session](#open-a-session)
-    - [Add video call components](#add-video-call-components)
-      - [Join or leave a conference](#join-or-leave-a-conference)
+    - [Add components](#add-components)
+      - [Join or leave a session](#join-or-leave-a-session)
       - [Display participants](#display-participants)
       - [Display video](#display-video)
       - [Show user controls](#show-user-controls)
@@ -52,18 +53,26 @@ The following Dolby.io sample projects demonstrates the UIkit in action:
 ## Prerequisites
 
 - A [Dolby.io](https://dashboard.dolby.io/signup/) account
-- A working webcam and microphone
 - A Dolby.io [client access token](https://dashboard.dolby.io/dashboard/applications/summary)
 - [Voxeet Web SDK >=3.8.0](https://www.npmjs.com/package/@voxeet/voxeet-web-sdk) or later
 - [Node.js 16.x](https://nodejs.org/en/) or later
-- A supported browser, either Chrome 100+, Safari 15+, Firefox 100+, or Edge 100+
 - [Yarn v1.22.19](https://yarnpkg.com) installed.
+- A working webcam and microphone
+
+### Supported Browsers
+
+This UI kit is tested to work best with the following browser versions
+
+- Chrome 100+
+- Safari 15+
+- Firefox 100+
+- Edge 100+
 
 ## How to use this guide
 
-This guide demonstrates how to use video call UI components to quickly build the essential components of a video call application. Be sure to complete the [Connect your app to Dolby.io](#connect-your-app-to-dolbyio) section before moving onto the [Add video call components](#add-video-call-components) section.
+This guide demonstrates how to use UI components to quickly build the essential components of a Dolby.IO Communications SDK based app. Be sure to complete the [Connect your app to Dolby.io](#connect-your-app-to-dolbyio) section before moving onto the [Adding components](#add-components) section.
 
-Each component demonstrated within [Add video call components](#add-video-call-components) can be built independent of the others. The code blocks within each section only include the code for that individual component, and exclude the components from other sections.
+Each component demonstrated within [Add video call components](#add-components) can be built independent of the others. The code blocks within each section only include the code for that individual component, and exclude the components from other sections.
 
 If you prefer to get started by reviewing a complete code sample containing all the features in this guide, see [the example here](examples/example_App.js).
 
@@ -93,8 +102,7 @@ To setup your Dolby.io account, go to [Dolby.io dashboard](https://dashboard.dol
 
 You will need to generate a client access token to run this app. Follow the steps to obtain a token.
 
-1. Go to the Dashboard, and find the _Applications_ menu item..
-   ![dashboard](documentation/assets/Dashboard-e fvents.png)
+1. Go to the Dashboard, and find the _Applications_ menu item, ![dashboard](documentation/assets/Dashboard-events.png)
 
 2. On the next screen, there is a token field where you can copy the client access token to your clipboard. The generated token is active for the indicated amount of time.
 
@@ -104,7 +112,7 @@ You will need to generate a client access token to run this app. Follow the step
 
 ### Connect your app to Dolby.io
 
-This section will guide you on opening a connection to the Dolby.io APIs, which will enable the use of video calling features in your app.
+This section will guide you on connecting to the Dolby.io APIs, which will enable the use of our Communications related features.
 
 #### Initialize the SDK
 
@@ -208,13 +216,13 @@ const participantInfo = { name: 'John Doe' };
 
 > If you would like to create a session using your own component, refer to the [useSession](documentation/hooks/useSession.md) hook.
 
-### Add video call components
+### Add components
 
-Once your app has made the connection to Dolby.io, you can access its video call features.
+Once your app has made the connection to Dolby.io, you can access its features.
 
-#### Join or leave a conference
+#### Join or leave a session
 
-A conference connects participants to one another, enabling them to communicate using audio and/or video.
+A session connects participants to one another, enabling them to communicate using audio and/or video.
 
 1. Import `Conference`, `JoinConferenceButton` and `LeaveConferenceButton` from the UI kit. Import `useState` from React.
 
@@ -234,7 +242,7 @@ const joinOptions = {
 };
 ```
 
-3. Define a functional component `JoinOrLeave` with a state for conference ID. Insert the `Conference`, `JoinConferenceButton` and `LeaveConferenceButton` components, along with the `joinOptions` and `meetingName`. We want to show `JoinConferenceButton` when there's no conference ID, and `Conference` (which includes the `LeaveConferenceButton`) when there is. You can customise the `toolipText` property each respective join/leave buttons. Now, insert `<JoinOrLeave>` component inside the return statement in `Content` component (ie. Nested inside `Session`).
+3. Define a functional component `JoinOrLeave` with a state for conference ID. Insert the `Conference`, `JoinConferenceButton` and `LeaveConferenceButton` components, along with the `joinOptions` and `meetingName`. We want to show `JoinConferenceButton` when there is no conference ID, and `Conference` (which includes the `LeaveConferenceButton`) when there is. You can customise the `toolipText` property each respective join/leave buttons. Now, insert `<JoinOrLeave>` component inside the return statement in `Content` component (ie. Nested inside `Session`).
 
 We also pass `setConferenceId` as a callback to the `onSuccess` properties for both buttons which will set (or unset) the conference ID when the action is successful.
 
@@ -383,7 +391,7 @@ useEffect(() => {
 }, []);
 ```
 
-> More information about Voxeet WebSDK is [here](https://docs.dolby.io/communications-apis/docs/js-overview)
+> You can learn more about the Voxeet WebSDK [here](https://docs.dolby.io/communications-apis/docs/js-overview)
 
 > Download the sample source code [here](examples/example_Foundations.js).
 

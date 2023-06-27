@@ -1818,10 +1818,10 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@voxeet/voxeet-web-sdk@^3.9.0":
-  version "3.9.0"
-  resolved "https://registry.yarnpkg.com/@voxeet/voxeet-web-sdk/-/voxeet-web-sdk-3.9.0.tgz#3c71dc3e7946ecf74cd1aa032cd308f0207835f8"
-  integrity sha512-XJziAGseuFwSLSv9fV8sh/ioXjdQebGT8ykj8t6wCgc37TOIZpnl1VquhkCgsbBcACB8JgP8/yWl3P4cwN6X1w==
+"@voxeet/voxeet-web-sdk@^3.10.0":
+  version "3.10.0"
+  resolved "https://registry.yarnpkg.com/@voxeet/voxeet-web-sdk/-/voxeet-web-sdk-3.10.0.tgz#5f2bb3878b3bf9a779bce8b1cd8ed81dd36d28ad"
+  integrity sha512-L8ALer7B2g6CCRx4zMlJg7YzKmO07u96V9cm4Cj0ayd37AQMPojinS7XrVTx5Dfh/lgOJQjnU6fhyZKAlNuwvg==
   dependencies:
     axios "^0.26.0"
     bowser "^2.8.1"

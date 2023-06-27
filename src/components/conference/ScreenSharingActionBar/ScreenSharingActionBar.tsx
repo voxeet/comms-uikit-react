@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
 import { Status as ShareStatus } from '../../../hooks/types/misc';
-import useParticipants from '../../../hooks/useParticipants';
 import useScreenSharing from '../../../hooks/useScreenSharing';
 import useTheme from '../../../hooks/useTheme';
 import ActionBar, { type AbstractionBarPropsBase, type ActionButtonLabels } from '../../ui/ActionBar/ActionBar';
@@ -28,25 +27,25 @@ const ScreenSharingActionBar = ({
   ...props
 }: ScreenSharingActionBarProps) => {
   const { isDesktop } = useTheme();
-  const { stopScreenShare, status, owner } = useScreenSharing();
-  const { participant } = useParticipants();
+  const { stopScreenShare, status, isLocalUserPresentationOwner, firstPresenter } = useScreenSharing();
 
   const stopPresenting = useCallback(async () => {
     await stopScreenShare();
     onActionSuccess?.();
   }, []);
 
-  const isLocalPresenter = participant?.id === owner?.id;
+  const avatar = useMemo(
+    () => !isLocalUserPresentationOwner && <Avatar size="xs" participant={firstPresenter} />,
+    [firstPresenter, isLocalUserPresentationOwner],
+  );
 
-  const avatar = useMemo(() => !isLocalPresenter && <Avatar size="xs" participant={owner} />, [owner]);
-
-  if (!isLocalPresenter && status !== ShareStatus.Active) return null;
+  if (!isLocalUserPresentationOwner && status !== ShareStatus.Active) return null;
   return (
     <ActionBar
       compact={compact}
       testID={testID}
       actionButtonConfig={
-        isLocalPresenter && status !== ShareStatus.Error && isDesktop && !compact
+        isLocalUserPresentationOwner && status !== ShareStatus.Error && isDesktop && !compact
           ? { callback: stopPresenting, ...buttonLabels }
           : undefined
       }
@@ -54,10 +53,10 @@ const ScreenSharingActionBar = ({
     >
       {isDesktop ? (
         <Status
-          statusDotColor={isLocalPresenter ? statusColors[status] : undefined}
+          statusDotColor={isLocalUserPresentationOwner ? statusColors[status] : undefined}
           icon="present"
           avatar={avatar}
-          label={isLocalPresenter ? statusLabels[status] : guestLabel}
+          label={isLocalUserPresentationOwner ? statusLabels[status] : guestLabel}
         />
       ) : (
         <Text>{guestLabel}</Text>

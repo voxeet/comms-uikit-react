@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 import type { UseRealTimeStreaming } from './types/RealTimeStreaming';
 import useCommsContext from './useCommsContext';
@@ -12,19 +12,24 @@ function getFetchOptions(body: unknown) {
 }
 
 const useRealTimeStreaming: UseRealTimeStreaming = (proxyBaseUrl: string) => {
-  const { conference, participants } = useCommsContext();
-  const [isLive, setIsLive] = useState(false);
+  const { conference, participant, participants } = useCommsContext();
 
-  useEffect(() => {
-    setIsLive(participants.some((p) => p.info.externalId === 'Mixer_rts' || p.info.externalId === 'mixer_mix'));
-  }, [participants]);
+  const isLive = useMemo(() => {
+    return participants.some((p) => {
+      // If the local participant is a listener, a conference is considered live if there is a non-listener participant (the mixer)
+      if (participant?.type === 'listener') {
+        return participants.some((p) => p.type !== 'listener');
+      }
+      return p.info.externalId === 'Mixer_rts';
+    });
+  }, [participant?.type, participants]);
 
   const startRealTimeStreaming = async () => {
     if (!conference) {
       throw new Error('Tried to start Real-time Streaming but no conference is available');
     }
     const res = await fetch(`${proxyBaseUrl}/event/start`, getFetchOptions({ conferenceId: conference.id }));
-    if (res.status !== 200) {
+    if (!res.ok) {
       const errorMessage = await res.json();
       throw new Error(`Could not start Real-time Streaming, ${res.status}, ${errorMessage}`);
     }
@@ -36,7 +41,8 @@ const useRealTimeStreaming: UseRealTimeStreaming = (proxyBaseUrl: string) => {
     }
     const res = await fetch(`${proxyBaseUrl}/event/stop`, getFetchOptions({ conferenceId: conference.id }));
     if (!res.ok) {
-      throw new Error('Could not stop Real-time Streaming');
+      const errorMessage = await res.json();
+      throw new Error(`Could not stop Real-time Streaming, ${res.status}, ${errorMessage}`);
     }
   };
 

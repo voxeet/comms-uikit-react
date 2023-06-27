@@ -1,8 +1,12 @@
+import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
+
 import { ErrorCodes } from '../providers/CommsProvider';
 
 import type { UseScreenSharing } from './types/ScreenShare';
 import useCommsContext from './useCommsContext';
 import useSession from './useSession';
+
+const MAX_ALLOWED_SCREENSHARE = 2;
 
 const useScreenSharing: UseScreenSharing = () => {
   const {
@@ -14,11 +18,11 @@ const useScreenSharing: UseScreenSharing = () => {
     errors: { screenShareErrors: errorMessages },
     setContextErrors,
   } = useCommsContext();
-  const { owner, status, stream, isPendingTakeoverRequest, isPresentationModeActive } = screenSharingData;
+  const { owners, status, isPendingTakeoverRequest, isPresentationModeActive } = screenSharingData;
   const { participant } = useSession();
 
   const handleStartScreenShare = async (takingOver?: boolean) => {
-    if (stream && !takingOver) {
+    if (owners.size >= MAX_ALLOWED_SCREENSHARE && !takingOver) {
       setContextErrors({ context: 'screenShareErrors', error: ErrorCodes.ScreenShareAlreadyInProgress });
       return false;
     }
@@ -29,12 +33,30 @@ const useScreenSharing: UseScreenSharing = () => {
     setContextErrors({ context: 'screenShareErrors', error });
   };
 
+  function isLocalUserPresentationOwner(): boolean {
+    if (participant === null) {
+      return false;
+    }
+
+    return owners.get(participant) !== undefined;
+  }
+
+  function firstPresenter(): Participant | null {
+    const p = owners.keys().next().value;
+
+    if (p === undefined) {
+      return null;
+    }
+
+    return p;
+  }
+
   return {
     startScreenShare: handleStartScreenShare,
     stopScreenShare,
-    stream,
-    owner,
-    isLocalUserPresentationOwner: owner?.id === participant?.id,
+    owners,
+    isLocalUserPresentationOwner: isLocalUserPresentationOwner(),
+    firstPresenter: firstPresenter(),
     status,
     permissionError: !!errorMessages[ErrorCodes.PermissionDeniedBySystem],
     sharingInProgressError: !!errorMessages[ErrorCodes.ScreenShareAlreadyInProgress],

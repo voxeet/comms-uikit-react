@@ -20,8 +20,8 @@ import styles from './VideoLocalView.module.scss';
 
 export type VideoViewProps = React.HTMLAttributes<HTMLDivElement> & {
   testID?: string;
-  width?: number;
-  height?: number;
+  width?: string | number;
+  height?: string | number;
   noVideoFallback?: React.ReactNode;
   username?: string;
   indicator?: boolean;
@@ -163,7 +163,7 @@ const VideoLocalView = ({
     if (localStream) {
       if (!isDesktop && localStream) {
         const streamTrack = localStream.getVideoTracks()[0];
-        if (streamTrack) {
+        if (streamTrack && streamTrack.getCapabilities) {
           const { facingMode } = streamTrack.getCapabilities();
           if (facingMode?.[0] === FacingModes.Env) {
             setIsUsingRearCamera(true);
