@@ -100,6 +100,10 @@ export { default as BlurButton } from './components/conference/BlurButton/BlurBu
 export { default as LiveStreamButton } from './components/conference/LiveStreamButton/LiveStreamButton';
 export { default as MusicModeButton } from './components/conference/MusicModeButton/MusicModeButton';
 
+// Utils
+
+export { isEdgeOrChromeBrowser } from './utils/misc';
+
 // Themes
 
 export { default as customThemes } from './theme/customThemes';
