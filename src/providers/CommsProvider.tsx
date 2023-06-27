@@ -3,9 +3,10 @@ import type { AudioCaptureModeOptions } from '@voxeet/voxeet-web-sdk/types/model
 import type Conference from '@voxeet/voxeet-web-sdk/types/models/Conference';
 import type ConferenceOptions from '@voxeet/voxeet-web-sdk/types/models/ConferenceOptions';
 import type { MediaStreamWithType } from '@voxeet/voxeet-web-sdk/types/models/MediaStream';
-import type { JoinOptions, ParticipantInfo } from '@voxeet/voxeet-web-sdk/types/models/Options';
+import type { JoinOptions, ParticipantInfo, ScreenshareOptions } from '@voxeet/voxeet-web-sdk/types/models/Options';
 import type { Participant } from '@voxeet/voxeet-web-sdk/types/models/Participant';
 import type Recording from '@voxeet/voxeet-web-sdk/types/models/Recording';
+import type { Quality } from '@voxeet/voxeet-web-sdk/types/models/Simulcast';
 import type { VideoForwardingOptions } from '@voxeet/voxeet-web-sdk/types/models/VideoForwarding';
 import React, { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -18,7 +19,12 @@ import { LogLevel } from '../hooks/types/Logger';
 import { Status } from '../hooks/types/misc';
 import type { Notification, NotificationBase } from '../hooks/types/Notifications';
 import type { ParticipantStatus } from '../hooks/types/Participants';
-import { AudioCaptureMode, AudioProcessingMessages } from '../hooks/types/UseAudioProcessing';
+import {
+  AudioCaptureMode,
+  AudioEchoCancellation,
+  AudioProcessingMessages,
+  NoiseReductionLevel,
+} from '../hooks/types/UseAudioProcessing';
 import useLogger from '../hooks/useLogger';
 import commandService from '../services/command';
 import conferenceService, { HandledEventStatus } from '../services/conference';
@@ -45,8 +51,7 @@ dioWindow.dolbyio = {
 };
 
 type ScreenSharingDataType = {
-  owner: Participant | null;
-  stream: MediaStreamWithType | null;
+  owners: Map<Participant, MediaStreamWithType | null>;
   status: Status;
   isPendingTakeoverRequest: boolean;
   isPresentationModeActive: boolean;
@@ -74,8 +79,7 @@ type MessageData = {
 };
 
 const initialScreenSharingData: ScreenSharingDataType = {
-  owner: null,
-  stream: null,
+  owners: new Map(),
   status: Status.Other,
   isPendingTakeoverRequest: false,
   isPresentationModeActive: false,
@@ -134,7 +138,7 @@ export type CommsContextType = {
   setBlockedAudioState: React.Dispatch<React.SetStateAction<BlockedAudioState>>;
   isPageMuted: boolean;
   toggleMuteParticipants: () => void;
-  startScreenShare: () => Promise<boolean>;
+  startScreenShare: () => Promise<boolean | undefined>;
   stopScreenShare: () => Promise<void>;
   screenSharingData: ScreenSharingDataType;
   recordingData: RecordingDataType;
@@ -166,7 +170,7 @@ export type CommsContextType = {
   stopLiveStreaming: (stop: () => Promise<void>) => Promise<boolean>;
   resetLiveStreamingData: () => void;
   getAudioCaptureMode: () => Promise<AudioCaptureModeOptions | undefined>;
-  setAudioCaptureMode: (option: Partial<AudioCaptureModeOptions>) => Promise<void>;
+  setAudioCaptureMode: (option: AudioCaptureModeOptions) => Promise<void>;
   audioMode?: AudioCaptureModeOptions;
   startLocalVideo: (params: LocalVideoParams) => Promise<MediaStreamTrack>;
   stopLocalVideo: () => Promise<void>;
@@ -182,6 +186,7 @@ export type CommsContextType = {
   videoInputDevices: MediaDeviceInfo[];
   setVideoInputDevices: React.Dispatch<React.SetStateAction<MediaDeviceInfo[]>>;
   setContextErrors: (params: ErrorParams) => void;
+  setConferenceQuality: (quality: Quality) => void;
 };
 
 export type ErrorParams = { error?: ErrorCodes; context: keyof Errors };
@@ -255,7 +260,6 @@ export const errorMapper = (error: unknown) => {
     return undefined;
   }
   const { message } = error;
-
   switch (message) {
     case ErrorCodes.PermissionDeniedBySystem:
     case ErrorCodes.PermissionDeniedBySystemMozilla:
@@ -716,32 +720,48 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       status: Status.Loading,
     }));
     setContextErrors({ context: 'screenShareErrors' });
-
     try {
-      await conferenceService.startScreenShare();
+      const options: ScreenshareOptions = {};
+      await conferenceService.startScreenShare(options);
       setScreenSharingData((prev) => ({
         ...prev,
-        owner: participant,
         isPresentationModeActive: true,
       }));
       return true;
     } catch (error) {
       const message = errorMapper(error);
-      if (message) {
+      if (message && message !== ErrorCodes.LackOfBrowserPermissions) {
         setContextErrors({ context: 'screenShareErrors', error: message });
       }
       if (message === ErrorCodes.LackOfBrowserPermissions || message === ErrorCodes.ScreenShareAutoTakeoverError) {
+        const owners = screenSharingData.owners.size;
+
+        if (owners > 0) {
+          setScreenSharingData((prev) => ({
+            ...prev,
+            status: Status.Active,
+            isPresentationModeActive: true,
+          }));
+          // If we already have a screen share in progress, then don't end it
+          return undefined;
+        }
         setScreenSharingData((prev) => ({
           ...prev,
-          owner: null,
           status: Status.Other,
           isPresentationModeActive: false,
         }));
-      } else if (message !== ErrorCodes.ScreenShareAlreadyInProgress) {
+        return message === ErrorCodes.LackOfBrowserPermissions ? undefined : false;
+      }
+      if (message !== ErrorCodes.ScreenShareAlreadyInProgress) {
         setScreenSharingData((prev) => ({
           ...prev,
-          owner: participant,
           status: Status.Error,
+          isPresentationModeActive: true,
+        }));
+      } else if (message === ErrorCodes.ScreenShareAlreadyInProgress) {
+        setScreenSharingData((prev) => ({
+          ...prev,
+          status: Status.Active,
           isPresentationModeActive: true,
         }));
       }
@@ -754,8 +774,6 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       await conferenceService.stopScreenShare();
       setScreenSharingData((prev) => ({
         ...prev,
-        owner: null,
-        status: Status.Other,
         isPresentationModeActive: false,
       }));
     } catch (error) {
@@ -1018,9 +1036,8 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
        * Since we are getting error from SDK about emitting stopStream event, right now we need to explicitly clear data about screenSharing
        * This occurs while screenSharing on Safari and mainly while rejoining and screenSharing
        */
-      if (updatedParticipant.id === screenSharingData.owner?.id) {
-        setScreenSharingData(initialScreenSharingData);
-      }
+      screenSharingData.owners.delete(updatedParticipant);
+
       return setParticipants((participants) => {
         participants.delete(updatedParticipant.id);
         return new Map(participants);
@@ -1128,24 +1145,20 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     if (stream.type === 'ScreenShare') {
       try {
         setContextErrors({ context: 'screenShareErrors' });
-        setScreenSharingData((prev) => ({
-          ...prev,
-          owner: participant,
-          stream,
-          status: Status.Active,
-        }));
+        setScreenSharingData((prev) => {
+          prev.owners.delete(participant);
+          prev.owners.set(participant, stream);
+          return {
+            ...prev,
+            status: Status.Active,
+          };
+        });
         log(LogLevel.info, `Owner ${participant.info.name} finished their screen share stream.`);
       } catch (error) {
         const message = errorMapper(error);
         if (message) {
           setContextErrors({ context: 'screenShareErrors', error: message });
         }
-        setScreenSharingData((prev) => ({
-          ...prev,
-          owner: participant,
-          stream,
-          status: Status.Error,
-        }));
       }
     }
   };
@@ -1154,22 +1167,18 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     if (stream.type === 'ScreenShare') {
       try {
         setContextErrors({ context: 'screenShareErrors' });
-        setScreenSharingData((prev) => ({
-          ...prev,
-          owner: null,
-          stream: null,
-          status: Status.Other,
-        }));
+        setScreenSharingData((prev) => {
+          prev.owners.delete(participant);
+          return {
+            ...prev,
+            status: prev.owners.size > 0 ? Status.Active : Status.Other,
+          };
+        });
       } catch (error) {
         const message = errorMapper(error);
         if (message) {
           setContextErrors({ context: 'screenShareErrors', error: message });
         }
-        setScreenSharingData((prev) => ({
-          ...prev,
-          owner: participant,
-          stream,
-        }));
       }
     }
   };
@@ -1399,7 +1408,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     }
   };
 
-  const setAudioCaptureMode = async (option: Partial<AudioCaptureModeOptions>) => {
+  const setAudioCaptureMode = async (option: AudioCaptureModeOptions) => {
     const preCheck = async () => {
       if (!audioMode) {
         return getAudioCaptureMode();
@@ -1418,6 +1427,18 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
         mode: option.mode || currentMode.mode,
         modeOptions: { ...currentMode.modeOptions, ...option.modeOptions },
       };
+      switch (mergedOptions.mode) {
+        case AudioCaptureMode.Music:
+          mergedOptions.modeOptions.echoCancellation =
+            mergedOptions.modeOptions.echoCancellation || AudioEchoCancellation.Off;
+          break;
+        case AudioCaptureMode.Standard:
+          mergedOptions.modeOptions.noiseReductionLevel =
+            mergedOptions.modeOptions.noiseReductionLevel || NoiseReductionLevel.High;
+          break;
+        default:
+          break;
+      }
       try {
         await conferenceService.setCaptureMode(mergedOptions);
         return setAudioMode(mergedOptions);
@@ -1429,6 +1450,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
             audioCapture: { ...prev.audioCapture, [message]: true },
           }));
         }
+        return Promise.reject(message || `Problem with setting audio mode: ${err}`);
       }
     }
     throw new Error('Problem with setting audio mode');
@@ -1441,6 +1463,12 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       max: maxVideoForwarding,
     });
     setMaxVideoForwarding(maxVideoForwarding);
+  };
+
+  const setConferenceQuality = async (quality: Quality) => {
+    if (participant?.id) {
+      await conferenceService.setQuality([{ id: participant?.id, quality }]);
+    }
   };
 
   const contextValue: CommsContextType = useMemo(() => {
@@ -1529,6 +1557,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       setAudioInputDevices,
       setAudioOutputDevices,
       setVideoInputDevices,
+      setConferenceQuality,
       ...value,
     };
   }, [

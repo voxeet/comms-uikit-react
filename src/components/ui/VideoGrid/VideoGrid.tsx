@@ -37,7 +37,7 @@ const VideoGrid = ({
   ...props
 }: VideoGridProps) => {
   const { participantsStatus, participant } = useParticipants();
-  const { owner } = useScreenSharing();
+  const { owners } = useScreenSharing();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { isLandscape } = useTheme();
   const [actualMaxTiles, setActualMaxTiles] = useState(0);
@@ -60,16 +60,25 @@ const VideoGrid = ({
     return (
       actualMaxTiles -
       (localParticipant ? 1 : 0) -
-      (presenterFirst && owner ? 1 : 0) -
+      (presenterFirst && owners.size > 0 ? 1 : 0) -
       (participants.length > actualMaxTiles ? 1 : 0)
     );
-  }, [localParticipant, presenterFirst, actualMaxTiles, participants]);
+  }, [actualMaxTiles, localParticipant, presenterFirst, owners.size, participants.length]);
+
+  function isPresentationOwner(id: string): boolean {
+    for (const owner of owners.keys()) {
+      if (owner.id === id) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   useEffect(() => {
     // eslint-disable-next-line no-nested-ternary
     Object.keys(participantsStatus).forEach((key) => {
       const { isSpeaking, isVideo } = participantsStatus[key];
-      if (participant?.id !== key && owner?.id !== key) {
+      if (participant?.id !== key && !isPresentationOwner(key)) {
         if (isSpeaking || isVideo || activeHistory[key] === undefined) {
           setActiveHistory((prev) => ({
             ...prev,
@@ -117,7 +126,7 @@ const VideoGrid = ({
     participants.forEach((p) => {
       if (p.id === participant?.id) {
         local = p;
-      } else if (presenterFirst && p.id === owner?.id) {
+      } else if (presenterFirst && isPresentationOwner(p.id)) {
         presenter = p;
       } else {
         withoutLocal.push(p);
@@ -162,7 +171,7 @@ const VideoGrid = ({
       if (tiles.length === 0) {
         tiles = [local];
       } else {
-        tiles.push(local);
+        tiles.unshift(local);
       }
     }
     return [tiles, restTiles];

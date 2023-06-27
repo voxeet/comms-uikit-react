@@ -1,6 +1,7 @@
 import type Conference from '@voxeet/voxeet-web-sdk/types/models/Conference';
 import type ConferenceOptions from '@voxeet/voxeet-web-sdk/types/models/ConferenceOptions';
 import type { JoinOptions } from '@voxeet/voxeet-web-sdk/types/models/Options';
+import type { Quality } from '@voxeet/voxeet-web-sdk/types/models/Simulcast';
 import type { VideoForwardingOptions } from '@voxeet/voxeet-web-sdk/types/models/VideoForwarding';
 
 export type PrevConference = {
@@ -72,6 +73,12 @@ export type Conferencing = {
    * @param options - additional options to set specific user and forwarding strategy
    */
   setVideoForwarding: (maxVideoForwarding: number, options?: Partial<VideoForwardingOptions>) => Promise<void>;
+
+  /**
+   * Set the quality of the conference
+   * @param quality - Quality of the stream as defined in Quality model
+   */
+  setConferenceQuality: (quality: Quality) => void;
 };
 
 export type UseConference = () => Conferencing;

@@ -12,6 +12,7 @@ import Spinner from '../Spinner/Spinner';
 import styles from './PresentationBox.module.scss';
 
 export type PresentationBoxProps = {
+  children?: React.ReactNode;
   stream?: MediaStreamWithType | null;
   fallbackContent: React.ReactNode;
   isError?: boolean;
@@ -22,6 +23,7 @@ export type PresentationBoxProps = {
 };
 
 const PresentationBox = ({
+  children,
   stream,
   fallbackContent,
   isError = false,
@@ -59,6 +61,7 @@ const PresentationBox = ({
         muted
         playsInline
       />
+      {children && <Space className={styles.pill}>{children}</Space>}
       {isError && isLocalUserPresentationOwner && fallbackContent}
       {isLoading && (
         <Space fw fh className={styles.spinnerWrapper}>

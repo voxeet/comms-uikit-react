@@ -36,6 +36,7 @@ export type MediaButtonProps = {
   onClick: () => void;
   testID?: string;
   style?: React.CSSProperties;
+  id?: string;
 };
 
 const MediaButton = ({
@@ -63,6 +64,7 @@ const MediaButton = ({
   onClick,
   testID = 'LocalTogglePresentButton',
   style,
+  id,
 }: MediaButtonProps) => {
   const [timedDisable, setTimedDisable] = useState(false);
 
@@ -129,7 +131,7 @@ const MediaButton = ({
   }, [isActive, isDisabled, theme]);
 
   return (
-    <Space className={styles.container}>
+    <Space id={id} className={styles.container}>
       <Tooltip position={tooltipPosition} text={isDesktop ? tooltipText : ''}>
         <IconButton
           testID={testID}

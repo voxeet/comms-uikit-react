@@ -18,7 +18,7 @@ const LeaveConferenceButton = ({
   tooltipPosition = 'top',
   onSuccess,
   preAction,
-  testID,
+  testID = 'LeaveConferenceButton',
   ...rest
 }: LeaveConferenceButtonProps) => {
   const { leaveConference } = useConference();

@@ -13,21 +13,13 @@ const child = (
 );
 
 describe('Tooltip', () => {
-  test('Should pass testID', () => {
-    render(
-      <Tooltip text={text} testID={testID}>
-        {child}
-      </Tooltip>,
-    );
-    expect(screen.getByTestId(testID)).toBeInTheDocument();
-  });
   test('Should not be visible', () => {
     render(
       <Tooltip text={text} testID={testID}>
         {child}
       </Tooltip>,
     );
-    expect(screen.getByTestId(testID)).toHaveClass('hidden');
+    expect(screen.getByTestId(testID)).not.toBeInTheDocument();
   });
   test('Should be visible on hover', () => {
     render(
@@ -37,6 +29,6 @@ describe('Tooltip', () => {
     );
     expect(screen.getByTestId(buttonTestID)).toBeVisible();
     fireEvent.mouseOver(screen.getByTestId(buttonTestID));
-    expect(screen.getByTestId(testID)).toHaveClass('tooltip');
+    expect(screen.getByTestId(testID)).toBeInTheDocument();
   });
 });

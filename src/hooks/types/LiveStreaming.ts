@@ -71,10 +71,10 @@ export type LiveStreaming = {
    * Note: please don't use this function if your own proxy server implementation
    * is different with the dolby.io demo proxy server, instead please use `startLiveStreaming`
    * @param baseUrl the base URL of the proxy server to start live streaming
-   * @param rtmp RTMP url
+   * @param rtmpUrl RTMP url
    * @returns true means operation success, false means failure
    */
-  startLiveStreamingByProxy: (baseUrl: string, rtmp: string) => Promise<boolean>;
+  startLiveStreamingByProxy: (baseUrl: string, rtmpUrl: string) => Promise<boolean>;
 
   /**
    * A handy function to stop live streaming using proxy server

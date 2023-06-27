@@ -11,6 +11,7 @@ type ScreenShareButtonProps = Partial<Omit<MediaButtonProps, 'onClick' | 'isActi
   onStartSharingAction?: () => void;
   onTakeOverDeclineAction?: () => void;
   onLackOfBrowserPermissions?: () => void;
+  onError?: () => void;
   renderTakeOver?: (isVisible: boolean, resetError: () => void) => ReactNode;
   renderHandOver?: (isVisible: boolean, accept: () => void, cancel: () => void, participant?: string) => ReactNode;
   renderAskForShare?: (isVisible: boolean, accept: () => void, cancel: () => void) => ReactNode;
@@ -22,6 +23,7 @@ const ScreenShareButton = ({
   onStartSharingAction,
   onTakeOverDeclineAction,
   onLackOfBrowserPermissions,
+  onError,
   tooltipPosition = 'top',
   defaultIcon = 'present',
   activeIcon = 'present',
@@ -44,7 +46,7 @@ const ScreenShareButton = ({
     sharingInProgressError,
     isPendingTakeoverRequest,
     setPendingTakeoverRequest,
-    stream,
+    owners,
     isAutoStartShareError,
     isLackOfBrowserPermissions,
   } = useScreenSharing();
@@ -130,8 +132,11 @@ const ScreenShareButton = ({
       onStopSharingAction?.();
     } else {
       const result = await startScreenShare();
+      if (result === undefined) return;
       if (result) {
         onStartSharingAction?.();
+      } else {
+        onError?.();
       }
     }
   };
@@ -163,7 +168,7 @@ const ScreenShareButton = ({
     handleTakeoverPresentationResponse();
     showAskForShareTooltip();
     handleLackOfBrowserPermissions();
-  }, [isLocalUserPresentationOwner, status, message, isAutoStartShareError, isLackOfBrowserPermissions, stream]);
+  }, [isLocalUserPresentationOwner, status, message, isAutoStartShareError, isLackOfBrowserPermissions, owners]);
 
   return (
     <>

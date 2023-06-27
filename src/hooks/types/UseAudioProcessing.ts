@@ -44,7 +44,7 @@ export type AudioProcessing = {
    * Indicates echo cancellation mode enabled / disabled
    * It is suggested to disable echo cancellation while setting audio processing mode to "music"
    */
-  echoCancellation: boolean;
+  isEchoCancellationOn: boolean;
   /**
    * Indicates music mode enabled / disabled
    */
@@ -76,5 +76,6 @@ export type UseAudioProcessing = () => AudioProcessing;
 export enum AudioProcessingMessages {
   MUSIC_MODE_STARTED = 'Music mode started',
   MUSIC_MODE_STOPPED = 'Music mode stopped',
+  MUSIC_MODE_FAILED = 'Faild to start music mode',
   PARTICIPANTS_STATUS = 'Participants status',
 }

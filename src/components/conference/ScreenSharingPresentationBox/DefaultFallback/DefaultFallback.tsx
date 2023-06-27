@@ -1,3 +1,4 @@
+import { Status } from '../../../../hooks/types/misc';
 import useScreenSharing from '../../../../hooks/useScreenSharing';
 import useTheme from '../../../../hooks/useTheme';
 import Button from '../../../ui/Button/Button';
@@ -19,11 +20,11 @@ const DefaultFallbackContent = ({
   buttonText,
   testID = 'DefaultFallback',
 }: DefaultFallbackContentProps) => {
-  const { startScreenShare, stopScreenShare, stream, resetScreenSharingData } = useScreenSharing();
+  const { startScreenShare, stopScreenShare, status, resetScreenSharingData } = useScreenSharing();
   const { getColor } = useTheme();
 
   const closePresentation = () => {
-    if (stream) {
+    if (status === Status.Active) {
       stopScreenShare();
     } else {
       resetScreenSharingData();
