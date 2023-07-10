@@ -38,7 +38,7 @@ const DefaultFallbackContent = ({
       </Space>
       <Space className={styles.contentContainer}>
         <Space className={styles.warningIcon}>
-          <Icon name="warning" size="xl" />
+          <Icon color="grey.500" name="warning" size="xl" />
         </Space>
         <Space className={styles.text}>
           <Text type="paragraphSmall">{messageText}</Text>

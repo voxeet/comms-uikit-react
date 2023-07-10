@@ -12,16 +12,32 @@ function getFetchOptions(body: unknown) {
 }
 
 const useRealTimeStreaming: UseRealTimeStreaming = (proxyBaseUrl: string) => {
-  const { conference, participant, participants } = useCommsContext();
+  const { conference, participant, participants, recordingData } = useCommsContext();
 
   const isLive = useMemo(() => {
-    return participants.some((p) => {
-      // If the local participant is a listener, a conference is considered live if there is a non-listener participant (the mixer)
-      if (participant?.type === 'listener') {
-        return participants.some((p) => p.type !== 'listener');
-      }
-      return p.info.externalId === 'Mixer_rts';
-    });
+    // Count the number of mixers - if there are 2 mixers, then the conference is definitley being live streamed.
+    const mixers = participants.filter((p) => p.type === 'mixer').length;
+
+    // If the local participant is a listener, a conference is considered live if there is a non-listener participant (the mixer)
+    if (participant?.type === 'listener') {
+      return participants.some((p) => p.type !== 'listener');
+    }
+    // two mixers indicates LIVE and RECORDING
+    // zero mixers  indicates not live and not recording
+    // any other positive number - we need to work out if it's recording or if it's for RTS.
+    // short term work around to determine if the event has gone live.
+    // The recommended solution to figuring out whether the event is live is to use
+    // webhooks. https://docs.dolby.io/communications-apis/docs/webhooks-events-stream-rts-status-updated
+    switch (mixers) {
+      case 2:
+        return true;
+      case 1:
+        return !recordingData.isRecordingModeActive;
+      case 0:
+      default:
+        // Can there be more than 2 mixers?
+        return false;
+    }
   }, [participant?.type, participants]);
 
   const startRealTimeStreaming = async () => {

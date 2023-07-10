@@ -10,7 +10,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   danger?: boolean;
   variant?: 'primary' | 'secondary' | 'tertiaryGrey';
   testID?: string;
-  size?: Extract<Sizes, 'l' | 'm' | 's'>;
+  size?: Extract<Sizes, 'l' | 'm' | 's' | 'xs'>;
   fw?: boolean;
 }
 
@@ -77,7 +77,7 @@ const colorsMap: Record<
     base: {
       background: 'transparent',
       hover: 'transparent',
-      text: 'primary.400',
+      text: 'grey.25',
       hoverText: 'primary.500',
       border: 'grey.25',
       hoverBorder: 'primary.500',
