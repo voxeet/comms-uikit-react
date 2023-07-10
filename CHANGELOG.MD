@@ -1,5 +1,36 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- 05503b00: Changed RTMP endpoints
+- e04db747: - Implement responsive hosts panel grid items
+  - Change `Tooltip` component to use absolute positioning instead of fixed positioning
+  - Allow `Tooltip` to be positioned to the left and right
+- 9616f186: Upgraded Voxeet-Web-SDK to 3.10 and enabled RTMP by default for video call app
+- 83882344: Updated SDK to 3.10.0 and Added multi-screen-share support for 2 hosts
+- 4a39e616: Implement session view skeleton
+- 1c3cb640: Fixed a bug where in multi-screen share was being incorrectly handled
+
+### Patch Changes
+
+- ec90eec7: Added top bar
+- 27237560: UiKit Readme Validation
+- c5338020: Add support for quality selection and set viewer quality to auto
+- 27c15032: The useRealTime streaming hook can now handle multi-layout mixer changes and determine when the event is live
+- 11775255: Implement responsive recording button
+- f2f3a860: Implement reponsive multi-screenshare
+  Refactor media control buttons
+  Change style of screenSharingPresentationBox fallback text
+- b424d0c3: Refactor stage component
+- f4afd837: Implement exit screen for v2
+- 6431b247: Fix layut for multi-screen share
+- a51111c4: Implement responsive timer
+- c422c01f: Make stream button responsive
+- 238185f6: Update read me to be less conferencing centric
+- 00a51d4d: Turn off echo cancellation with music mode
+
 ## 1.0.1
 
 ### Patch Changes
