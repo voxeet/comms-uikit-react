@@ -18,6 +18,7 @@ import Close from './Close';
 import Copy from './Copy';
 import CopyGradient from './CopyGradient';
 import Delete from './Delete';
+import DolbyDD from './DolbyDD';
 import DotsHorizontal from './DotsHorizontal';
 import DotsHorizontalGradient from './DotsHorizontalGradient';
 import DotsVertical from './DotsVertical';
@@ -132,10 +133,11 @@ const IconComponents = {
   chevronUp: ChevronUp,
   chevronDown: ChevronDown,
   circle: Circle,
+  dolbyDD: DolbyDD,
 };
 
 export default IconComponents;
 export type IconComponentName = keyof typeof IconComponents;
 export interface SVGComponent extends SVGProps<SVGSVGElement> {
-  testID: string;
+  testID?: string;
 }

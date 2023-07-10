@@ -66,7 +66,6 @@ const ScreenSharingPresentationBox = ({
           </>
         </PresentationBox>
       ))}
-      ;
     </>
   );
 };

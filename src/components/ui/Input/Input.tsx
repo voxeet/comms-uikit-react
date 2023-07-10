@@ -51,8 +51,8 @@ const Input = ({
   };
 
   return (
-    <div style={{ backgroundColor: 'inherit' }}>
-      <Space className={styles.wrapper} testID={testID}>
+    <div data-testid={testID} style={{ backgroundColor: 'inherit' }}>
+      <Space className={styles.wrapper}>
         {label && (
           <Space
             tag="span"

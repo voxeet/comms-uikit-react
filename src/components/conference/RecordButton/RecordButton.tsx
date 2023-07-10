@@ -8,7 +8,7 @@ type RecordButtonProps = Partial<Omit<MediaButtonProps, 'onClick' | 'isActive'>>
   onStopRecordingAction?: () => void;
   onStartRecordingAction?: () => void;
   onError?: () => void;
-  renderStartConfirmation?: (isVisible: boolean, acept: () => void, cancel: () => void) => ReactNode;
+  renderStartConfirmation?: (isVisible: boolean, accept: () => void, cancel: () => void) => ReactNode;
   renderStopConfirmation?: (isVisible: boolean, accept: () => void, cancel: () => void) => ReactNode;
 };
 
