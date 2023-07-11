@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spaces-xxs);
+}
+
+.copy {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  background-color: var(--colors-grey-700);
+  border-radius: var(--borderRadius);
+  padding-right: 18px;
+}
+
+.link {
+  overflow: scroll;
+  white-space: nowrap;
+}

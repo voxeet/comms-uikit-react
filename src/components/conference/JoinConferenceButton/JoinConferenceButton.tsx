@@ -50,6 +50,7 @@ const JoinConferenceButton = ({
         params: {
           // Keep empty conferences alive for 5 minutes to allow participants to join or rejoin
           ttl: 60 * 5,
+          liveRecording: true,
         },
       });
       await joinConference(newConference, joinOptions);
