@@ -29,6 +29,7 @@ export { default as useCommsContext } from './hooks/useCommsContext';
 export { default as Avatar } from './components/ui/Avatar/Avatar';
 export { default as Badge } from './components/ui/Badge/Badge';
 export { default as Button } from './components/ui/Button/Button';
+export { default as Copy } from './components/ui/Copy/Copy';
 export { default as Icon } from './components/ui/Icon/Icon';
 export { default as IconButton } from './components/ui/IconButton/IconButton';
 export { default as Input } from './components/ui/Input/Input';
@@ -110,6 +111,7 @@ export { default as customThemes } from './theme/customThemes';
 export { default as defaultTheme } from './theme/defaultTheme';
 
 // Types
+
 export { LogLevel } from './hooks/types/Logger';
 export type { TextProps } from './components/ui/Text/Text';
 export type { DropdownProps, DropdownOptionType } from './components/ui/Dropdown/Dropdown';

@@ -32,7 +32,7 @@ const useRealTimeStreaming: UseRealTimeStreaming = (proxyBaseUrl: string) => {
       case 2:
         return true;
       case 1:
-        return !recordingData.isRecordingModeActive;
+        return recordingData.status !== 'active';
       case 0:
       default:
         // Can there be more than 2 mixers?
