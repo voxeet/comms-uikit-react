@@ -1,11 +1,23 @@
 # Changelog
 
+## 1.3.0
+
+### Minor Changes
+
+- bdea3669: Enable VFS and sort participants
+- afaeb92b: Implement drawer
+- 216d0fbb: Align drawer layout
+
+### Patch Changes
+
+- e7b745fd: Removed participant dependency in uikit
+- 08a9569d: Implement participants panel
+
 ## 1.2.0
 
 ### Minor Changes
 
-- 5ac6e7a2: - Implement invite viewer modal for watch party
-  - Duplicate Copy component from V2 events over to UIKit
+- 5ac6e7a2: - Implement invite viewer modal
 
 ### Patch Changes
 

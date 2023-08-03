@@ -113,6 +113,7 @@ export { default as defaultTheme } from './theme/defaultTheme';
 // Types
 
 export { LogLevel } from './hooks/types/Logger';
+export { VideoForwardingStrategy } from './hooks/types/Conferencing';
 export type { TextProps } from './components/ui/Text/Text';
 export type { DropdownProps, DropdownOptionType } from './components/ui/Dropdown/Dropdown';
 export type { ValidationType } from './components/ui/Input/Input';

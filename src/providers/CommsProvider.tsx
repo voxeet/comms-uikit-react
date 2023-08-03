@@ -247,11 +247,6 @@ export enum ErrorCodes {
   'RecordingAlreadyInProgress' = 'Recording already in progress',
 }
 
-/*
- * For storing users previously muted , in case of page mute trigger.
- */
-
-const singleParticipantMutedSet = new Set();
 const liveStreamAwareParticipants = new Set();
 let retries = 0;
 
@@ -482,7 +477,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     setParticipant(null);
   };
 
-  const startParticipantAudio = async (participantArg: Participant, isBatch?: boolean): Promise<void> => {
+  const startParticipantAudio = async (participantArg: Participant): Promise<void> => {
     const p = conferenceService.participants().get(participantArg.id);
     if (p) {
       log(LogLevel.info, 'Starting audio for participant.', p);
@@ -491,7 +486,6 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       } else {
         await conferenceService.startRemoteAudio(p);
       }
-      if (!isBatch) singleParticipantMutedSet.delete(participantArg.id);
       setParticipantsStatus((participantsStatus) => {
         return {
           ...participantsStatus,
@@ -504,7 +498,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
     }
   };
 
-  const stopParticipantAudio = async (participantArg: Participant, isBatch?: boolean): Promise<void> => {
+  const stopParticipantAudio = async (participantArg: Participant): Promise<void> => {
     const p = conferenceService.participants().get(participantArg.id);
     if (p) {
       log(LogLevel.info, 'Stopping audio for participant', p);
@@ -513,7 +507,6 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
       } else {
         await conferenceService.stopRemoteAudio(p);
       }
-      if (!isBatch) singleParticipantMutedSet.add(participantArg.id);
       setParticipantsStatus((participantsStatus) => {
         return {
           ...participantsStatus,
@@ -527,18 +520,8 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   };
 
   const toggleMuteParticipants = async () => {
-    const onlyRemoteNotMutedParticipants = participantsArray.filter(
-      (p: Participant) => p.id !== participant?.id && !singleParticipantMutedSet.has(p.id),
-    );
     try {
-      await Promise.all(
-        onlyRemoteNotMutedParticipants.map(async (participant) => {
-          if (!isPageMuted) {
-            return stopParticipantAudio(participant, true);
-          }
-          return startParticipantAudio(participant, true);
-        }),
-      );
+      await conferenceService.muteOutput(!isPageMuted);
       setIsPageMuted((prevState) => !prevState);
     } catch (e) {
       log(LogLevel.error, 'Error while toggling mute status', e);
@@ -711,7 +694,6 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
   const resetAudio = () => {
     setIsAudio(true);
     setIsPageMuted(false);
-    singleParticipantMutedSet.clear();
   };
 
   const startScreenShare = async () => {
@@ -1071,18 +1053,7 @@ const CommsProvider = ({ children, token, refreshToken, value, packageUrlPrefix 
         } as Participant),
       );
     });
-    if (isPageMuted && updatedParticipant.id !== participant?.id) {
-      await stopParticipantAudio(updatedParticipant, true);
-    }
 
-    if (updatedParticipant.id !== participant?.id) {
-      if (
-        singleParticipantMutedSet.has(updatedParticipant.id) &&
-        (participantsStatus[updatedParticipant.id]?.isLocalAudio || !participantsStatus[updatedParticipant.id])
-      ) {
-        return stopParticipantAudio(updatedParticipant);
-      }
-    }
     return true;
   };
 
