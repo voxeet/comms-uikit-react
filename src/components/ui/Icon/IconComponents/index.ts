@@ -38,6 +38,7 @@ import InfoFilled from './InfoFilled';
 import InfoGradient from './InfoGradient';
 import Invite from './Invite';
 import Loader from './Loader';
+import Logout from './Logout';
 import Lossless from './Lossless';
 import Microphone from './Microphone';
 import MicrophoneGradient from './MicrophoneGradient';
@@ -100,6 +101,7 @@ const IconComponents = {
   infoGradient: InfoGradient,
   invite: Invite,
   loader: Loader,
+  logout: Logout,
   lossless: Lossless,
   microphone: Microphone,
   microphoneGradient: MicrophoneGradient,

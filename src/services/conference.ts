@@ -78,6 +78,10 @@ export default class ConferenceService {
     return VoxeetSDK.audio.local.stop();
   }
 
+  public static muteOutput(isMuted: boolean) {
+    return VoxeetSDK.conference.muteOutput(isMuted);
+  }
+
   public static getCaptureMode() {
     return VoxeetSDK.audio.local.getCaptureMode();
   }

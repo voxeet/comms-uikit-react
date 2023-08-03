@@ -47,6 +47,7 @@ const IconButton = ({
   onClick,
   testID,
   style,
+  className,
   ...props
 }: IconButtonProps) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -72,7 +73,7 @@ const IconButton = ({
     if (!isGradient && backgroundColor !== 'transparent') {
       if (backgroundColor) color = getColor(backgroundColor as string);
       if ((isHovered && !disabled && isDesktop) || (isTouched && !disabled && !isDesktop)) {
-        color = Color(color).lighten(0.2).hex();
+        color = Color(color).lighten(0.2).hexa();
       }
     }
 
@@ -129,6 +130,7 @@ const IconButton = ({
         variant !== 'rectangular' && styles[`size-${size}`],
         isHovered && !disabled && styles.hovered,
         disabled && styles.disabled,
+        className,
       )}
       style={{
         background: handleBackgroundColor,
