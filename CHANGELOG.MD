@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.1
+
+### Patch Changes
+
+- e8bd63f4: Exporting Tooltip types
+- 175c08d5: Implement mute/unmute all button
+
 ## 1.3.0
 
 ### Minor Changes
