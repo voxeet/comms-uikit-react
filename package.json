@@ -1,14 +1,19 @@
 {
   "name": "@dolbyio/comms-uikit-react",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Dolby.io Communications UIKit for React",
   "license": "MIT",
-  "main": "dist/index.es.js",
+  "main": "src/index.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "rollup -c",
+    "test": "jest",
+    "test:coverage": "jest --coverage=true",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook",
+    "license-checker": "license-checker --json --out third-party-licenses.json --relativeLicensePath",
     "prepack": "yarn build"
   },
   "repository": {
@@ -70,7 +75,5 @@
     "rules": {
       "react/react-in-jsx-scope": "off"
     }
-  },
-  "module": "dist/index.js",
-  "types": "dist/src/index.d.ts"
+  }
 }

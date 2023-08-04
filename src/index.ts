@@ -130,3 +130,4 @@ export type { LiveStreamProvider } from './hooks/types/LiveStreaming';
 export { ErrorCodes } from './providers/CommsProvider';
 export type { IconComponentName } from './components/ui/Icon/IconComponents';
 export type { VideoViewProps } from './components/conference/VideoLocalView/VideoLocalView';
+export type { TooltipProps } from './components/ui/Tooltip/Tooltip';
